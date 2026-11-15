@@ -12,6 +12,13 @@
     "storefyr/Skrynja-1 — prototype, hvor config.yaml er projektets eneste normative kilde"
   ],
   "arbejdsform": "Én funktion ad gangen i rækkefølgen nedenfor: implementer funktionen, kør dens verifikations_trin, og sæt først passerer til sand, når hvert trin er målt med en udskrift, der kan gengives. Ingen påstand om et udfald uden en måling. Fremdriften læses af passerer-felterne i denne fil.",
+  "ved_genoptagelse": [
+    "Kør pwd og git status for at se arbejdsområdet og dets tilstand",
+    "Kør git log --oneline -20 for at komme ajour med seneste indskrivninger",
+    "Læs denne funktionsliste.json, og vælg den første funktion i rækkefølgen med passerer: false",
+    "Efter hver arbejdsgang: indskriv med beskrivende besked, så næste samtale kan læse fremdriften i git-historikken"
+  ],
+  "redigeringsregel": "En post i funktioner må kun ændres ved at sætte passerer fra false til sand efter målte verifikations_trin. Det er uacceptabelt at fjerne eller omskrive en beskrivelse eller et verifikations_trin — det kunne føre til manglende eller fejlbehæftet funktionalitet. JSON er valgt frem for Markdown, fordi stokastikeren mindre ofte utilsigtet overskriver JSON.",
   "begrænsninger": {
     "qt": "Kun Qt 5.6 — ingen API indført i 5.7 eller senere",
     "qml": "QtQuick 2.0 + Sailfish.Silica 1.0; JavaScript i QML er ES5",
