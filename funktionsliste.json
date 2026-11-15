@@ -1,0 +1,166 @@
+{
+  "projekt": "Skrynja_2",
+  "rolle": "projektinitialiseringsstokastiker",
+  "henvisning": "https://www.anthropic.com/research/effective-harnesses-for-long-running-agents",
+  "oprettet": "2026-11-15",
+  "licens": "GPL-3.0",
+  "formål": "ACP-klient til Sailfish OS. Appen starter en lokal agent (vibe-acp) som underordnet proces over stdio og lægger agentens arbejde ind i en grænseflade: værktøjskald, filændringer, tilladelser og tilstande vises, mens de sker, og brugeren svarer med et tryk i stedet for en kommando i en tekststrøm.",
+  "mål_enhed": "Jolla Phone (2026) med Sailfish OS — kun aarch64 bygges, måles og udgives",
+  "succeskriterium": "prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0",
+  "forgængere": [
+    "storefyr/Skrynja — vejkort S0-S7, måltilstand og den kendte hårdknude",
+    "storefyr/Skrynja-1 — prototype, hvor config.yaml er projektets eneste normative kilde"
+  ],
+  "arbejdsform": "Én funktion ad gangen i rækkefølgen nedenfor: implementer funktionen, kør dens verifikations_trin, og sæt først passerer til sand, når hvert trin er målt med en udskrift, der kan gengives. Ingen påstand om et udfald uden en måling. Fremdriften læses af passerer-felterne i denne fil.",
+  "begrænsninger": {
+    "qt": "Kun Qt 5.6 — ingen API indført i 5.7 eller senere",
+    "qml": "QtQuick 2.0 + Sailfish.Silica 1.0; JavaScript i QML er ES5",
+    "harbour": "Appnavnet beholder harbour-præfikset; kun tilladte importer",
+    "kapabiliteter": "Tom clientCapabilities ved initialize — agenten må ikke kalde fs/* eller terminal/*",
+    "indespærring": "Ingen SailJail — Sandboxing=Disabled i .desktop-filen fra første indskrivning, ellers er agentstien ikke nåbar",
+    "agentsti": "/home/defaultuser/.local/bin/vibe-acp",
+    "sprog": "Kode, kommentarer og commits er engelske; dokumentation og brugerflade er dansk uden qsTr",
+    "prøver": "QtTest i tests/ uden Silica-afhængighed; prøven indskrives før den kilde, den afprøver",
+    "filer": "Nye kildefiler registreres i .pro-filen; nye QML-filer registreres til installation",
+    "hemmeligheder": "Ingen nøgler, tokens eller samtale-transskripter må nogensinde ind i depotet"
+  },
+  "funktioner": [
+    {
+      "id": "byggesti_og_logfil",
+      "navn": "Byggesti og logrotering",
+      "beskrivelse": "Projektstien med .pro, .yaml, .spec og .desktop-fil bygges med Sailfish SDK, og hver appstart spejler alle [acp]-linjer til en logfil under /tmp, så en wire-optagelse kan måles og gengives.",
+      "verifikations_trin": [
+        "sfdk byg gennemføres uden fejl",
+        "den byggede RPM installeres og starter på Jolla Phone (2026)",
+        "fire appstarter giver fire initialize-rammer i én akkumulerende logfil"
+      ],
+      "passerer": false
+    },
+    {
+      "id": "acp_rygrad",
+      "navn": "ACP-rygrad — rammelæsning",
+      "beskrivelse": "Content-Length-rammer læses fra agentens standard-ud: sammenklæbede rammer samles, splittede rammer ventes på, ugyldige rammer kasseres med årsag, og en for stor ramme afvises uden at stoppe klienten.",
+      "verifikations_trin": [
+        "prøverne for rygrad (hoved, sammenklæbning, split, CRLF, ugyldig, for stor ramme) går igennem i tests/",
+        "en kasseret ramme logges med årsag, og klienten fortsætter"
+      ],
+      "passerer": false
+    },
+    {
+      "id": "agentproces_og_initialisering",
+      "navn": "Agentproces og initialisering",
+      "beskrivelse": "Agenten startes som underordnet proces fra agentstien, der sendes initialize med protocolVersion 1, clientInfo og tom clientCapabilities, og derefter session/load med fallback til session/new. Session-id gemmes i indstillingerne under acp/sessionId.",
+      "verifikations_trin": [
+        "loggen viser præcis ét initialize med tomt clientCapabilities pr. appstart",
+        "session/load der fejler falder tilbage til session/new",
+        "session-id ligger i indstillingerne efter første kørsel"
+      ],
+      "passerer": false
+    },
+    {
+      "id": "prompt_og_svar",
+      "navn": "Prompt og svar",
+      "beskrivelse": "Brugerens tekst sendes som session/prompt, agent_message_chunk akkumuleres til det viste svar, og turen afsluttes når agenten sender end_turn.",
+      "verifikations_trin": [
+        "spørgsmål ind på enheden giver svar ud i grænsefladen",
+        "loggen viser ét session/prompt fulgt af end_turn",
+        "appen afslutter med kode 0 når turen er færdig"
+      ],
+      "passerer": false
+    },
+    {
+      "id": "genoptagelse_af_samtale",
+      "navn": "Genoptagelse af samtale",
+      "beskrivelse": "Ved genstart kaldes session/load med det gemte session-id, og den gamle samtale genspilles inklusive user_message_chunk fra replay, så klienten henter gammel tekst ved start.",
+      "verifikations_trin": [
+        "efter genstart vises den gamle samtale korrekt på enheden",
+        "prøverne for load (ok, fallback ved fejl, replay i vist svar, gammel tekst ved start) går igennem i tests/"
+      ],
+      "passerer": false
+    },
+    {
+      "id": "værktøjskald_visning",
+      "navn": "Værktøjskald i grænsefladen",
+      "beskrivelse": "Værktøjskald fra session/update samles i en liste og vises med ikon efter kind, titel og fuld sti, og status for hvert kald opdateres mens det kører.",
+      "verifikations_trin": [
+        "et kald der læser en fil vises med ikon efter kind, titel og fuld sti",
+        "prøverne for værktøjskald (felter, tekstchunk, statusopdatering) går igennem i tests/"
+      ],
+      "passerer": false
+    },
+    {
+      "id": "tilladelsesdialog",
+      "navn": "Tilladelsesdialog",
+      "beskrivelse": "session/request_permission vises som dialog med id, titel og options; kun én anmodning gemmes ad gangen; svaret sendes med optionId; kind i options kasseres; en tom titel får fallback.",
+      "verifikations_trin": [
+        "dialogen viser id, titel og options fra anmodningen",
+        "tillad og afvis sender korrekt svar tilbage til agenten",
+        "prøverne for tilladelse (anmodning, tillad-svar, afvis-svar, tom titel) går igennem i tests/"
+      ],
+      "passerer": false
+    },
+    {
+      "id": "stop_og_afvis",
+      "navn": "Stop og afvis",
+      "beskrivelse": "Stop sender session/cancel før cancelled, så en agent der på et tidspunkt må skrive filer stadig kan standses. Afvis afviser den ventende tilladelsesanmodning. Dette trin må ikke springes over.",
+      "verifikations_trin": [
+        "rækkefølgen cancel før cancelled kan gengives i loggen",
+        "prøven for stop-rækkefølgen går igennem i tests/",
+        "agentprocessen kan standses og appen lukker ned"
+      ],
+      "passerer": false
+    },
+    {
+      "id": "diff_og_uddata",
+      "navn": "Diff og uddata",
+      "beskrivelse": "Filændringer fra agenten samles til en diff der vises i grænsefladen, og terminaluddata samles og vises for den kommando, der kørte.",
+      "verifikations_trin": [
+        "en filændring vises som diff på enheden",
+        "en kommando viser sit uddata",
+        "prøverne for diff-blokke og uddata-blokke går igennem i tests/"
+      ],
+      "passerer": false
+    },
+    {
+      "id": "konfiguration_af_agent",
+      "navn": "Konfiguration af agent",
+      "beskrivelse": "configOptions læses fra agentens svar og vises i grænsefladen, og en ændret værdi sendes tilbage med session/set_config_option.",
+      "verifikations_trin": [
+        "configOptions vises og kan ændres på enheden",
+        "prøverne for configOptions (samles, opdateres ved svar) går igennem i tests/"
+      ],
+      "passerer": false
+    },
+    {
+      "id": "selvtest_med_verdict",
+      "navn": "Selvtest med verdict",
+      "beskrivelse": "Indbygget selvtest-tilstand kører en probe mod agenten og giver verdict: bestået kun ved faktisk værktøjskald fulgt af svar; verdict gives også ved agentdød og startfejl; aldrig dobbelt verdict; diff alene giver ikke bestået.",
+      "verifikations_trin": [
+        "alle selvtest-prøver går igennem i tests/",
+        "selvtest på enheden ender med ét verdict i loggen"
+      ],
+      "passerer": false
+    },
+    {
+      "id": "prøvesuite_i_tests",
+      "navn": "Prøvesuite i tests",
+      "beskrivelse": "Hver funktion afprøves i tests/ med QtTest uden Silica-afhængighed; prøven committes før den kilde, den afprøver, målt med git log; en anmodning med ukendt metode får fejl.",
+      "verifikations_trin": [
+        "hele tests/ kører grønt",
+        "git log viser prøvens commit før kildens commit for hver funktion",
+        "prøven for ukendt metode går igennem i tests/"
+      ],
+      "passerer": false
+    },
+    {
+      "id": "oprydning_af_træ",
+      "navn": "Oprydning af træet",
+      "beskrivelse": "Træet på main indeholder ingen fil, som specifikationen ikke nævner, og ingen hemmeligheder, nøgler eller samtale-transskripter.",
+      "verifikations_trin": [
+        "inventaret i dokumentationen dækker alle filer i træet på main",
+        "git grep finder ingen nøgler eller tokens i træet"
+      ],
+      "passerer": false
+    }
+  ]
+}
