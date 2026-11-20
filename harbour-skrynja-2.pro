@@ -11,7 +11,8 @@ SOURCES += \
     src/acpbesked.cpp \
     src/agentproces.cpp \
     src/acpclient.cpp \
-    src/samtalemodel.cpp
+    src/samtalemodel.cpp \
+    src/sessionlager.cpp
 
 HEADERS += \
     src/logfil.h \
@@ -19,7 +20,8 @@ HEADERS += \
     src/acpbesked.h \
     src/agentproces.h \
     src/acpclient.h \
-    src/samtalemodel.h
+    src/samtalemodel.h \
+    src/sessionlager.h
 
 OTHER_FILES += \
     harbour-skrynja-2.desktop \

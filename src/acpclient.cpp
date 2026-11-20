@@ -8,6 +8,9 @@
 #include "acpframereader.h"
 #include "agentproces.h"
 #include "samtalemodel.h"
+#include "sessionlager.h"
+
+#include <QDir>
 
 static const QString kSessionPrompt = QLatin1String("session/prompt");
 
@@ -16,8 +19,10 @@ AcpClient::AcpClient(QObject* parent)
     , m_proces(new AgentProces(this))
     , m_læser(new AcpFrameReader(m_proces->proces(), this))
     , m_samtale(new SamtaleModel(this))
+    , m_lager(new SessionLager)
     , m_næsteId(1)
     , m_testTilstand(false)
+    , m_hadRestoredHistory(false)
 {
     connect(m_læser, SIGNAL(beskedKlar(QByteArray)), this, SLOT(modtagLinje(QByteArray)));
     connect(m_proces, SIGNAL(fejl(QString)), this, SLOT(modtagAgentFejl(QString)));
@@ -56,6 +61,22 @@ void AcpClient::sendInitialize()
     m_åbneAnmodninger.insert(id, "initialize");
 }
 
+void AcpClient::startSession()
+{
+    if (m_lager->harSessionId())
+        sendSessionLoad(m_lager->sessionId());
+    else
+        sendSessionNew(QDir::homePath());
+}
+
+void AcpClient::sendSessionLoad(const QString& sessionId)
+{
+    QJsonObject params;
+    params.insert("sessionId", sessionId);
+    qint64 id = sendRequest("session/load", params);
+    m_åbneAnmodninger.insert(id, "session/load");
+}
+
 void AcpClient::sendSessionNew(const QString& cwd)
 {
     QJsonObject params;
@@ -92,6 +113,11 @@ QString AcpClient::sessionId() const
 QString AcpClient::stopReason() const
 {
     return m_stopReason;
+}
+
+bool AcpClient::hadRestoredHistory() const
+{
+    return m_hadRestoredHistory;
 }
 
 QString AcpClient::lastError() const
@@ -190,6 +216,12 @@ void AcpClient::håndterBesked(const AcpBesked& besked)
 {
     if (besked.type() == AcpBesked::Svar && besked.harId()) {
         QString metode = m_åbneAnmodninger.take(besked.id());
+        if (metode == "session/load" && besked.erFejl()) {
+            m_hadRestoredHistory = false;
+            emit historieAendret();
+            sendSessionNew(QDir::homePath());
+            return;
+        }
         if (besked.erFejl()) {
             m_lastError = besked.fejl().value("message").toString();
             if (metode == "initialize")
@@ -204,9 +236,18 @@ void AcpClient::håndterBesked(const AcpBesked& besked)
                 m_configOptions.append(options.at(i).toObject().toVariantMap());
             emit initializeSvar(resultat);
             emit agentKlar();
+        } else if (metode == "session/load") {
+            m_sessionId = resultat.value("sessionId").toString();
+            m_hadRestoredHistory = true;
+            m_lager->gemSessionId(m_sessionId);
+            emit sessionOprettet(m_sessionId);
+            emit historieAendret();
         } else if (metode == "session/new") {
             m_sessionId = resultat.value("sessionId").toString();
+            m_hadRestoredHistory = false;
+            m_lager->gemSessionId(m_sessionId);
             emit sessionOprettet(m_sessionId);
+            emit historieAendret();
         } else if (metode == kSessionPrompt) {
             m_stopReason = resultat.value("stopReason").toString();
         }

@@ -13,12 +13,14 @@ SOURCES += \
     tst_acp_rygrad.cpp \
     tst_agentproces_og_initialisering.cpp \
     tst_prompt_og_svar.cpp \
+    tst_genoptagelse_af_samtale.cpp \
     ../src/logfil.cpp \
     ../src/acpframereader.cpp \
     ../src/acpbesked.cpp \
     ../src/agentproces.cpp \
     ../src/acpclient.cpp \
-    ../src/samtalemodel.cpp
+    ../src/samtalemodel.cpp \
+    ../src/sessionlager.cpp
 
 HEADERS += \
     testregistrering.h \
@@ -27,4 +29,5 @@ HEADERS += \
     ../src/acpbesked.h \
     ../src/agentproces.h \
     ../src/acpclient.h \
-    ../src/samtalemodel.h
+    ../src/samtalemodel.h \
+    ../src/sessionlager.h
