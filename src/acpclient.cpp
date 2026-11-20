@@ -36,6 +36,7 @@ AcpClient::AcpClient(QObject* parent)
 {
     connect(m_læser, SIGNAL(beskedKlar(QByteArray)), this, SLOT(modtagLinje(QByteArray)));
     connect(m_proces, SIGNAL(fejl(QString)), this, SLOT(modtagAgentFejl(QString)));
+    connect(m_proces, SIGNAL(faerdig(int)), this, SLOT(procesFaerdig(int)));
     connect(m_vaerktoejskald, SIGNAL(changed()), this, SIGNAL(vaerktoejskaldAendret()));
     connect(m_samtale, SIGNAL(changed()), this, SIGNAL(samtaleAendret()));
     connect(m_tilladelse, SIGNAL(changed()), this, SIGNAL(tilladelseAendret()));
@@ -291,6 +292,11 @@ void AcpClient::feedBytesForTest(const QByteArray& data)
     m_læser->feedBytesForTest(data);
 }
 
+void AcpClient::simulerAgentDødForTest(int kode)
+{
+    procesFaerdig(kode);
+}
+
 QList<QByteArray> AcpClient::sendteForTest() const
 {
     return m_sendte;
@@ -339,10 +345,10 @@ void AcpClient::skriv(const QByteArray& linje)
 {
     if (m_testTilstand) {
         m_sendte.append(linje);
-        emit beskedSendt(linje);
     } else if (m_proces->proces()->isOpen()) {
         m_proces->proces()->write(linje);
     }
+    emit beskedSendt(linje);
 }
 
 void AcpClient::modtagLinje(const QByteArray& linje)
@@ -455,4 +461,9 @@ void AcpClient::modtagAgentFejl(const QString& fejl)
 {
     m_lastError = fejl;
     emit agentFejl(fejl);
+}
+
+void AcpClient::procesFaerdig(int exitKode)
+{
+    emit agentDoed(exitKode);
 }

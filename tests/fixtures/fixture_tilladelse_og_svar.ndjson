@@ -1,0 +1,2 @@
+{"jsonrpc":"2.0","id":50,"method":"session/request_permission","params":{"toolCall":{"toolCallId":"tc-s","title":"Skriv fil","kind":"edit"},"options":[{"optionId":"allow","label":"Tillad"},{"optionId":"deny","label":"Afvis"}]}}
+{"jsonrpc":"2.0","method":"session/update","params":{"sessionId":"s","update":{"sessionUpdate":"tool_call","toolCallId":"tc-s","title":"Skriv fil","kind":"edit","status":"in_progress","content":[{"type":"diff","path":"/tmp/selvtest.txt","diff":"--- a/selvtest.txt\n+++ b/selvtest.txt\n@@ -0,0 +1 @@\n+skrevet af selvtest"}]}}}

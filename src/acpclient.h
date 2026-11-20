@@ -73,6 +73,7 @@ public:
     void sætTestTilstand(bool tilstand);
     bool testTilstand() const;
     void feedBytesForTest(const QByteArray& data);
+    void simulerAgentDødForTest(int kode);
     QList<QByteArray> sendteForTest() const;
     QByteArray sidsteSendtForTest() const;
     void nulstilForTest();
@@ -89,6 +90,7 @@ signals:
     void samtaleAendret();
     void permissionAnmodet();
     void tilladelseAendret();
+    void agentDoed(int kode);
     void diffsAendret();
     void outputsAendret();
     void konfigurationAendret();
@@ -127,6 +129,7 @@ protected:
 private slots:
     void modtagLinje(const QByteArray& linje);
     void modtagAgentFejl(const QString& fejl);
+    void procesFaerdig(int exitKode);
 };
 
 #endif

@@ -19,6 +19,7 @@ SOURCES += \
     tst_stop_og_afvis.cpp \
     tst_diff_og_uddata.cpp \
     tst_konfiguration_af_agent.cpp \
+    tst_selvtest_med_verdict.cpp \
     ../src/logfil.cpp \
     ../src/acpframereader.cpp \
     ../src/acpbesked.cpp \
@@ -29,7 +30,8 @@ SOURCES += \
     ../src/vaerktoejskaldsmodel.cpp \
     ../src/tilladelsesmodel.cpp \
     ../src/diffmodel.cpp \
-    ../src/konfigurationsmodel.cpp
+    ../src/konfigurationsmodel.cpp \
+    ../src/selvtest.cpp
 
 HEADERS += \
     testregistrering.h \
@@ -43,4 +45,5 @@ HEADERS += \
     ../src/vaerktoejskaldsmodel.h \
     ../src/tilladelsesmodel.h \
     ../src/diffmodel.h \
-    ../src/konfigurationsmodel.h
+    ../src/konfigurationsmodel.h \
+    ../src/selvtest.h

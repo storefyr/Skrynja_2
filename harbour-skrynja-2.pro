@@ -16,7 +16,8 @@ SOURCES += \
     src/vaerktoejskaldsmodel.cpp \
     src/tilladelsesmodel.cpp \
     src/diffmodel.cpp \
-    src/konfigurationsmodel.cpp
+    src/konfigurationsmodel.cpp \
+    src/selvtest.cpp
 
 HEADERS += \
     src/logfil.h \
@@ -29,7 +30,8 @@ HEADERS += \
     src/vaerktoejskaldsmodel.h \
     src/tilladelsesmodel.h \
     src/diffmodel.h \
-    src/konfigurationsmodel.h
+    src/konfigurationsmodel.h \
+    src/selvtest.h
 
 OTHER_FILES += \
     harbour-skrynja-2.desktop \

@@ -515,7 +515,7 @@
           "forventet_uddata": "exit=0 og verdict-filen viser pass (kræver vibe-acp på enheden)"
         }
       ],
-      "passerer": false
+      "passerer": true
     },
     {
       "id": "prøvesuite_i_tests",
