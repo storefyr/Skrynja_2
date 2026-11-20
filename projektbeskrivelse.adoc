@@ -29,14 +29,32 @@ Menneskelig konceptualisator og realiseringsorkestrator
             └──► Kildesondringsstokastiker (hovedstokastiker /
                    informationsstokastiker)
                    vurdering_af_realiseringsartefaktets_arkitektur_,
-                   vedligeholdbarhed og støjindhold for stokastikere.json
+                   fragilitet og støjindhold for stokastikere.json
 
   Sufflør: artefakt i kildekodelageret (git-indskrivninger)
 ----
 
 == Projektet
 
-*Skrynja_2* er en ACP-klient til Sailfish OS. Appen starter en lokal agent (`vibe-acp`) som underordnet proces over stdio (ACP, protocolVersion 1) og lægger agentens arbejde ind i en grænseflade: værktøjskald, filændringer, tilladelser og tilstande vises, mens de sker, og brugeren svarer med et tryk i stedet for en kommando i en tekststrøm.
+*Skrynja_2* er kontrolcenteret for realiseringsøkosystemet: en applikation til Jolla Phone 2026, der på en overskuelig, intuitiv og kohærent måde administrerer flowet mellem vision, plan, manifest og artefakter — med `vibe-acp` som backend.
+
+Appen er en ACP-klient til Sailfish OS. Den starter agenten (`vibe-acp`) som underordnet proces over stdio (ACP, protocolVersion 1) og lægger agentens arbejde ind i en grænseflade: værktøjskald, filændringer, tilladelser og tilstande vises, mens de sker, og brugeren svarer med et tryk i stedet for en kommando i en tekststrøm.
+
+Flowet, som appen administrerer, svarer til økosystemets artefakter:
+
+|===
+| Økosystem-trin | Artefakt | Hvad kontrolcenteret giver indsigt i
+
+| Vision | Den menneskelige konceptualisators skitse | Konteksten for hele kæden
+
+| Plan | `projektbeskrivelse.adoc` | Strategien, som agenten arbejder efter
+
+| Manifest | `funktionsliste.json` + parrede tests i `tests/` | Funktion for funktion med målbare verifikations_trin og `passerer`-status
+
+| Artefakter | Realiseringsartefakt (kildekode), distributionsartefakt (RPM), vurderings-JSON'er | Værktøjskald, filændringer og diffs, mens de sker; tilladelser besvares med et tryk
+|===
+
+De tre egenskaber — overskuelig, intuitiv og kohærent — er præcis dem, som Slutbrugeranvendelighedssonderingsstokastikeren vurderer i `vurdering_af_programmelets_intuitivitet_og_kohærens_for_slutbrugeren.json` og `vurdering_af_programmelets_ansvarlighed_for_slutbrugeren.json`.
 
 * Mål-enhed: Jolla Phone (2026) med Sailfish OS — kun aarch64 bygges, måles og udgives.
 * Succeskriterium: prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0.
@@ -72,8 +90,8 @@ Menneskelig konceptualisator og realiseringsorkestrator
 | Sonderer, om programmet opleves ansvarligt, intuitivt og kohærent for slutbrugeren, og leverer vurderingen tilbage i kæden.
 
 | Kildesondringsstokastiker (hovedstokastiker / informationsstokastiker)
-| `vurdering_af_realiseringsartefaktets_arkitektur_vedligeholdbarhed_og_stoejindhold_for_stokastikere.json`
-| Udfører semantisk kontrol af projektets retning ved audit af kildekoden: arkitektur, vedligeholdbarhed og støjindhold for stokastikerne.
+| `vurdering_af_realiseringsartefaktets_arkitektur_fragilitet_og_stoejindhold_for_stokastikere.json`
+| Udfører semantisk kontrol af projektets retning ved audit af kildekoden: arkitektur, fragilitet og støjindhold for stokastikerne.
 |===
 
 == Kommandoveje og eskaleringer
@@ -130,7 +148,7 @@ Rammen er ikke-forhandlingsbar og kommer fra projektets initialiseringsartefakt 
 | JSON
 | Slutbrugeranvendelighedssonderingsstokastiker → Strategistokastiker
 
-| `vurdering_af_realiseringsartefaktets_arkitektur_vedligeholdbarhed_og_stoejindhold_for_stokastikere.json`
+| `vurdering_af_realiseringsartefaktets_arkitektur_fragilitet_og_stoejindhold_for_stokastikere.json`
 | JSON
 | Kildesondringsstokastiker → økosystemet
 
