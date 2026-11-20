@@ -1,0 +1,4 @@
+{"jsonrpc":"2.0","method":"session/update","params":{"sessionId":"s","update":{"sessionUpdate":"tool_call","toolCallId":"tc-1","title":"Læs fil","kind":"read","status":"pending"}}}
+{"jsonrpc":"2.0","method":"session/update","params":{"sessionId":"s","update":{"sessionUpdate":"tool_call","toolCallId":"tc-2","title":"Skriv fil","kind":"edit","status":"pending"}}}
+{"jsonrpc":"2.0","method":"session/update","params":{"sessionId":"s","update":{"sessionUpdate":"tool_call_update","toolCallId":"tc-1","status":"completed"}}}
+{"jsonrpc":"2.0","method":"session/update","params":{"sessionId":"s","update":{"sessionUpdate":"tool_call_update","toolCallId":"tc-2","status":"in_progress"}}}

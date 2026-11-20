@@ -9,6 +9,7 @@
 #include "agentproces.h"
 #include "samtalemodel.h"
 #include "sessionlager.h"
+#include "vaerktoejskaldsmodel.h"
 
 #include <QDir>
 
@@ -20,12 +21,15 @@ AcpClient::AcpClient(QObject* parent)
     , m_læser(new AcpFrameReader(m_proces->proces(), this))
     , m_samtale(new SamtaleModel(this))
     , m_lager(new SessionLager)
+    , m_vaerktoejskald(new VaerktoejskaldsModel(this))
     , m_næsteId(1)
     , m_testTilstand(false)
     , m_hadRestoredHistory(false)
 {
     connect(m_læser, SIGNAL(beskedKlar(QByteArray)), this, SLOT(modtagLinje(QByteArray)));
     connect(m_proces, SIGNAL(fejl(QString)), this, SLOT(modtagAgentFejl(QString)));
+    connect(m_vaerktoejskald, SIGNAL(changed()), this, SIGNAL(vaerktoejskaldAendret()));
+    connect(m_samtale, SIGNAL(changed()), this, SIGNAL(samtaleAendret()));
 }
 
 AcpClient::~AcpClient()
@@ -103,6 +107,36 @@ void AcpClient::sendSessionPrompt(const QString& prompt)
 SamtaleModel* AcpClient::samtaleModel() const
 {
     return m_samtale;
+}
+
+VaerktoejskaldsModel* AcpClient::vaerktoejskaldsModel() const
+{
+    return m_vaerktoejskald;
+}
+
+QVariantList AcpClient::toolkald() const
+{
+    return m_vaerktoejskald->toolCalls();
+}
+
+QString AcpClient::samtaleTekst() const
+{
+    return m_samtale->lastText();
+}
+
+int AcpClient::samtaleRunde() const
+{
+    return m_samtale->round();
+}
+
+QString AcpClient::samtaleStatus() const
+{
+    return m_samtale->status();
+}
+
+void AcpClient::kvitterVaerktoejskald(const QString& toolCallId)
+{
+    m_vaerktoejskald->acknowledge(toolCallId);
 }
 
 QString AcpClient::sessionId() const
@@ -273,6 +307,14 @@ void AcpClient::håndterSessionUpdate(const QJsonObject& params)
     if (art == "agent_message_chunk") {
         QJsonObject content = update.value("content").toObject();
         m_samtale->addChunk(content.value("text").toString());
+    } else if (art == "tool_call") {
+        m_vaerktoejskald->addToolCall(update.value("toolCallId").toString(),
+                                      update.value("title").toString(),
+                                      update.value("status").toString());
+    } else if (art == "tool_call_update") {
+        m_vaerktoejskald->updateToolCall(update.value("toolCallId").toString(),
+                                         update.value("status").toString(),
+                                         update.value("title").toString());
     } else if (art == "turn_end") {
         m_samtale->endRunde();
         emit rundeAfsluttet();

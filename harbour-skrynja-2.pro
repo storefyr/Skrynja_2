@@ -12,7 +12,8 @@ SOURCES += \
     src/agentproces.cpp \
     src/acpclient.cpp \
     src/samtalemodel.cpp \
-    src/sessionlager.cpp
+    src/sessionlager.cpp \
+    src/vaerktoejskaldsmodel.cpp
 
 HEADERS += \
     src/logfil.h \
@@ -21,7 +22,8 @@ HEADERS += \
     src/agentproces.h \
     src/acpclient.h \
     src/samtalemodel.h \
-    src/sessionlager.h
+    src/sessionlager.h \
+    src/vaerktoejskaldsmodel.h
 
 OTHER_FILES += \
     harbour-skrynja-2.desktop \
@@ -36,3 +38,9 @@ INSTALLS += target
 desktop.files = harbour-skrynja-2.desktop
 desktop.path = /usr/share/applications
 INSTALLS += desktop
+
+qml.files = qml/harbour-skrynja-2.qml
+qml.path = /usr/share/harbour-skrynja-2/qml
+qmlpages.files = qml/pages/StartSide.qml
+qmlpages.path = /usr/share/harbour-skrynja-2/qml/pages
+INSTALLS += qml qmlpages

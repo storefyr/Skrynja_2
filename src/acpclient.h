@@ -13,11 +13,16 @@ class AcpFrameReader;
 class AgentProces;
 class SamtaleModel;
 class SessionLager;
+class VaerktoejskaldsModel;
 
 class AcpClient : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool hadRestoredHistory READ hadRestoredHistory NOTIFY historieAendret)
+    Q_PROPERTY(QVariantList toolkald READ toolkald NOTIFY vaerktoejskaldAendret)
+    Q_PROPERTY(QString samtaleTekst READ samtaleTekst NOTIFY samtaleAendret)
+    Q_PROPERTY(int samtaleRunde READ samtaleRunde NOTIFY samtaleAendret)
+    Q_PROPERTY(QString samtaleStatus READ samtaleStatus NOTIFY samtaleAendret)
 public:
     explicit AcpClient(QObject* parent = 0);
     ~AcpClient();
@@ -32,6 +37,12 @@ public:
     Q_INVOKABLE void sendSessionNew(const QString& cwd);
     Q_INVOKABLE void sendSessionPrompt(const QString& prompt);
     SamtaleModel* samtaleModel() const;
+    VaerktoejskaldsModel* vaerktoejskaldsModel() const;
+    QVariantList toolkald() const;
+    QString samtaleTekst() const;
+    int samtaleRunde() const;
+    QString samtaleStatus() const;
+    Q_INVOKABLE void kvitterVaerktoejskald(const QString& toolCallId);
     QString sessionId() const;
     QString stopReason() const;
     bool hadRestoredHistory() const;
@@ -51,6 +62,8 @@ signals:
     void sessionOprettet(const QString& sessionId);
     void rundeAfsluttet();
     void historieAendret();
+    void vaerktoejskaldAendret();
+    void samtaleAendret();
 
 protected:
     qint64 næsteId();
@@ -67,6 +80,7 @@ protected:
     AcpFrameReader* m_læser;
     SamtaleModel* m_samtale;
     SessionLager* m_lager;
+    VaerktoejskaldsModel* m_vaerktoejskald;
     qint64 m_næsteId;
     bool m_testTilstand;
     QList<QByteArray> m_sendte;
