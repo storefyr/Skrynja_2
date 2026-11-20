@@ -393,7 +393,7 @@
           "forventet_uddata": "rækkefølge ok; stop_og_afvis ikke sprunget over"
         }
       ],
-      "passerer": false
+      "passerer": true
     },
     {
       "id": "diff_og_uddata",

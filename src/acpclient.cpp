@@ -15,6 +15,7 @@
 #include <QDir>
 
 static const QString kSessionPrompt = QLatin1String("session/prompt");
+static const QString kSessionCancel = QLatin1String("session/cancel");
 
 AcpClient::AcpClient(QObject* parent)
     : QObject(parent)
@@ -167,6 +168,18 @@ bool AcpClient::afvisPermission()
     sendBesked(AcpBesked::svar(m_tilladelse->anmodningsId(), result));
     m_tilladelse->setSvaret();
     return true;
+}
+
+void AcpClient::sessionCancel()
+{
+    QJsonObject params;
+    params.insert("sessionId", m_sessionId);
+    sendNotifikation(kSessionCancel, params);
+}
+
+void AcpClient::stopAgent()
+{
+    m_proces->stopAgent();
 }
 
 Tilladelsesmodel* AcpClient::tilladelsesmodel() const

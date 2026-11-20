@@ -53,6 +53,11 @@ bool AgentProces::start()
     if (!m_arbejdsmappe.isEmpty())
         m_proces->setWorkingDirectory(m_arbejdsmappe);
     m_proces->start();
+    if (!m_proces->waitForStarted(3000)) {
+        m_lastError = "agent kunne ikke startes: " + program;
+        emit fejl(m_lastError);
+        return false;
+    }
     return true;
 }
 

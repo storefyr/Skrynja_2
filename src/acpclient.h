@@ -48,6 +48,8 @@ public:
     Q_INVOKABLE void kvitterVaerktoejskald(const QString& toolCallId);
     Q_INVOKABLE bool answerPermission(const QString& optionId);
     Q_INVOKABLE bool afvisPermission();
+    Q_INVOKABLE void sessionCancel();
+    Q_INVOKABLE void stopAgent();
     Tilladelsesmodel* tilladelsesmodel() const;
     QVariantMap pendingPermission() const;
     int tilladelseAntal() const;

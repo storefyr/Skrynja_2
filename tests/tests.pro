@@ -16,6 +16,7 @@ SOURCES += \
     tst_genoptagelse_af_samtale.cpp \
     tst_vaerktoejskald_visning.cpp \
     tst_tilladelsesdialog.cpp \
+    tst_stop_og_afvis.cpp \
     ../src/logfil.cpp \
     ../src/acpframereader.cpp \
     ../src/acpbesked.cpp \
