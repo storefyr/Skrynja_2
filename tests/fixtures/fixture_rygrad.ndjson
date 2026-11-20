@@ -1,0 +1,5 @@
+{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":1,"clientCapabilities":{}}}
+{"jsonrpc":"2.0","id":2,"result":{"protocolVersion":1,"configOptions":[]}}
+{"jsonrpc":"2.0","method":"session/update","params":{"sessionId":"abc","update":{"sessionUpdate":"agent_message_chunk","content":{"type":"text","text":"Hej"}}}}
+{"jsonrpc":"2.0","id":3,"error":{"code":-32600,"message":"ugyldig anmodning"}}
+{"jsonrpc":"2.0","method":"end_turn","params":{"sessionId":"abc"}}

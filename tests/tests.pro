@@ -10,8 +10,13 @@ INCLUDEPATH += ../src
 
 SOURCES += \
     tst_byggesti_og_logfil.cpp \
-    ../src/logfil.cpp
+    tst_acp_rygrad.cpp \
+    ../src/logfil.cpp \
+    ../src/acpframereader.cpp \
+    ../src/acpbesked.cpp
 
 HEADERS += \
     testregistrering.h \
-    ../src/logfil.h
+    ../src/logfil.h \
+    ../src/acpframereader.h \
+    ../src/acpbesked.h

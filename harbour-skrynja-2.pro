@@ -6,10 +6,14 @@ CONFIG += c++11
 
 SOURCES += \
     src/main.cpp \
-    src/logfil.cpp
+    src/logfil.cpp \
+    src/acpframereader.cpp \
+    src/acpbesked.cpp
 
 HEADERS += \
-    src/logfil.h
+    src/logfil.h \
+    src/acpframereader.h \
+    src/acpbesked.h
 
 OTHER_FILES += \
     harbour-skrynja-2.desktop \

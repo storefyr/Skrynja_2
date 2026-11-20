@@ -1,0 +1,3 @@
+{"jsonrpc":"2.0","id":10,"method":"initialize","params":{"protocolVersion":1,"clientCapabilities":{}}}
+{"jsonrpc":"2.0","id":11,"result":{"sessionId":"abc-123"}}
+{"jsonrpc":"2.0","method":"session/update","params":{"sessionId":"abc-123","update":{"sessionUpdate":"agent_message_chunk","content":{"type":"text","text":"Hej fra agenten"}}}}

@@ -1,0 +1,3 @@
+{"jsonrpc":"2.0","id":1,"method":"initialize"}
+{"tekst":"ÿþ ugyldig sekvens"}
+{"jsonrpc":"2.0","method":"end_turn"}

@@ -153,7 +153,7 @@
           "forventet_uddata": "ok"
         }
       ],
-      "passerer": false
+      "passerer": true
     },
     {
       "id": "agentproces_og_initialisering",

@@ -1,0 +1,5 @@
+{"jsonrpc":"2.0","id":1,"method":"initialize"}
+denne linje er ikke json
+{"jsonrpc":"2.0","method":"end_turn"}
+{brudt json uden slutning
+{"jsonrpc":"2.0","id":2,"result":{"ok":true}}
