@@ -11,6 +11,7 @@
 
 class AcpFrameReader;
 class AgentProces;
+class SamtaleModel;
 
 class AcpClient : public QObject
 {
@@ -25,6 +26,12 @@ public:
     AgentProces* agentProces() const;
     QVariantList configOptions() const;
 
+    Q_INVOKABLE void sendSessionNew(const QString& cwd);
+    Q_INVOKABLE void sendSessionPrompt(const QString& prompt);
+    SamtaleModel* samtaleModel() const;
+    QString sessionId() const;
+    QString stopReason() const;
+
     void sætTestTilstand(bool tilstand);
     bool testTilstand() const;
     void feedBytesForTest(const QByteArray& data);
@@ -37,6 +44,8 @@ signals:
     void agentKlar();
     void agentFejl(const QString& fejl);
     void initializeSvar(const QJsonObject& resultat);
+    void sessionOprettet(const QString& sessionId);
+    void rundeAfsluttet();
 
 protected:
     qint64 næsteId();
@@ -45,14 +54,19 @@ protected:
     void sendBesked(const AcpBesked& besked);
     void skriv(const QByteArray& linje);
     virtual void håndterBesked(const AcpBesked& besked);
+    void håndterNotifikation(const AcpBesked& besked);
+    void håndterSessionUpdate(const QJsonObject& params);
 
     AgentProces* m_proces;
     AcpFrameReader* m_læser;
+    SamtaleModel* m_samtale;
     qint64 m_næsteId;
     bool m_testTilstand;
     QList<QByteArray> m_sendte;
     QHash<qint64, QString> m_åbneAnmodninger;
     QString m_lastError;
+    QString m_sessionId;
+    QString m_stopReason;
     QVariantList m_configOptions;
 
 private slots:

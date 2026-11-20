@@ -1,0 +1,5 @@
+{"jsonrpc":"2.0","id":11,"result":{"sessionId":"sess-42"}}
+{"jsonrpc":"2.0","method":"session/update","params":{"sessionId":"sess-42","update":{"sessionUpdate":"agent_message_chunk","content":{"type":"text","text":"Hej "}}}}
+{"jsonrpc":"2.0","method":"session/update","params":{"sessionId":"sess-42","update":{"sessionUpdate":"agent_message_chunk","content":{"type":"text","text":"verden"}}}}
+{"jsonrpc":"2.0","id":12,"result":{"stopReason":"end_turn"}}
+{"jsonrpc":"2.0","method":"end_turn","params":{"sessionId":"sess-42"}}

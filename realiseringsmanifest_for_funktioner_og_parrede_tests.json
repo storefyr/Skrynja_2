@@ -234,7 +234,7 @@
           "forventet_uddata": "1"
         }
       ],
-      "passerer": false
+      "passerer": true
     },
     {
       "id": "genoptagelse_af_samtale",

@@ -7,11 +7,15 @@
 
 #include "acpframereader.h"
 #include "agentproces.h"
+#include "samtalemodel.h"
+
+static const QString kSessionPrompt = QLatin1String("session/prompt");
 
 AcpClient::AcpClient(QObject* parent)
     : QObject(parent)
     , m_proces(new AgentProces(this))
     , m_læser(new AcpFrameReader(m_proces->proces(), this))
+    , m_samtale(new SamtaleModel(this))
     , m_næsteId(1)
     , m_testTilstand(false)
 {
@@ -50,6 +54,44 @@ void AcpClient::sendInitialize()
     params.insert("clientInfo", clientInfo);
     qint64 id = sendRequest("initialize", params);
     m_åbneAnmodninger.insert(id, "initialize");
+}
+
+void AcpClient::sendSessionNew(const QString& cwd)
+{
+    QJsonObject params;
+    params.insert("cwd", cwd);
+    qint64 id = sendRequest("session/new", params);
+    m_åbneAnmodninger.insert(id, "session/new");
+}
+
+void AcpClient::sendSessionPrompt(const QString& prompt)
+{
+    m_samtale->startRunde();
+    QJsonObject blok;
+    blok.insert("type", "text");
+    blok.insert("text", prompt);
+    QJsonArray blokke;
+    blokke.append(blok);
+    QJsonObject params;
+    params.insert("sessionId", m_sessionId);
+    params.insert("prompt", blokke);
+    qint64 id = sendRequest(kSessionPrompt, params);
+    m_åbneAnmodninger.insert(id, kSessionPrompt);
+}
+
+SamtaleModel* AcpClient::samtaleModel() const
+{
+    return m_samtale;
+}
+
+QString AcpClient::sessionId() const
+{
+    return m_sessionId;
+}
+
+QString AcpClient::stopReason() const
+{
+    return m_stopReason;
 }
 
 QString AcpClient::lastError() const
@@ -100,6 +142,8 @@ void AcpClient::nulstilForTest()
     m_åbneAnmodninger.clear();
     m_configOptions.clear();
     m_lastError.clear();
+    m_sessionId.clear();
+    m_stopReason.clear();
 }
 
 qint64 AcpClient::næsteId()
@@ -146,20 +190,51 @@ void AcpClient::håndterBesked(const AcpBesked& besked)
 {
     if (besked.type() == AcpBesked::Svar && besked.harId()) {
         QString metode = m_åbneAnmodninger.take(besked.id());
-        if (metode == "initialize") {
-            if (besked.erFejl()) {
-                m_lastError = besked.fejl().value("message").toString();
+        if (besked.erFejl()) {
+            m_lastError = besked.fejl().value("message").toString();
+            if (metode == "initialize")
                 emit agentFejl(m_lastError);
-                return;
-            }
-            QJsonObject resultat = besked.resultat().toObject();
+            return;
+        }
+        QJsonObject resultat = besked.resultat().toObject();
+        if (metode == "initialize") {
             QJsonArray options = resultat.value("configOptions").toArray();
             m_configOptions.clear();
             for (int i = 0; i < options.size(); ++i)
                 m_configOptions.append(options.at(i).toObject().toVariantMap());
             emit initializeSvar(resultat);
             emit agentKlar();
+        } else if (metode == "session/new") {
+            m_sessionId = resultat.value("sessionId").toString();
+            emit sessionOprettet(m_sessionId);
+        } else if (metode == kSessionPrompt) {
+            m_stopReason = resultat.value("stopReason").toString();
         }
+    } else if (besked.type() == AcpBesked::Notifikation) {
+        håndterNotifikation(besked);
+    }
+}
+
+void AcpClient::håndterNotifikation(const AcpBesked& besked)
+{
+    if (besked.metode() == "session/update")
+        håndterSessionUpdate(besked.params());
+    else if (besked.metode() == "end_turn") {
+        m_samtale->endRunde();
+        emit rundeAfsluttet();
+    }
+}
+
+void AcpClient::håndterSessionUpdate(const QJsonObject& params)
+{
+    QJsonObject update = params.value("update").toObject();
+    QString art = update.value("sessionUpdate").toString();
+    if (art == "agent_message_chunk") {
+        QJsonObject content = update.value("content").toObject();
+        m_samtale->addChunk(content.value("text").toString());
+    } else if (art == "turn_end") {
+        m_samtale->endRunde();
+        emit rundeAfsluttet();
     }
 }
 

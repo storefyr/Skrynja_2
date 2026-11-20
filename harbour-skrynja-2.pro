@@ -10,14 +10,16 @@ SOURCES += \
     src/acpframereader.cpp \
     src/acpbesked.cpp \
     src/agentproces.cpp \
-    src/acpclient.cpp
+    src/acpclient.cpp \
+    src/samtalemodel.cpp
 
 HEADERS += \
     src/logfil.h \
     src/acpframereader.h \
     src/acpbesked.h \
     src/agentproces.h \
-    src/acpclient.h
+    src/acpclient.h \
+    src/samtalemodel.h
 
 OTHER_FILES += \
     harbour-skrynja-2.desktop \

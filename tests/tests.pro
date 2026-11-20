@@ -12,11 +12,13 @@ SOURCES += \
     tst_byggesti_og_logfil.cpp \
     tst_acp_rygrad.cpp \
     tst_agentproces_og_initialisering.cpp \
+    tst_prompt_og_svar.cpp \
     ../src/logfil.cpp \
     ../src/acpframereader.cpp \
     ../src/acpbesked.cpp \
     ../src/agentproces.cpp \
-    ../src/acpclient.cpp
+    ../src/acpclient.cpp \
+    ../src/samtalemodel.cpp
 
 HEADERS += \
     testregistrering.h \
@@ -24,4 +26,5 @@ HEADERS += \
     ../src/acpframereader.h \
     ../src/acpbesked.h \
     ../src/agentproces.h \
-    ../src/acpclient.h
+    ../src/acpclient.h \
+    ../src/samtalemodel.h
