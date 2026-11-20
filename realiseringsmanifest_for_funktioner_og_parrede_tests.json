@@ -1,0 +1,597 @@
+{
+  "artefakt": "realiseringsmanifest_for_funktioner_og_parrede_tests.json",
+  "version": "1.0.0",
+  "status": "udstedt",
+  "producent": "Projektstokastiker",
+  "konsument": "Realiseringsstokastiker",
+  "kildeplan": "projektbeskrivelse.adoc",
+  "licens": "GPL-3.0",
+  "kommandokæde": {
+    "modtager_input_fra": [
+      "Strategistokastiker: projektbeskrivelse.adoc (strategisk plan)",
+      "Kildesondringsstokastiker: vurdering_af_realiseringsartefaktets_arkitektur_fragilitet_og_stoejindhold_for_stokastikere.json (triage-input)"
+    ],
+    "leverer_ordrer_til": "Realiseringsstokastiker via dette manifest — én funktion ad gangen i strategisk rækkefølge, hver parret med en specifik test i tests/"
+  },
+  "mandat": "Hver funktion er parret med en specifik test-specifikation i tests/. Intet implementeres uden en tilhørende parret test. Prøven indskrives før den kilde, den afprøver.",
+  "teknisk_ramme": {
+    "qt": "Kun Qt 5.6 — ingen API indført i 5.7 eller senere",
+    "qml": "QtQuick 2.0 + Sailfish.Silica 1.0; JavaScript i QML er ES5",
+    "mål": "Kun aarch64 (Jolla Phone 2026) bygges, måles og udgives; unit tests kører også på CI og tæller ikke som mål-byg",
+    "app_navn": "harbour-skrynja-2",
+    "sailjail": "Ingen SailJail: Sandboxing=Disabled i harbour-skrynja-2.desktop fra første indskrivning, ellers er agentstien ikke nåbar",
+    "agentsti": "/home/defaultuser/.local/bin/vibe-acp",
+    "acp": "ACP over stdio, protocolVersion 1, tom clientCapabilities ved initialize — agenten må ikke kalde fs/* eller terminal/*",
+    "prøver": "QtTest i tests/ uden Silica-afhængighed (QT += core testlib); prøven indskrives før kilden; nye kildefiler registreres i harbour-skrynja-2.pro; nye QML-filer registreres til installation",
+    "sprog": "Kode, kommentarer og commits er engelske; dokumentation og brugerflade er dansk; JSON-nøgler er dansk snake_case med æøå; C++-identifikatorer (testklasser og testslots) er ascii, fordi moc ikke håndterer æøå",
+    "hemmeligheder": "Ingen nøgler, tokens eller samtale-transskripter må nogensinde ind i depotet"
+  },
+  "arbejdsregler": [
+    "Én funktion ad gangen i strategisk_rækkefølge — ingen trin springes over; særligt stop_og_afvis må ikke springes over.",
+    "Intet implementeres uden den parrede test: tests/tst_*.cpp indskrives før den kilde, den afprøver, og registreres i tests/tests.pro.",
+    "passerer sættes først til sand, når hvert verifikations_trin er kørt med en gengivelig uddata, der er målt — ingen påstand om et udfald uden en måling.",
+    "Redigeringsregel for manifestet: en post må kun ændres ved at sætte passerer fra false til sand efter målte trin; navn, beskrivelse, filer, parret_test og verifikations_trin må ikke fjernes eller omskrives.",
+    "Ved genoptagelse af en arbejdsgang: kør pwd og git status, kør git log --oneline -20, læs dette manifest, og vælg den første funktion i rækken med passerer: false.",
+    "Nye kildefiler registreres i harbour-skrynja-2.pro; nye QML-filer registreres til installation.",
+    "Efter hver arbejdsgang indskrives ændringerne med en beskrivende besked, så næste samtale kan læse fremdriften i git-historikken.",
+    "Ingen nøgler, tokens eller samtale-transskripter ind i depotet."
+  ],
+  "triage_logik": {
+    "input": "vurdering_af_realiseringsartefaktets_arkitektur_fragilitet_og_stoejindhold_for_stokastikere.json",
+    "ved_stoej": "Udsted direkte rengøringsordrer til Realiseringsstokastikeren: fjern støj fra realiseringsartefaktet uden ny funktionalitet; rengøringen dækkes af den eksisterende parrede test.",
+    "ved_fragilitet": "Opdater dette manifest med krav om nye parrede tests eller specifik fejlhåndtering i den berørte funktion — nye verifikations_trin og testslots tilføjes, eksisterende må ikke fjernes.",
+    "ved_arkitektur_brister": "Enten omdefinér funktionerne i dette manifest, eller eskalér til Strategistokastikeren for revision af projektbeskrivelse.adoc; arkitektoniske brister løses ikke lokalt i kildekoden."
+  },
+  "succeskriterium": "prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0, samtidig med at alle 13 funktioner har passerer: sand og alle parrede tests i tests/ er grønne.",
+  "strategisk_rækkefølge": [
+    "byggesti_og_logfil",
+    "acp_rygrad",
+    "agentproces_og_initialisering",
+    "prompt_og_svar",
+    "genoptagelse_af_samtale",
+    "værktøjskald_visning",
+    "tilladelsesdialog",
+    "stop_og_afvis",
+    "diff_og_uddata",
+    "konfiguration_af_agent",
+    "selvtest_med_verdict",
+    "prøvesuite_i_tests",
+    "oprydning_af_træ"
+  ],
+  "funktioner": [
+    {
+      "id": "byggesti_og_logfil",
+      "navn": "Byggesti og logfil",
+      "beskrivelse": "Opret projektets byggesti og logfil: harbour-skrynja-2.pro (registrerer alle src-filer), harbour-skrynja-2.desktop med [X-Sailjail] Sandboxing=Disabled fra første indskrivning, harbour-skrynja-2.yaml, rpm/harbour-skrynja-2.spec samt src/logfil.{h,cpp} og src/main.cpp. Hver kørsel skriver én tidsstemplet linje til logfilen under appens data-mappe; logfilen må aldrig indeholde samtale-transskripter eller hemmeligheder.",
+      "filer": [
+        "harbour-skrynja-2.pro",
+        "harbour-skrynja-2.desktop",
+        "harbour-skrynja-2.yaml",
+        "rpm/harbour-skrynja-2.spec",
+        "src/main.cpp",
+        "src/logfil.h",
+        "src/logfil.cpp",
+        "tests/tests.pro"
+      ],
+      "parret_test": {
+        "testfil": "tests/tst_byggesti_og_logfil.cpp",
+        "testklasse": "TestByggestiOgLogfil",
+        "testslots": [
+          "logfil_oprettes_ved_foerste_linje",
+          "logfil_linje_har_iso_tidsstempel",
+          "logfil_appender_uden_at_overskrive",
+          "logfil_roerer_ikke_transskripter"
+        ],
+        "fixtures": [],
+        "bemærkning": "QtTest uden Silica (QT += core testlib); prøven indskrives før src/logfil.cpp og registreres i tests/tests.pro"
+      },
+      "verifikations_trin": [
+        {
+          "trin": "Projektet bygger",
+          "kommando": "qmake harbour-skrynja-2.pro && make",
+          "forventet_uddata": "bygger uden fejl; binæren harbour-skrynja-2 oprettes"
+        },
+        {
+          "trin": "SailJail er frakoblet fra første indskrivning",
+          "kommando": "grep -A1 'X-Sailjail' harbour-skrynja-2.desktop",
+          "forventet_uddata": "[X-Sailjail] efterfulgt af Sandboxing=Disabled"
+        },
+        {
+          "trin": "Kildefiler er registreret i .pro",
+          "kommando": "grep -c 'src/logfil.cpp' harbour-skrynja-2.pro",
+          "forventet_uddata": "1"
+        },
+        {
+          "trin": "Parret test kører grønt",
+          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "forventet_uddata": "ALL TESTS PASSED (heraf TestByggestiOgLogfil)"
+        }
+      ],
+      "passerer": false
+    },
+    {
+      "id": "acp_rygrad",
+      "navn": "ACP-rygrad",
+      "beskrivelse": "ACP-rygraden over stdio: newline-delimiteret JSON (som forgængerens AcpFrameReader) — split på 0x0A, hver linje valideres før levering, flere objekter på én linje håndteres, linjer over cap droppes ved ankomst, ikke-tom hale ved EOF leveres via haleReady. AcpBesked kapsler beskederne med id-korrelation (request/response/notification) og protocolVersion 1.",
+      "filer": [
+        "src/acpframereader.h",
+        "src/acpframereader.cpp",
+        "src/acpbesked.h",
+        "src/acpbesked.cpp"
+      ],
+      "parret_test": {
+        "testfil": "tests/tst_acp_rygrad.cpp",
+        "testklasse": "TestAcpRygrad",
+        "testslots": [
+          "rygrad_fixture_hoved",
+          "rygrad_sammenklaebning",
+          "rygrad_ugyldig_ruller_tilbage",
+          "rygrad_utf8_ugyldig",
+          "rygrad_crlf",
+          "rygrad_flere_paa_en_linje",
+          "rygrad_cap_droppes",
+          "rygrad_hale_ved_eof",
+          "besked_id_korrelation"
+        ],
+        "fixtures": [
+          "tests/fixtures/fixture_rygrad.ndjson",
+          "tests/fixtures/fixture_rygrad_sammenklæbning.ndjson",
+          "tests/fixtures/fixture_rygrad_ugyldig.ndjson",
+          "tests/fixtures/fixture_rygrad_utf8_ugyldig.ndjson"
+        ],
+        "bemærkning": "Prøven indskrives før src/acpframereader.cpp; fixtures læses relativt fra tests/fixtures/"
+      },
+      "verifikations_trin": [
+        {
+          "trin": "Parret test kører grønt på alle fixtures",
+          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "forventet_uddata": "ALL TESTS PASSED (heraf TestAcpRygrad)"
+        },
+        {
+          "trin": "Fixtures er gyldig ndjson",
+          "kommando": "python3 -c \"import json,glob; [ [json.loads(l) for l in open(f) if l.strip()] for f in glob.glob('tests/fixtures/fixture_rygrad*.ndjson') if 'ugyldig' not in f]; print('ok')\"",
+          "forventet_uddata": "ok"
+        }
+      ],
+      "passerer": false
+    },
+    {
+      "id": "agentproces_og_initialisering",
+      "navn": "Agentproces og initialisering",
+      "beskrivelse": "Agentproces og initialisering: QProcess starter agenten på agentstien /home/defaultuser/.local/bin/vibe-acp (standardsti, overskrivelig via QSettings) med arbejdsmappe; der sendes initialize med protocolVersion 1 og tom clientCapabilities (agenten må ikke kalde fs/* eller terminal/*); initialize-svaret parses og configOptions uddrages; startfejl (agent findes ikke) sættes i lastError uden at hænge.",
+      "filer": [
+        "src/agentproces.h",
+        "src/agentproces.cpp",
+        "src/acpclient.h",
+        "src/acpclient.cpp"
+      ],
+      "parret_test": {
+        "testfil": "tests/tst_agentproces_og_initialisering.cpp",
+        "testklasse": "TestAgentprocesOgInitialisering",
+        "testslots": [
+          "standard_agentsti_er_vibe_acp",
+          "initialize_payload_protocolversion_1",
+          "initialize_payload_tom_clientCapabilities",
+          "initialize_svar_parses_og_giver_config_options",
+          "startfejl_giver_lastError_uden_haeng"
+        ],
+        "fixtures": [],
+        "bemærkning": "Prøven indskrives før src/agentproces.cpp; payloads bygges uden at starte en rigtig proces (feedBytesForTest/sendRequestForTest)"
+      },
+      "verifikations_trin": [
+        {
+          "trin": "Parret test kører grønt",
+          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "forventet_uddata": "ALL TESTS PASSED (heraf TestAgentprocesOgInitialisering)"
+        },
+        {
+          "trin": "Agentstien er den låste standardsti",
+          "kommando": "grep -rn '/home/defaultuser/.local/bin/vibe-acp' src/",
+          "forventet_uddata": "præcis én forekomst i standardsti-definitionen"
+        },
+        {
+          "trin": "clientCapabilities er tom i initialize-payload",
+          "kommando": "grep -n 'clientCapabilities' src/acpclient.cpp",
+          "forventet_uddata": "tomt objekt (ingen fs/* eller terminal/* kapabiliteter anmodet)"
+        }
+      ],
+      "passerer": false
+    },
+    {
+      "id": "prompt_og_svar",
+      "navn": "Prompt og svar",
+      "beskrivelse": "Efter initialize sendes session/new med cwd, derefter session/prompt med prompten som content-blokke; agentens session/update med agent_message_chunk akkumuleres løbende til lastText; svar korreleres på request-id; end_turn-notifikationen afslutter runden. Samtalemodellen eksponerer tekst, runde og status til QML.",
+      "filer": [
+        "src/acpclient.h",
+        "src/acpclient.cpp",
+        "src/samtalemodel.h",
+        "src/samtalemodel.cpp"
+      ],
+      "parret_test": {
+        "testfil": "tests/tst_prompt_og_svar.cpp",
+        "testklasse": "TestPromptOgSvar",
+        "testslots": [
+          "session_new_payload_cwd",
+          "prompt_payload_content_blokke",
+          "chunk_akkumuleres_til_lastText",
+          "svar_korreleres_paa_request_id",
+          "end_turn_afslutter_runde"
+        ],
+        "fixtures": [
+          "tests/fixtures/fixture_prompt_svar.ndjson"
+        ],
+        "bemærkning": "Prøven indskrives før src/samtalemodel.cpp"
+      },
+      "verifikations_trin": [
+        {
+          "trin": "Parret test kører grønt",
+          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "forventet_uddata": "ALL TESTS PASSED (heraf TestPromptOgSvar)"
+        },
+        {
+          "trin": "session/prompt förekommer præcis én gang i klienten",
+          "kommando": "grep -c 'session/prompt' src/acpclient.cpp",
+          "forventet_uddata": "1"
+        }
+      ],
+      "passerer": false
+    },
+    {
+      "id": "genoptagelse_af_samtale",
+      "navn": "Genoptagelse af samtale",
+      "beskrivelse": "SessionId gemmes i QSettings efter session/new; ved app-start forsøges session/load med det gemte id (genoptag), ved fejl falder der tilbage til session/new; om samtalen blev genoptaget eksponeres (hadRestoredHistory) til UI. Ved genoptagelse af en arbejdsgang følges projektbeskrivelsens resume-regel: pwd, git status, git log --oneline -20, læs manifestet, vælg første funktion med passerer: false.",
+      "filer": [
+        "src/acpclient.h",
+        "src/acpclient.cpp",
+        "src/sessionlager.h",
+        "src/sessionlager.cpp"
+      ],
+      "parret_test": {
+        "testfil": "tests/tst_genoptagelse_af_samtale.cpp",
+        "testklasse": "TestGenoptagelseAfSamtale",
+        "testslots": [
+          "session_id_gemmes_i_settings",
+          "load_med_gemt_session_id",
+          "fallback_til_new_ved_load_fejl",
+          "hadRestoredHistory_saettes_korrekt",
+          "resumeregel_laeser_manifest_og_finder_foerste_false"
+        ],
+        "fixtures": [],
+        "bemærkning": "Prøven indskrives før src/sessionlager.cpp; QSettings køres mod en midlertidig lokation i prøven"
+      },
+      "verifikations_trin": [
+        {
+          "trin": "Parret test kører grønt",
+          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "forventet_uddata": "ALL TESTS PASSED (heraf TestGenoptagelseAfSamtale)"
+        },
+        {
+          "trin": "session/load håndteres med fallback",
+          "kommando": "grep -n 'session/load' src/acpclient.cpp",
+          "forventet_uddata": "forekomst med tilhørende fallback til session/new"
+        }
+      ],
+      "passerer": false
+    },
+    {
+      "id": "værktøjskald_visning",
+      "navn": "Værktøjskald-visning",
+      "beskrivelse": "Værktøjskald vises i UI mens de sker: session/update med tool_call og tool_call_update parses til en toolCalls-liste (toolCallId, titel, status); UI kvitterer sete kald; listen eksponeres som Q_PROPERTY til QML og opdateres løbende. QML-filerne registreres til installation i .pro.",
+      "filer": [
+        "src/acpclient.h",
+        "src/acpclient.cpp",
+        "src/vaerktoejskaldsmodel.h",
+        "src/vaerktoejskaldsmodel.cpp",
+        "qml/harbour-skrynja-2.qml",
+        "qml/pages/StartSide.qml"
+      ],
+      "parret_test": {
+        "testfil": "tests/tst_vaerktoejskald_visning.cpp",
+        "testklasse": "TestVaerktoejskaldVisning",
+        "testslots": [
+          "tool_call_felter_parses",
+          "tool_call_update_opdaterer_status",
+          "ui_kvitterer_sete_kald",
+          "flere_kald_i_raekkefoelge"
+        ],
+        "fixtures": [
+          "tests/fixtures/fixture_værktøjskald.ndjson"
+        ],
+        "bemærkning": "Prøven indskrives før src/vaerktoejskaldsmodel.cpp; kun modelklassen testes — ingen Silica"
+      },
+      "verifikations_trin": [
+        {
+          "trin": "Parret test kører grønt",
+          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "forventet_uddata": "ALL TESTS PASSED (heraf TestVaerktoejskaldVisning)"
+        },
+        {
+          "trin": "QML-filer er registreret til installation",
+          "kommando": "grep -n 'qml/harbour-skrynja-2.qml' harbour-skrynja-2.pro",
+          "forventet_uddata": "forekomst i installationslisten (INSTALLS eller tilsvarende)"
+        }
+      ],
+      "passerer": false
+    },
+    {
+      "id": "tilladelsesdialog",
+      "navn": "Tilladelsesdialog",
+      "beskrivelse": "Session/request_permission parses til pendingPermission (toolCall-metadata plus options med optionId); UI viser dialogen og brugeren svarer med ét tryk via answerPermission(optionId), som sender svaret med outcome selected og det valgte optionId; afvisning svarer outcome cancelled; der må ikke svares to gange på samme anmodning; antal anmodninger tælles.",
+      "filer": [
+        "src/acpclient.h",
+        "src/acpclient.cpp",
+        "src/tilladelsesmodel.h",
+        "src/tilladelsesmodel.cpp",
+        "qml/pages/TilladelsesDialog.qml"
+      ],
+      "parret_test": {
+        "testfil": "tests/tst_tilladelsesdialog.cpp",
+        "testklasse": "TestTilladelsesdialog",
+        "testslots": [
+          "anmodning_parses_til_pendingPermission",
+          "options_liste_med_optionId",
+          "svar_payload_selected_optionId",
+          "afvisning_giver_outcome_cancelled",
+          "ingen_dobbelt_svar"
+        ],
+        "fixtures": [
+          "tests/fixtures/fixture_tilladelse.ndjson"
+        ],
+        "bemærkning": "Prøven indskrives før src/tilladelsesmodel.cpp"
+      },
+      "verifikations_trin": [
+        {
+          "trin": "Parret test kører grønt",
+          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "forventet_uddata": "ALL TESTS PASSED (heraf TestTilladelsesdialog)"
+        },
+        {
+          "trin": "request_permission håndteres før svar",
+          "kommando": "grep -n 'session/request_permission' src/acpclient.cpp",
+          "forventet_uddata": "håndtering før answerPermission-svaret sendes"
+        }
+      ],
+      "passerer": false
+    },
+    {
+      "id": "stop_og_afvis",
+      "navn": "Stop og afvis",
+      "beskrivelse": "Stop og afvis — dette trin må ikke springes over: session/cancel sendes som notifikation for at stoppe agentens igangværende runde; afvisning af en tilladelse svarer outcome cancelled; stopAgent() terminerer QProcess (kill hvis nødvendigt), så ingen agent hænger efter app-afslutning.",
+      "filer": [
+        "src/acpclient.h",
+        "src/acpclient.cpp",
+        "src/agentproces.h",
+        "src/agentproces.cpp"
+      ],
+      "parret_test": {
+        "testfil": "tests/tst_stop_og_afvis.cpp",
+        "testklasse": "TestStopOgAfvis",
+        "testslots": [
+          "cancel_notification_payload",
+          "afvisning_outcome_cancelled",
+          "stopAgent_terminerer_proces",
+          "ingen_haengende_proces_efter_stop",
+          "stop_og_afvis_er_obligatorisk_i_raekkefoelge"
+        ],
+        "fixtures": [],
+        "bemærkning": "Prøven indskrives før ændringen i src/agentproces.cpp; 'obligatorisk i rækkefølge' tjekker manifest-ordenen via tjek_manifest_parrede_tests.py"
+      },
+      "verifikations_trin": [
+        {
+          "trin": "Parret test kører grønt",
+          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "forventet_uddata": "ALL TESTS PASSED (heraf TestStopOgAfvis)"
+        },
+        {
+          "trin": "session/cancel er implementeret",
+          "kommando": "grep -c 'session/cancel' src/acpclient.cpp",
+          "forventet_uddata": "1"
+        },
+        {
+          "trin": "Manifest-rækkefølge placerer stop_og_afvis før diff_og_uddata",
+          "kommando": "python3 tjek_manifest_parrede_tests.py",
+          "forventet_uddata": "rækkefølge ok; stop_og_afvis ikke sprunget over"
+        }
+      ],
+      "passerer": false
+    },
+    {
+      "id": "diff_og_uddata",
+      "navn": "Diff og uddata",
+      "beskrivelse": "Filændringer fra tool_call/tool_call_update content (diff-blokke) samles i diffs-listen, og øvrig uddata (f.eks. kommando-output) i outputs-listen — vist i UI mens det sker; lange diff-linjer cappes som i rygraden; diff vises som diff, ikke som rå transskript.",
+      "filer": [
+        "src/acpclient.h",
+        "src/acpclient.cpp",
+        "src/diffmodel.h",
+        "src/diffmodel.cpp",
+        "qml/pages/DiffVisning.qml"
+      ],
+      "parret_test": {
+        "testfil": "tests/tst_diff_og_uddata.cpp",
+        "testklasse": "TestDiffOgUddata",
+        "testslots": [
+          "diff_blok_parses",
+          "diff_linjer_cappes",
+          "outputs_akkumuleres",
+          "diff_vises_mens_det_sker"
+        ],
+        "fixtures": [
+          "tests/fixtures/fixture_diff.ndjson",
+          "tests/fixtures/fixture_uddata.ndjson"
+        ],
+        "bemærkning": "Prøven indskrives før src/diffmodel.cpp"
+      },
+      "verifikations_trin": [
+        {
+          "trin": "Parret test kører grønt",
+          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "forventet_uddata": "ALL TESTS PASSED (heraf TestDiffOgUddata)"
+        },
+        {
+          "trin": "diffs og outputs eksponeres til UI",
+          "kommando": "grep -n 'Q_PROPERTY.*diffs\\|Q_PROPERTY.*outputs' src/acpclient.h",
+          "forventet_uddata": "to Q_PROPERTY-linjer (diffs, outputs)"
+        }
+      ],
+      "passerer": false
+    },
+    {
+      "id": "konfiguration_af_agent",
+      "navn": "Konfiguration af agent",
+      "beskrivelse": "ConfigOptions uddrages af initialize-svaret og eksponeres til UI; set_config_option sendes med configId og værdi; agentstien kan overskrives via QSettings (standard /home/defaultuser/.local/bin/vibe-acp); clientCapabilities forbliver tom ved initialize.",
+      "filer": [
+        "src/acpclient.h",
+        "src/acpclient.cpp",
+        "src/konfigurationsmodel.h",
+        "src/konfigurationsmodel.cpp",
+        "qml/pages/KonfigurationsSide.qml"
+      ],
+      "parret_test": {
+        "testfil": "tests/tst_konfiguration_af_agent.cpp",
+        "testklasse": "TestKonfigurationAfAgent",
+        "testslots": [
+          "config_options_fra_initialize_svar",
+          "set_config_option_payload",
+          "agentsti_override_fra_settings",
+          "standard_agentsti_er_vibe_acp",
+          "clientCapabilities_fortsat_tom"
+        ],
+        "fixtures": [
+          "tests/fixtures/fixture_initialize_config.ndjson"
+        ],
+        "bemærkning": "Prøven indskrives før src/konfigurationsmodel.cpp; QSettings køres mod midlertidig lokation"
+      },
+      "verifikations_trin": [
+        {
+          "trin": "Parret test kører grønt",
+          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "forventet_uddata": "ALL TESTS PASSED (heraf TestKonfigurationAfAgent)"
+        },
+        {
+          "trin": "set_config_option er implementeret",
+          "kommando": "grep -c 'set_config_option' src/acpclient.cpp",
+          "forventet_uddata": "1"
+        }
+      ],
+      "passerer": false
+    },
+    {
+      "id": "selvtest_med_verdict",
+      "navn": "Selvtest med verdict",
+      "beskrivelse": "--selvtest kører kæden end-to-end mod agenten: prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med exit-kode 0; verdict (pass/fail med årsag) skrives til en verdict-fil (JSON), der kan læses tilbage; der skrives aldrig to verdicts; verdict skrives også ved agentdød og startfejl.",
+      "filer": [
+        "src/main.cpp",
+        "src/acpclient.h",
+        "src/acpclient.cpp",
+        "src/selvtest.h",
+        "src/selvtest.cpp"
+      ],
+      "parret_test": {
+        "testfil": "tests/tst_selvtest_med_verdict.cpp",
+        "testklasse": "TestSelvtestMedVerdict",
+        "testslots": [
+          "verdict_pass_ved_end_turn_og_exit_0",
+          "verdict_fail_uden_toolcall",
+          "ingen_dobbelt_verdict",
+          "verdict_ved_agentdoed",
+          "verdict_ved_startfejl",
+          "verdict_fil_skrives_og_laeses_tilbage"
+        ],
+        "fixtures": [
+          "tests/fixtures/fixture_end_turn.ndjson",
+          "tests/fixtures/fixture_tilladelse_og_svar.ndjson"
+        ],
+        "bemærkning": "Prøven indskrives før src/selvtest.cpp; selvtest simuleres via feedBytesForTest uden rigtig agent"
+      },
+      "verifikations_trin": [
+        {
+          "trin": "Parret test kører grønt",
+          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "forventet_uddata": "ALL TESTS PASSED (heraf TestSelvtestMedVerdict)"
+        },
+        {
+          "trin": "End-to-end selvtest på mål-enheden afslutter med kode 0",
+          "kommando": "./harbour-skrynja-2 --selvtest; echo \"exit=$?\"",
+          "forventet_uddata": "exit=0 og verdict-filen viser pass (kræver vibe-acp på enheden)"
+        }
+      ],
+      "passerer": false
+    },
+    {
+      "id": "prøvesuite_i_tests",
+      "navn": "Prøvesuite i tests/",
+      "beskrivelse": "Hele prøvesuiten samles i tests/: tests.pro bygger alle parrede testfiler (tst_*.cpp) plus de src-filer de afprøver, uden Silica-afhængighed (QT += core testlib); suiten kører alle 13 testklasser svarende til manifestets parrede tests; tjek_manifest_parrede_tests.py kontrollerer, at hver funktion i manifestet har sin parrede testfil registreret i tests.pro.",
+      "filer": [
+        "tests/tests.pro",
+        "tests/tst_proevesuite_i_tests.cpp",
+        "tjek_manifest_parrede_tests.py"
+      ],
+      "parret_test": {
+        "testfil": "tests/tst_proevesuite_i_tests.cpp",
+        "testklasse": "TestProevesuiteITests",
+        "testslots": [
+          "alle_manifest_testfiler_er_i_tests_pro",
+          "ingen_silica_afhaengighed_i_tests_pro",
+          "suite_omfatter_alle_13_testklasser",
+          "manifest_har_13_parrede_tests"
+        ],
+        "fixtures": [],
+        "bemærkning": "Meta-prøve: læser manifestet og tests.pro og tjekker parringen 1:1"
+      },
+      "verifikations_trin": [
+        {
+          "trin": "Hele suiten bygger og kører grønt",
+          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "forventet_uddata": "ALL TESTS PASSED (alle 13 testklasser)"
+        },
+        {
+          "trin": "Manifest-parring kontrolleres",
+          "kommando": "python3 tjek_manifest_parrede_tests.py",
+          "forventet_uddata": "13/13 funktioner har parret testfil registreret i tests/tests.pro"
+        }
+      ],
+      "passerer": false
+    },
+    {
+      "id": "oprydning_af_træ",
+      "navn": "Oprydning af træ",
+      "beskrivelse": "Efter hver arbejdsgang er depotet rent: ingen build-artefakter, midlertidige filer, logfiler eller hemmeligheder (nøgler, tokens, transskripter) i træet; .gitignore dækker build-mapper; agenten er stoppet; alle ændringer er indskrevet med beskrivende besked.",
+      "filer": [
+        ".gitignore",
+        "src/agentproces.cpp",
+        "src/acpclient.cpp"
+      ],
+      "parret_test": {
+        "testfil": "tests/tst_oprydning_af_trae.cpp",
+        "testklasse": "TestOprydningAfTrae",
+        "testslots": [
+          "git_status_porcelain_tom_efter_indskrivning",
+          "ingen_hemmeligheder_i_trae",
+          "ingen_build_artefakter_i_trae",
+          "agentproces_ikke_haengende",
+          "logfil_uden_transskripter"
+        ],
+        "fixtures": [],
+        "bemærkning": "Prøven kører git/git-grep mod repo-roden fra tests/ (..); prøven indskrives før .gitignore-ændringen"
+      },
+      "verifikations_trin": [
+        {
+          "trin": "Parret test kører grønt",
+          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "forventet_uddata": "ALL TESTS PASSED (heraf TestOprydningAfTrae)"
+        },
+        {
+          "trin": "Arbejdstræ er rent efter indskrivning",
+          "kommando": "git status --porcelain",
+          "forventet_uddata": "tom uddata"
+        },
+        {
+          "trin": "Ingen hemmeligheder i træet",
+          "kommando": "git grep -nE '(api[_-]?key|token|password|BEGIN [A-Z ]*PRIVATE KEY)' -- . ':!LICENSE' || true",
+          "forventet_uddata": "ingen hits"
+        }
+      ],
+      "passerer": false
+    }
+  ]
+}
