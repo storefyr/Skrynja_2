@@ -591,7 +591,7 @@
           "forventet_uddata": "ingen hits"
         }
       ],
-      "passerer": false
+      "passerer": true
     }
   ]
 }
