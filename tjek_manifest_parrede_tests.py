@@ -39,27 +39,32 @@ def main():
     ok = 0
     mangler = []
     for fn in funktioner:
-        if not fn.get("passerer"):
-            continue
         pt = fn["parret_test"]
         testfil = os.path.join(ROOT, pt["testfil"])
         if not os.path.exists(testfil):
-            mangler.append(fn["id"] + " (testfil mangler)")
+            if fn.get("passerer"):
+                mangler.append(fn["id"] + " (testfil mangler)")
             continue
         if os.path.basename(pt["testfil"]) not in tests_pro:
-            mangler.append(fn["id"] + " (ikke i tests.pro)")
+            if fn.get("passerer"):
+                mangler.append(fn["id"] + " (ikke i tests.pro)")
             continue
         with open(testfil, encoding="utf-8") as f:
             indhold = f.read()
         if pt["testklasse"] not in indhold:
-            mangler.append(fn["id"] + " (testklasse mangler)")
+            if fn.get("passerer"):
+                mangler.append(fn["id"] + " (testklasse mangler)")
             continue
+        slot_mangler = None
         for slot in pt.get("testslots", []):
             if slot not in indhold:
-                mangler.append(fn["id"] + " (testslot mangler: " + slot + ")")
+                slot_mangler = slot
                 break
-        else:
-            ok += 1
+        if slot_mangler is not None:
+            if fn.get("passerer"):
+                mangler.append(fn["id"] + " (testslot mangler: " + slot_mangler + ")")
+            continue
+        ok += 1
 
     total = len(funktioner)
     print("%d/%d funktioner har parret testfil registreret i tests/tests.pro" % (ok, total))

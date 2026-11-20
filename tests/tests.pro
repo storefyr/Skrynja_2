@@ -20,6 +20,8 @@ SOURCES += \
     tst_diff_og_uddata.cpp \
     tst_konfiguration_af_agent.cpp \
     tst_selvtest_med_verdict.cpp \
+    tst_proevesuite_i_tests.cpp \
+    tst_oprydning_af_trae.cpp \
     ../src/logfil.cpp \
     ../src/acpframereader.cpp \
     ../src/acpbesked.cpp \

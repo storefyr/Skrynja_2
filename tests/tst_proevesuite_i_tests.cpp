@@ -1,0 +1,108 @@
+#include <QtTest/QtTest>
+#include <QCoreApplication>
+#include <QFile>
+#include <QFileInfo>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+
+#include "testregistrering.h"
+
+class TestProevesuiteITests : public QObject
+{
+    Q_OBJECT
+private slots:
+    void manifest_har_13_parrede_tests();
+    void alle_manifest_testfiler_er_i_tests_pro();
+    void ingen_silica_afhaengighed_i_tests_pro();
+    void suite_omfatter_alle_13_testklasser();
+private:
+    QString repoRod();
+    QJsonObject læsManifest();
+    QString læsTestsPro();
+};
+
+REGISTRER_TEST(TestProevesuiteITests)
+
+QString TestProevesuiteITests::repoRod()
+{
+    QString rod = QCoreApplication::applicationDirPath() + "/..";
+    if (!QFileInfo::exists(rod + "/realiseringsmanifest_for_funktioner_og_parrede_tests.json"))
+        rod = "..";
+    return rod;
+}
+
+QJsonObject TestProevesuiteITests::læsManifest()
+{
+    QFile f(repoRod() + "/realiseringsmanifest_for_funktioner_og_parrede_tests.json");
+    if (!f.open(QIODevice::ReadOnly))
+        return QJsonObject();
+    return QJsonDocument::fromJson(f.readAll()).object();
+}
+
+QString TestProevesuiteITests::læsTestsPro()
+{
+    QString sti = QCoreApplication::applicationDirPath() + "/tests.pro";
+    if (!QFileInfo::exists(sti))
+        sti = "tests.pro";
+    QFile f(sti);
+    if (!f.open(QIODevice::ReadOnly))
+        return QString();
+    return QString::fromUtf8(f.readAll());
+}
+
+void TestProevesuiteITests::manifest_har_13_parrede_tests()
+{
+    QJsonObject manifest = læsManifest();
+    QVERIFY(!manifest.isEmpty());
+    QJsonArray funktioner = manifest.value("funktioner").toArray();
+    QCOMPARE(funktioner.size(), 13);
+    QCOMPARE(manifest.value("strategisk_rækkefølge").toArray().size(), 13);
+    for (int i = 0; i < funktioner.size(); ++i) {
+        QJsonObject fn = funktioner.at(i).toObject();
+        QJsonObject pt = fn.value("parret_test").toObject();
+        QVERIFY2(!pt.value("testfil").toString().isEmpty(), qPrintable(fn.value("id").toString()));
+        QVERIFY2(!pt.value("testklasse").toString().isEmpty(), qPrintable(fn.value("id").toString()));
+        QVERIFY2(!pt.value("testslots").toArray().isEmpty(), qPrintable(fn.value("id").toString()));
+    }
+}
+
+void TestProevesuiteITests::alle_manifest_testfiler_er_i_tests_pro()
+{
+    QJsonObject manifest = læsManifest();
+    QString testsPro = læsTestsPro();
+    QVERIFY(!testsPro.isEmpty());
+    QJsonArray funktioner = manifest.value("funktioner").toArray();
+    for (int i = 0; i < funktioner.size(); ++i) {
+        QJsonObject pt = funktioner.at(i).toObject().value("parret_test").toObject();
+        QString testfil = pt.value("testfil").toString();
+        QVERIFY2(QFileInfo::exists(repoRod() + "/" + testfil), qPrintable(testfil));
+        QVERIFY2(testsPro.contains(QFileInfo(testfil).fileName()),
+                 qPrintable("ikke i tests.pro: " + testfil));
+    }
+}
+
+void TestProevesuiteITests::ingen_silica_afhaengighed_i_tests_pro()
+{
+    QString testsPro = læsTestsPro();
+    QVERIFY(testsPro.contains("testlib"));
+    QVERIFY(!testsPro.contains("silica", Qt::CaseInsensitive));
+    QVERIFY(!testsPro.contains("Sailfish", Qt::CaseInsensitive));
+}
+
+void TestProevesuiteITests::suite_omfatter_alle_13_testklasser()
+{
+    QJsonObject manifest = læsManifest();
+    QJsonArray funktioner = manifest.value("funktioner").toArray();
+    QStringList registrerede;
+    for (int i = 0; i < testRegistreringer().size(); ++i)
+        registrerede.append(testRegistreringer().at(i).navn);
+    QCOMPARE(registrerede.size(), 13);
+    for (int i = 0; i < funktioner.size(); ++i) {
+        QString klasse = funktioner.at(i).toObject().value("parret_test").toObject()
+                             .value("testklasse").toString();
+        QVERIFY2(registrerede.contains(klasse), qPrintable(klasse));
+    }
+}
+
+#include "tst_proevesuite_i_tests.moc"
