@@ -58,7 +58,7 @@ void TestOprydningAfTrae::ingen_hemmeligheder_i_trae()
     tilladte << "realiseringsmanifest_for_funktioner_og_parrede_tests.json"
              << "projektbeskrivelse.adoc";
     for (int i = 0; i < linjer.size(); ++i) {
-        QString fil = linjer.at(i).section(':', 1, 1);
+        QString fil = linjer.at(i).section(':', 0, 0);
         QVERIFY2(tilladte.contains(fil),
                  qPrintable("uventet hit (mulig hemmelighed): " + linjer.at(i)));
     }
