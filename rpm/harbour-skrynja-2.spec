@@ -15,6 +15,9 @@ Skrynja_2 er en ACP-klient til Sailfish OS: den starter agenten
 og viser værktøjskald, filændringer, tilladelser og tilstande, mens de
 sker. Tilladelser besvares med et enkelt tryk.
 
+%prep
+%setup -q
+
 %build
 qmake harbour-skrynja-2.pro
 make %{?_smp_mflags}
