@@ -12,6 +12,7 @@
 class AcpFrameReader;
 class AgentProces;
 class DiffModel;
+class Konfigurationsmodel;
 class SamtaleModel;
 class SessionLager;
 class Tilladelsesmodel;
@@ -29,6 +30,8 @@ class AcpClient : public QObject
     Q_PROPERTY(int tilladelseAntal READ tilladelseAntal NOTIFY tilladelseAendret)
     Q_PROPERTY(QVariantList diffs READ diffs NOTIFY diffsAendret)
     Q_PROPERTY(QVariantList outputs READ outputs NOTIFY outputsAendret)
+    Q_PROPERTY(QVariantList configOptions READ configOptions NOTIFY konfigurationAendret)
+    Q_PROPERTY(QString agentsti READ agentsti NOTIFY agentstiAendret)
 public:
     explicit AcpClient(QObject* parent = 0);
     ~AcpClient();
@@ -59,6 +62,10 @@ public:
     DiffModel* diffModel() const;
     QVariantList diffs() const;
     QVariantList outputs() const;
+    Konfigurationsmodel* konfigurationsmodel() const;
+    Q_INVOKABLE void setConfigOption(const QString& configId, const QVariant& værdi);
+    QString agentsti() const;
+    Q_INVOKABLE void setAgentsti(const QString& sti);
     QString sessionId() const;
     QString stopReason() const;
     bool hadRestoredHistory() const;
@@ -84,6 +91,8 @@ signals:
     void tilladelseAendret();
     void diffsAendret();
     void outputsAendret();
+    void konfigurationAendret();
+    void agentstiAendret();
 
 protected:
     qint64 næsteId();
@@ -104,6 +113,7 @@ protected:
     VaerktoejskaldsModel* m_vaerktoejskald;
     Tilladelsesmodel* m_tilladelse;
     DiffModel* m_diff;
+    Konfigurationsmodel* m_konfiguration;
     qint64 m_næsteId;
     bool m_testTilstand;
     QList<QByteArray> m_sendte;

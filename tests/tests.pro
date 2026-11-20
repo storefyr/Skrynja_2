@@ -18,6 +18,7 @@ SOURCES += \
     tst_tilladelsesdialog.cpp \
     tst_stop_og_afvis.cpp \
     tst_diff_og_uddata.cpp \
+    tst_konfiguration_af_agent.cpp \
     ../src/logfil.cpp \
     ../src/acpframereader.cpp \
     ../src/acpbesked.cpp \
@@ -27,7 +28,8 @@ SOURCES += \
     ../src/sessionlager.cpp \
     ../src/vaerktoejskaldsmodel.cpp \
     ../src/tilladelsesmodel.cpp \
-    ../src/diffmodel.cpp
+    ../src/diffmodel.cpp \
+    ../src/konfigurationsmodel.cpp
 
 HEADERS += \
     testregistrering.h \
@@ -40,4 +42,5 @@ HEADERS += \
     ../src/sessionlager.h \
     ../src/vaerktoejskaldsmodel.h \
     ../src/tilladelsesmodel.h \
-    ../src/diffmodel.h
+    ../src/diffmodel.h \
+    ../src/konfigurationsmodel.h

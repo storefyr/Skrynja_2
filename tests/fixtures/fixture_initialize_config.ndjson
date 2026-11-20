@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","id":1,"result":{"protocolVersion":1,"configOptions":[{"configId":"model","name":"Model","value":"vibe-large","description":" hvilken model agenten bruger"},{"configId":"maxTokens","name":"Maks tokens","value":4096}]}}

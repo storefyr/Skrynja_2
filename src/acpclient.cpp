@@ -8,6 +8,7 @@
 #include "acpframereader.h"
 #include "agentproces.h"
 #include "diffmodel.h"
+#include "konfigurationsmodel.h"
 #include "samtalemodel.h"
 #include "sessionlager.h"
 #include "tilladelsesmodel.h"
@@ -17,6 +18,7 @@
 
 static const QString kSessionPrompt = QLatin1String("session/prompt");
 static const QString kSessionCancel = QLatin1String("session/cancel");
+static const QString kSetConfigOption = QLatin1String("session/set_config_option");
 
 AcpClient::AcpClient(QObject* parent)
     : QObject(parent)
@@ -27,6 +29,7 @@ AcpClient::AcpClient(QObject* parent)
     , m_vaerktoejskald(new VaerktoejskaldsModel(this))
     , m_tilladelse(new Tilladelsesmodel(this))
     , m_diff(new DiffModel(this))
+    , m_konfiguration(new Konfigurationsmodel(this))
     , m_næsteId(1)
     , m_testTilstand(false)
     , m_hadRestoredHistory(false)
@@ -38,6 +41,7 @@ AcpClient::AcpClient(QObject* parent)
     connect(m_tilladelse, SIGNAL(changed()), this, SIGNAL(tilladelseAendret()));
     connect(m_diff, SIGNAL(changed()), this, SIGNAL(diffsAendret()));
     connect(m_diff, SIGNAL(changed()), this, SIGNAL(outputsAendret()));
+    connect(m_konfiguration, SIGNAL(changed()), this, SIGNAL(konfigurationAendret()));
 }
 
 AcpClient::~AcpClient()
@@ -216,6 +220,32 @@ QVariantList AcpClient::outputs() const
     return m_diff->outputs();
 }
 
+Konfigurationsmodel* AcpClient::konfigurationsmodel() const
+{
+    return m_konfiguration;
+}
+
+void AcpClient::setConfigOption(const QString& configId, const QVariant& værdi)
+{
+    QJsonObject params;
+    params.insert("sessionId", m_sessionId);
+    params.insert("configId", configId);
+    params.insert("value", QJsonValue::fromVariant(værdi));
+    qint64 id = sendRequest(kSetConfigOption, params);
+    m_åbneAnmodninger.insert(id, kSetConfigOption);
+}
+
+QString AcpClient::agentsti() const
+{
+    return m_proces->agentsti();
+}
+
+void AcpClient::setAgentsti(const QString& sti)
+{
+    m_proces->sætAgentsti(sti);
+    emit agentstiAendret();
+}
+
 QString AcpClient::sessionId() const
 {
     return m_sessionId;
@@ -345,6 +375,7 @@ void AcpClient::håndterBesked(const AcpBesked& besked)
             m_configOptions.clear();
             for (int i = 0; i < options.size(); ++i)
                 m_configOptions.append(options.at(i).toObject().toVariantMap());
+            m_konfiguration->setConfigOptions(m_configOptions);
             emit initializeSvar(resultat);
             emit agentKlar();
         } else if (metode == "session/load") {

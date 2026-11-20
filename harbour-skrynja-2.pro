@@ -15,7 +15,8 @@ SOURCES += \
     src/sessionlager.cpp \
     src/vaerktoejskaldsmodel.cpp \
     src/tilladelsesmodel.cpp \
-    src/diffmodel.cpp
+    src/diffmodel.cpp \
+    src/konfigurationsmodel.cpp
 
 HEADERS += \
     src/logfil.h \
@@ -27,7 +28,8 @@ HEADERS += \
     src/sessionlager.h \
     src/vaerktoejskaldsmodel.h \
     src/tilladelsesmodel.h \
-    src/diffmodel.h
+    src/diffmodel.h \
+    src/konfigurationsmodel.h
 
 OTHER_FILES += \
     harbour-skrynja-2.desktop \
@@ -45,6 +47,6 @@ INSTALLS += desktop
 
 qml.files = qml/harbour-skrynja-2.qml
 qml.path = /usr/share/harbour-skrynja-2/qml
-qmlpages.files = qml/pages/StartSide.qml qml/pages/TilladelsesDialog.qml qml/pages/DiffVisning.qml
+qmlpages.files = qml/pages/StartSide.qml qml/pages/TilladelsesDialog.qml qml/pages/DiffVisning.qml qml/pages/KonfigurationsSide.qml
 qmlpages.path = /usr/share/harbour-skrynja-2/qml/pages
 INSTALLS += qml qmlpages
