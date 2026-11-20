@@ -20,7 +20,7 @@ qmake harbour-skrynja-2.pro
 make %{?_smp_mflags}
 
 %install
-%make_install INSTALL_ROOT=%{buildroot}
+make install INSTALL_ROOT=%{buildroot}
 
 %files
 %defattr(-,root,root,-)
