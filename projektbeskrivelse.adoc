@@ -121,7 +121,7 @@ Rammen er ikke-forhandlingsbar og arves fra forgængerprojekterne og fra license
 * Tom `clientCapabilities` ved initialize — agenten må ikke kalde `fs/*` eller `terminal/*`.
 * Ingen SailJail: `Sandboxing=Disabled` i `.desktop`-filen fra første indskrivning, ellers er agentstien ikke nåbar.
 * Agentsti: `/home/defaultuser/.local/bin/vibe-acp`.
-* Sprog: kode, kommentarer og commits er engelske; dokumentation og brugerflade er dansk.
+* Sprog: kode og kommentarer er engelske; dokumentation, brugerflade og commits er danske.
 * Prøver: QtTest i `tests/` uden Silica-afhængighed; prøven indskrives før den kilde, den afprøver.
 * Filer: nye kildefiler registreres i `.pro`-filen; nye QML-filer registreres til installation.
 * Hemmeligheder: ingen nøgler, tokens eller samtale-transskripter må nogensinde ind i depotet.
