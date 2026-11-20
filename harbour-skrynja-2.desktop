@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Skrynja 2
+Comment=Kontrolcenter for realiseringsøkosystemet
+Exec=harbour-skrynja-2
+Icon=harbour-skrynja-2
+X-Nemo-Application-Type=silica-qt5
+X-Harbour-Category=tools
+
+[X-Sailjail]
+Sandboxing=Disabled

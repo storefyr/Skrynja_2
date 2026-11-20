@@ -1,0 +1,7 @@
+Builder: qmake
+PkgConfigBR: []
+PkgBR: []
+
+Files:
+  - harbour-skrynja-2.desktop
+  - qml

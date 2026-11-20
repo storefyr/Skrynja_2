@@ -107,7 +107,7 @@
           "forventet_uddata": "ALL TESTS PASSED (heraf TestByggestiOgLogfil)"
         }
       ],
-      "passerer": false
+      "passerer": true
     },
     {
       "id": "acp_rygrad",
