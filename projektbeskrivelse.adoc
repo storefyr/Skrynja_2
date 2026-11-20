@@ -18,7 +18,7 @@ Menneskelig konceptualisator og realiseringsorkestrator
             │  ▲ strategisk eskalering (arkitektoniske brister)
             ▼
   Projektstokastiker ──────► realiseringsmanifest for funktioner
-            │                og parrede tests (funktionsliste.json + tests/)
+            │                og parrede tests (realiseringsmanifest_for_funktioner_og_parrede_tests.json + tests/)
             │  taktisk ordre
             ▼
   Realiseringsstokastiker ─► realiseringsartefaktet (kildekode)
@@ -49,7 +49,7 @@ Flowet, som appen administrerer, svarer til økosystemets artefakter:
 
 | Plan | `projektbeskrivelse.adoc` | Strategien, som agenten arbejder efter
 
-| Manifest | `funktionsliste.json` + parrede tests i `tests/` | Funktion for funktion med målbare verifikations_trin og `passerer`-status
+| Manifest | `realiseringsmanifest_for_funktioner_og_parrede_tests.json` + parrede tests i `tests/` | Funktion for funktion med målbare verifikations_trin og `passerer`-status
 
 | Artefakter | Realiseringsartefakt (kildekode), distributionsartefakt (RPM), vurderings-JSON'er | Værktøjskald, filændringer og diffs, mens de sker; tilladelser besvares med et tryk
 |===
@@ -58,7 +58,7 @@ De tre egenskaber — overskuelig, intuitiv og kohærent — er præcis dem, som
 
 * Mål-enhed: Jolla Phone (2026) med Sailfish OS — kun aarch64 bygges, måles og udgives.
 * Succeskriterium: prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0.
-* Forgængere: `storefyr/Skrynja` (vejkort S0–S7, måltilstand) og `storefyr/Skrynja-1` (prototype, hvor `config.yaml` er projektets eneste normative kilde).
+* Forgængere (kun reference): `storefyr/Skrynja` (vejkort S0–S7, måltilstand) og `storefyr/Skrynja-1` (prototype). Clean slate: dette depot starter fra `main` (kun licensen); de normative kilder her er denne `projektbeskrivelse.adoc` og — når Projektstokastikeren har udstedt det — `realiseringsmanifest_for_funktioner_og_parrede_tests.json`.
 
 == Roller og artefakter
 
@@ -78,7 +78,7 @@ De tre egenskaber — overskuelig, intuitiv og kohærent — er præcis dem, som
 | Ejer projektets overordnede plan og er garant for visionens integritet; omsætter visionen til en sammenhængende, teknisk realiserbar strategi.
 
 | Projektstokastiker
-| Realiseringsmanifest for funktioner og parrede tests — i dette depot realiseret som `funktionsliste.json` med tilhørende QtTest-prøver i `tests/`
+| Realiseringsmanifest for funktioner og parrede tests — artefaktet `realiseringsmanifest_for_funktioner_og_parrede_tests.json` med tilhørende QtTest-prøver i `tests/`
 | Bryder strategien ned i funktioner med målbare verifikations_trin; udsteder taktiske ordrer til Realiseringsstokastikeren; eskalerer arkitektoniske brister strategisk opad.
 
 | Realiseringsstokastiker
@@ -112,7 +112,7 @@ Kæden er lukket og sporbar i begge retninger:
 
 == Teknisk ramme og begrænsninger
 
-Rammen er ikke-forhandlingsbar og kommer fra projektets initialiseringsartefakt (`funktionsliste.json`):
+Rammen er ikke-forhandlingsbar og arves fra forgængerprojekterne og fra licensen i dette depot (GPL-3.0):
 
 * Kun Qt 5.6 — ingen API indført i 5.7 eller senere.
 * QML: QtQuick 2.0 + Sailfish.Silica 1.0; JavaScript i QML er ES5.
@@ -136,7 +136,7 @@ Rammen er ikke-forhandlingsbar og kommer fra projektets initialiseringsartefakt 
 | AsciiDoc (denne fil)
 | Strategistokastiker → alle stokastikere
 
-| `funktionsliste.json` (realiseringsmanifest for funktioner og parrede tests)
+| `realiseringsmanifest_for_funktioner_og_parrede_tests.json` (realiseringsmanifest for funktioner og parrede tests)
 | JSON, danske nøgler i snake_case; hver funktion har `id`, `navn`, `beskrivelse`, `verifikations_trin`, `passerer`
 | Projektstokastiker → Realiseringsstokastiker
 
@@ -161,13 +161,13 @@ Rammen er ikke-forhandlingsbar og kommer fra projektets initialiseringsartefakt 
 
 . Én funktion ad gangen i manifestets rækkefølge: implementer funktionen, kør dens verifikations_trin, og sæt først `passerer` til sand, når hvert trin er målt med en udskrift, der kan gengives. Ingen påstand om et udfald uden en måling.
 . Redigeringsregel for manifestet: en post må kun ændres ved at sætte `passerer` fra `false` til sand efter målte trin — beskrivelser og verifikations_trin må ikke fjernes eller omskrives.
-. Ved genoptagelse af en arbejdsgang: kør `pwd` og `git status`, kør `git log --oneline -20`, læs `funktionsliste.json`, og vælg den første funktion i rækkefølgen med `passerer: false`.
+. Ved genoptagelse af en arbejdsgang: kør `pwd` og `git status`, kør `git log --oneline -20`, læs realiseringsmanifestet (`realiseringsmanifest_for_funktioner_og_parrede_tests.json`), og vælg den første funktion i rækkefølgen med `passerer: false`.
 . Efter hver arbejdsgang indskrives ændringerne med beskrivende besked, så næste samtale kan læse fremdriften i git-historikken.
 . Semantisk kontrol (audit af kildekoden) udføres løbende: koden skal altid kunne læses tilbage til denne projektbeskrivelse og til manifestets verifikations_trin.
 
 == Strategisk rækkefølge
 
-Realiseringsmanifestet (`funktionsliste.json`) definerer 13 funktioner i denne rækkefølge — strategien er at gennemføre dem én ad gangen uden at springe trin over (særligt `stop_og_afvis` må ikke springes over):
+Denne plan fastlægger 13 funktioner i følgende rækkefølge; Projektstokastikeren overfører dem til realiseringsmanifestet — strategien er at gennemføre dem én ad gangen uden at springe trin over (særligt `stop_og_afvis` må ikke springes over):
 
 . `byggesti_og_logfil`
 . `acp_rygrad`
