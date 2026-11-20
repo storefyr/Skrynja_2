@@ -433,7 +433,7 @@
           "forventet_uddata": "to Q_PROPERTY-linjer (diffs, outputs)"
         }
       ],
-      "passerer": false
+      "passerer": true
     },
     {
       "id": "konfiguration_af_agent",

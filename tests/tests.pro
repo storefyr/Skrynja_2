@@ -17,6 +17,7 @@ SOURCES += \
     tst_vaerktoejskald_visning.cpp \
     tst_tilladelsesdialog.cpp \
     tst_stop_og_afvis.cpp \
+    tst_diff_og_uddata.cpp \
     ../src/logfil.cpp \
     ../src/acpframereader.cpp \
     ../src/acpbesked.cpp \
@@ -25,7 +26,8 @@ SOURCES += \
     ../src/samtalemodel.cpp \
     ../src/sessionlager.cpp \
     ../src/vaerktoejskaldsmodel.cpp \
-    ../src/tilladelsesmodel.cpp
+    ../src/tilladelsesmodel.cpp \
+    ../src/diffmodel.cpp
 
 HEADERS += \
     testregistrering.h \
@@ -37,4 +39,5 @@ HEADERS += \
     ../src/samtalemodel.h \
     ../src/sessionlager.h \
     ../src/vaerktoejskaldsmodel.h \
-    ../src/tilladelsesmodel.h
+    ../src/tilladelsesmodel.h \
+    ../src/diffmodel.h

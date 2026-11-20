@@ -7,6 +7,7 @@
 
 #include "acpframereader.h"
 #include "agentproces.h"
+#include "diffmodel.h"
 #include "samtalemodel.h"
 #include "sessionlager.h"
 #include "tilladelsesmodel.h"
@@ -25,6 +26,7 @@ AcpClient::AcpClient(QObject* parent)
     , m_lager(new SessionLager)
     , m_vaerktoejskald(new VaerktoejskaldsModel(this))
     , m_tilladelse(new Tilladelsesmodel(this))
+    , m_diff(new DiffModel(this))
     , m_næsteId(1)
     , m_testTilstand(false)
     , m_hadRestoredHistory(false)
@@ -34,6 +36,8 @@ AcpClient::AcpClient(QObject* parent)
     connect(m_vaerktoejskald, SIGNAL(changed()), this, SIGNAL(vaerktoejskaldAendret()));
     connect(m_samtale, SIGNAL(changed()), this, SIGNAL(samtaleAendret()));
     connect(m_tilladelse, SIGNAL(changed()), this, SIGNAL(tilladelseAendret()));
+    connect(m_diff, SIGNAL(changed()), this, SIGNAL(diffsAendret()));
+    connect(m_diff, SIGNAL(changed()), this, SIGNAL(outputsAendret()));
 }
 
 AcpClient::~AcpClient()
@@ -195,6 +199,21 @@ QVariantMap AcpClient::pendingPermission() const
 int AcpClient::tilladelseAntal() const
 {
     return m_tilladelse->anmodninger();
+}
+
+DiffModel* AcpClient::diffModel() const
+{
+    return m_diff;
+}
+
+QVariantList AcpClient::diffs() const
+{
+    return m_diff->diffs();
+}
+
+QVariantList AcpClient::outputs() const
+{
+    return m_diff->outputs();
 }
 
 QString AcpClient::sessionId() const
@@ -365,6 +384,19 @@ void AcpClient::håndterNotifikation(const AcpBesked& besked)
     }
 }
 
+void AcpClient::håndterContentBlokke(const QJsonObject& update)
+{
+    QJsonArray content = update.value("content").toArray();
+    for (int i = 0; i < content.size(); ++i) {
+        QJsonObject blok = content.at(i).toObject();
+        QString type = blok.value("type").toString();
+        if (type == "diff")
+            m_diff->addDiff(blok.value("path").toString(), blok.value("diff").toString());
+        else if (type == "output")
+            m_diff->addOutput(blok.value("text").toString());
+    }
+}
+
 void AcpClient::håndterSessionUpdate(const QJsonObject& params)
 {
     QJsonObject update = params.value("update").toObject();
@@ -376,10 +408,12 @@ void AcpClient::håndterSessionUpdate(const QJsonObject& params)
         m_vaerktoejskald->addToolCall(update.value("toolCallId").toString(),
                                       update.value("title").toString(),
                                       update.value("status").toString());
+        håndterContentBlokke(update);
     } else if (art == "tool_call_update") {
         m_vaerktoejskald->updateToolCall(update.value("toolCallId").toString(),
                                          update.value("status").toString(),
                                          update.value("title").toString());
+        håndterContentBlokke(update);
     } else if (art == "turn_end") {
         m_samtale->endRunde();
         emit rundeAfsluttet();

@@ -11,6 +11,7 @@
 
 class AcpFrameReader;
 class AgentProces;
+class DiffModel;
 class SamtaleModel;
 class SessionLager;
 class Tilladelsesmodel;
@@ -26,6 +27,8 @@ class AcpClient : public QObject
     Q_PROPERTY(QString samtaleStatus READ samtaleStatus NOTIFY samtaleAendret)
     Q_PROPERTY(QVariantMap pendingPermission READ pendingPermission NOTIFY tilladelseAendret)
     Q_PROPERTY(int tilladelseAntal READ tilladelseAntal NOTIFY tilladelseAendret)
+    Q_PROPERTY(QVariantList diffs READ diffs NOTIFY diffsAendret)
+    Q_PROPERTY(QVariantList outputs READ outputs NOTIFY outputsAendret)
 public:
     explicit AcpClient(QObject* parent = 0);
     ~AcpClient();
@@ -53,6 +56,9 @@ public:
     Tilladelsesmodel* tilladelsesmodel() const;
     QVariantMap pendingPermission() const;
     int tilladelseAntal() const;
+    DiffModel* diffModel() const;
+    QVariantList diffs() const;
+    QVariantList outputs() const;
     QString sessionId() const;
     QString stopReason() const;
     bool hadRestoredHistory() const;
@@ -76,6 +82,8 @@ signals:
     void samtaleAendret();
     void permissionAnmodet();
     void tilladelseAendret();
+    void diffsAendret();
+    void outputsAendret();
 
 protected:
     qint64 næsteId();
@@ -87,6 +95,7 @@ protected:
     virtual void håndterBesked(const AcpBesked& besked);
     void håndterNotifikation(const AcpBesked& besked);
     void håndterSessionUpdate(const QJsonObject& params);
+    void håndterContentBlokke(const QJsonObject& update);
 
     AgentProces* m_proces;
     AcpFrameReader* m_læser;
@@ -94,6 +103,7 @@ protected:
     SessionLager* m_lager;
     VaerktoejskaldsModel* m_vaerktoejskald;
     Tilladelsesmodel* m_tilladelse;
+    DiffModel* m_diff;
     qint64 m_næsteId;
     bool m_testTilstand;
     QList<QByteArray> m_sendte;

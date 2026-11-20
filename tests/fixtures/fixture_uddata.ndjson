@@ -1,0 +1,2 @@
+{"jsonrpc":"2.0","method":"session/update","params":{"sessionId":"s","update":{"sessionUpdate":"tool_call","toolCallId":"tc-o1","title":"Kør kommando","kind":"execute","status":"in_progress","content":[{"type":"output","text":"kommando kørte fint"}]}}}
+{"jsonrpc":"2.0","method":"session/update","params":{"sessionId":"s","update":{"sessionUpdate":"tool_call_update","toolCallId":"tc-o1","status":"completed","content":[{"type":"output","text":"mere output"}]}}}
