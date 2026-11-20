@@ -1,0 +1,32 @@
+# qmake/make build-artefakter
+Makefile
+Makefile.*
+*.o
+*.obj
+moc_*.cpp
+moc_*.h
+*.moc
+qrc_*.cpp
+ui_*.h
+.qmake.stash
+*.qrc.depends
+
+# binærer
+/harbour-skrynja-2
+/tests/tst_skrynja_2
+
+# build-mapper
+build/
+build-*/
+
+# rpm build-artefakter
+rpm/BUILD/
+rpm/BUILDROOT/
+rpm/RPMS/
+rpm/SOURCES/
+rpm/SPECS/
+rpm/SRPMS/
+*.rpm
+
+# logfiler og øvrige kørselsartefakter
+*.log
