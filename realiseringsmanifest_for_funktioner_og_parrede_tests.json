@@ -550,7 +550,7 @@
           "forventet_uddata": "13/13 funktioner har parret testfil registreret i tests/tests.pro"
         }
       ],
-      "passerer": false
+      "passerer": true
     },
     {
       "id": "oprydning_af_træ",
