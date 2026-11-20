@@ -15,6 +15,7 @@ SOURCES += \
     tst_prompt_og_svar.cpp \
     tst_genoptagelse_af_samtale.cpp \
     tst_vaerktoejskald_visning.cpp \
+    tst_tilladelsesdialog.cpp \
     ../src/logfil.cpp \
     ../src/acpframereader.cpp \
     ../src/acpbesked.cpp \
@@ -22,7 +23,8 @@ SOURCES += \
     ../src/acpclient.cpp \
     ../src/samtalemodel.cpp \
     ../src/sessionlager.cpp \
-    ../src/vaerktoejskaldsmodel.cpp
+    ../src/vaerktoejskaldsmodel.cpp \
+    ../src/tilladelsesmodel.cpp
 
 HEADERS += \
     testregistrering.h \
@@ -33,4 +35,5 @@ HEADERS += \
     ../src/acpclient.h \
     ../src/samtalemodel.h \
     ../src/sessionlager.h \
-    ../src/vaerktoejskaldsmodel.h
+    ../src/vaerktoejskaldsmodel.h \
+    ../src/tilladelsesmodel.h

@@ -13,7 +13,8 @@ SOURCES += \
     src/acpclient.cpp \
     src/samtalemodel.cpp \
     src/sessionlager.cpp \
-    src/vaerktoejskaldsmodel.cpp
+    src/vaerktoejskaldsmodel.cpp \
+    src/tilladelsesmodel.cpp
 
 HEADERS += \
     src/logfil.h \
@@ -23,7 +24,8 @@ HEADERS += \
     src/acpclient.h \
     src/samtalemodel.h \
     src/sessionlager.h \
-    src/vaerktoejskaldsmodel.h
+    src/vaerktoejskaldsmodel.h \
+    src/tilladelsesmodel.h
 
 OTHER_FILES += \
     harbour-skrynja-2.desktop \
@@ -41,6 +43,6 @@ INSTALLS += desktop
 
 qml.files = qml/harbour-skrynja-2.qml
 qml.path = /usr/share/harbour-skrynja-2/qml
-qmlpages.files = qml/pages/StartSide.qml
+qmlpages.files = qml/pages/StartSide.qml qml/pages/TilladelsesDialog.qml
 qmlpages.path = /usr/share/harbour-skrynja-2/qml/pages
 INSTALLS += qml qmlpages

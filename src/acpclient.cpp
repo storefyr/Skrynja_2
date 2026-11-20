@@ -9,6 +9,7 @@
 #include "agentproces.h"
 #include "samtalemodel.h"
 #include "sessionlager.h"
+#include "tilladelsesmodel.h"
 #include "vaerktoejskaldsmodel.h"
 
 #include <QDir>
@@ -22,6 +23,7 @@ AcpClient::AcpClient(QObject* parent)
     , m_samtale(new SamtaleModel(this))
     , m_lager(new SessionLager)
     , m_vaerktoejskald(new VaerktoejskaldsModel(this))
+    , m_tilladelse(new Tilladelsesmodel(this))
     , m_næsteId(1)
     , m_testTilstand(false)
     , m_hadRestoredHistory(false)
@@ -30,6 +32,7 @@ AcpClient::AcpClient(QObject* parent)
     connect(m_proces, SIGNAL(fejl(QString)), this, SLOT(modtagAgentFejl(QString)));
     connect(m_vaerktoejskald, SIGNAL(changed()), this, SIGNAL(vaerktoejskaldAendret()));
     connect(m_samtale, SIGNAL(changed()), this, SIGNAL(samtaleAendret()));
+    connect(m_tilladelse, SIGNAL(changed()), this, SIGNAL(tilladelseAendret()));
 }
 
 AcpClient::~AcpClient()
@@ -137,6 +140,48 @@ QString AcpClient::samtaleStatus() const
 void AcpClient::kvitterVaerktoejskald(const QString& toolCallId)
 {
     m_vaerktoejskald->acknowledge(toolCallId);
+}
+
+bool AcpClient::answerPermission(const QString& optionId)
+{
+    if (!m_tilladelse->afventende())
+        return false;
+    QJsonObject outcome;
+    outcome.insert("outcome", "selected");
+    outcome.insert("optionId", optionId);
+    QJsonObject result;
+    result.insert("outcome", outcome);
+    sendBesked(AcpBesked::svar(m_tilladelse->anmodningsId(), result));
+    m_tilladelse->setSvaret();
+    return true;
+}
+
+bool AcpClient::afvisPermission()
+{
+    if (!m_tilladelse->afventende())
+        return false;
+    QJsonObject outcome;
+    outcome.insert("outcome", "cancelled");
+    QJsonObject result;
+    result.insert("outcome", outcome);
+    sendBesked(AcpBesked::svar(m_tilladelse->anmodningsId(), result));
+    m_tilladelse->setSvaret();
+    return true;
+}
+
+Tilladelsesmodel* AcpClient::tilladelsesmodel() const
+{
+    return m_tilladelse;
+}
+
+QVariantMap AcpClient::pendingPermission() const
+{
+    return m_tilladelse->pendingPermission();
+}
+
+int AcpClient::tilladelseAntal() const
+{
+    return m_tilladelse->anmodninger();
 }
 
 QString AcpClient::sessionId() const
@@ -287,6 +332,13 @@ void AcpClient::håndterBesked(const AcpBesked& besked)
         }
     } else if (besked.type() == AcpBesked::Notifikation) {
         håndterNotifikation(besked);
+    } else if (besked.type() == AcpBesked::Anmodning && besked.harId()) {
+        if (besked.metode() == "session/request_permission") {
+            m_tilladelse->setAnmodning(besked.id(), besked.params());
+            emit permissionAnmodet();
+        } else {
+            sendBesked(AcpBesked::fejlSvar(besked.id(), -32601, "ukendt metode"));
+        }
     }
 }
 

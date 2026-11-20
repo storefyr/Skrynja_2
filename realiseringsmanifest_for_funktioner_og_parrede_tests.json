@@ -351,7 +351,7 @@
           "forventet_uddata": "håndtering før answerPermission-svaret sendes"
         }
       ],
-      "passerer": false
+      "passerer": true
     },
     {
       "id": "stop_og_afvis",

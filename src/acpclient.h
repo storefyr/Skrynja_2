@@ -13,6 +13,7 @@ class AcpFrameReader;
 class AgentProces;
 class SamtaleModel;
 class SessionLager;
+class Tilladelsesmodel;
 class VaerktoejskaldsModel;
 
 class AcpClient : public QObject
@@ -23,6 +24,8 @@ class AcpClient : public QObject
     Q_PROPERTY(QString samtaleTekst READ samtaleTekst NOTIFY samtaleAendret)
     Q_PROPERTY(int samtaleRunde READ samtaleRunde NOTIFY samtaleAendret)
     Q_PROPERTY(QString samtaleStatus READ samtaleStatus NOTIFY samtaleAendret)
+    Q_PROPERTY(QVariantMap pendingPermission READ pendingPermission NOTIFY tilladelseAendret)
+    Q_PROPERTY(int tilladelseAntal READ tilladelseAntal NOTIFY tilladelseAendret)
 public:
     explicit AcpClient(QObject* parent = 0);
     ~AcpClient();
@@ -43,6 +46,11 @@ public:
     int samtaleRunde() const;
     QString samtaleStatus() const;
     Q_INVOKABLE void kvitterVaerktoejskald(const QString& toolCallId);
+    Q_INVOKABLE bool answerPermission(const QString& optionId);
+    Q_INVOKABLE bool afvisPermission();
+    Tilladelsesmodel* tilladelsesmodel() const;
+    QVariantMap pendingPermission() const;
+    int tilladelseAntal() const;
     QString sessionId() const;
     QString stopReason() const;
     bool hadRestoredHistory() const;
@@ -64,6 +72,8 @@ signals:
     void historieAendret();
     void vaerktoejskaldAendret();
     void samtaleAendret();
+    void permissionAnmodet();
+    void tilladelseAendret();
 
 protected:
     qint64 næsteId();
@@ -81,6 +91,7 @@ protected:
     SamtaleModel* m_samtale;
     SessionLager* m_lager;
     VaerktoejskaldsModel* m_vaerktoejskald;
+    Tilladelsesmodel* m_tilladelse;
     qint64 m_næsteId;
     bool m_testTilstand;
     QList<QByteArray> m_sendte;

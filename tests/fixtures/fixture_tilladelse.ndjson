@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","id":100,"method":"session/request_permission","params":{"toolCall":{"toolCallId":"tc-9","title":"Skriv fil","kind":"edit"},"options":[{"optionId":"allow","label":"Tillad"},{"optionId":"deny","label":"Afvis"}]}}
