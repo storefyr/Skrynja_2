@@ -143,8 +143,8 @@ void TestGenoptagelseAfSamtale::resumeregel_laeser_manifest_og_finder_foerste_fa
 void TestGenoptagelseAfSamtale::resumeregel_koerer_git_kommandoer_mod_fixture()
 {
     QString repo = QDir::tempPath() + "/skrynja-tst-fixture-repo";
+    QDir(repo).removeRecursively();
     QDir().mkpath(repo);
-    QFile::remove(repo + "/.git/HEAD");
     QProcess p;
     p.setWorkingDirectory(repo);
     p.start("git", QStringList() << "init" << "-q");
@@ -156,8 +156,8 @@ void TestGenoptagelseAfSamtale::resumeregel_koerer_git_kommandoer_mod_fixture()
     fil.close();
     p.start("git", QStringList() << "add" << ".");
     QVERIFY(p.waitForFinished(15000));
-    p.start("git", QStringList() << "-c" << "user.email=t@t" << "-c" << "user.name=t"
-            << "commit" << "-q" << "-m" << "fixture-commit");
+    p.start("git", QStringList() << "-c" << "commit.gpgsign=false" << "-c" << "user.email=t@t"
+            << "-c" << "user.name=t" << "commit" << "-q" << "-m" << "fixture-commit");
     QVERIFY(p.waitForFinished(15000));
     QCOMPARE(p.exitCode(), 0);
 
