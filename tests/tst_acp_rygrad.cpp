@@ -59,7 +59,7 @@ void TestAcpRygrad::rygrad_sammenklaebning()
     AcpFrameReader reader(0);
     QSignalSpy klar(&reader, SIGNAL(messageReady(QByteArray)));
     QSignalSpy droppet(&reader, SIGNAL(lineDropped(QByteArray,QString)));
-    QByteArray data = readFixture("fixture_rygrad_sammenklaebning.ndjson");
+    QByteArray data = readFixture("fixture_rygrad_sammenklæbning.ndjson");
     QVERIFY(!data.isEmpty());
     for (int i = 0; i < data.size(); i += 7)
         reader.feedBytesForTest(data.mid(i, 7));
