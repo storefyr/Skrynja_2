@@ -276,6 +276,20 @@ Strategisk begrundelse (spørgsmål fra orkestratoren, besvaret 2026-11-21): Ja,
 
 *Verifikation:* `python3 tjek_manifest_parrede_tests.py` exit 0; host `ALL TESTS PASSED`; mål-byg rc=0 med 0 fejl; `rpm -qpl` viser forventet indhold; on-device exit 0.
 
+== Udviklingsloop og hastighed (host-loop vs. device-loop)
+
+Verdensbillede (orkestratoren 2026-11-21): mål-enheden er Jolla Phone 2026 (Sailfish OS), brugeren skriver via Vibe-appen, og hver stokastiker arbejder i sin egen sandkasse. Udviklingshastigheden højnes ved at køre to adskilte loops i stedet for én lang kæde pr. ændring:
+
+*Host-loop (hurtigt, pr. ændring, i sandkassen med værktøjskæden):* rediger kildekode → host-byg (`qmake && make`) → QtTest i `tests/` → qemu-aarch64 kørsel af tests (vist virker, jf. commit `b163e78`) → `python3 tjek_manifest_parrede_tests.py` → Projektstokastikeren flipper `passerer` efter måling. Hele loopet tager minutter og fanger de fleste fejl, før telefonen ser koden.
+
+*Device-loop (langsomt, kun som release-gate ved milepæle):* mål-byg aarch64/Qt 5.6 i sandkasse med Sailfish SDK → `.rpm` → GitHub Release på `storefyr/Skrynja_2` → download på Jolla Phone 2026 → `rpm -qpl`-tjek → `pkcon install-local` → on-device verifikation. Funktionen 23's on-device-del er dette gate, ikke en del af hver udviklingscyklus.
+
+*Automatisering af device-loop:* on-device køres succeskriteriet via appens eget `--selvtest` (funktion 11, verdict-JSON + exit-kode) i stedet for manuel gennemkørsel; mål-byg og `gh release create`/upload køres i samme automatiserede kørsel, så intet manuelt trin står mellem byg og download.
+
+*Process:* batch relaterede triage-ordrer (støj/fragilitet) i én PR med flere parrede test-slots; kildesondrings-audit kører pr. milepæl, ikke pr. PR; dokumentationsændringer samles i batched PRs.
+
+*Begrænsning:* denne sandkasse har ingen Qt/Sailfish-værktøjskæde (ingen qmake/sfdk/rpmbuild, x86_64) — host-loop kræver sandkassen med værktøjskæden; her kan kun dokumentation, manifest-checks og audit køres.
+
 == Succeskriterium for økosystemet
 
 Økosystemet betragtes som realiseret, når kæden kører end-to-end på mål-enheden: prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0, samtidig med at alle stokastiker-artefakter (denne beskrivelse, manifestet med alle 23 funktioner `passerer: sand`, de parrede tests og vurderings-JSON'erne) ligger sporbare i kildekodelageret, og distributionsartefaktet (.rpm) desuden er bygget som aarch64 mål-byg i Sailfish SDK og kørt igennem on-device med exit 0.
