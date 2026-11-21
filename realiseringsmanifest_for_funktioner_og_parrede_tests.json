@@ -169,17 +169,7 @@
       "parret_test": {
         "testfil": "tests/tst_acp_rygrad.cpp",
         "testklasse": "TestAcpRygrad",
-        "testslots": [
-          "rygrad_fixture_hoved",
-          "rygrad_sammenklaebning",
-          "rygrad_ugyldig_ruller_tilbage",
-          "rygrad_utf8_ugyldig",
-          "rygrad_crlf",
-          "rygrad_flere_paa_en_linje",
-          "rygrad_cap_droppes",
-          "rygrad_hale_ved_eof",
-          "besked_id_korrelation"
-        ],
+        "testslots": ["rygrad_fixture_hoved", "rygrad_sammenklaebning", "rygrad_ugyldig_ruller_tilbage", "rygrad_utf8_ugyldig", "rygrad_crlf", "rygrad_flere_paa_en_linje", "rygrad_cap_droppes", "rygrad_hale_ved_eof", "besked_id_korrelation", "lineDropped_logges_i_produktion", "haleReady_logges_i_produktion"],
         "fixtures": [
           "tests/fixtures/fixture_rygrad.ndjson",
           "tests/fixtures/fixture_rygrad_sammenklæbning.ndjson",

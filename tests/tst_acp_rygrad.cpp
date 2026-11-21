@@ -1,10 +1,16 @@
 #include <QtTest/QtTest>
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonParseError>
+#include <QStandardPaths>
 
+#include "acpclient.h"
 #include "acpmessage.h"
 #include "acpframereader.h"
+#include "logfile.h"
 #include "testregistrering.h"
 
 class TestAcpRygrad : public QObject
@@ -20,7 +26,10 @@ private slots:
     void rygrad_cap_droppes();
     void rygrad_hale_ved_eof();
     void besked_id_korrelation();
+    void lineDropped_logges_i_produktion();
+    void haleReady_logges_i_produktion();
 private:
+    QString logFil(const QString& navn);
 };
 
 REGISTER_TEST(TestAcpRygrad)
@@ -170,6 +179,49 @@ void TestAcpRygrad::besked_id_korrelation()
 
     AcpMessage::fraJson("ikke json overhovedet", &ok);
     QVERIFY(!ok);
+}
+
+QString TestAcpRygrad::logFil(const QString& navn)
+{
+    QStandardPaths::setTestModeEnabled(true);
+    QString path = QDir::tempPath() + "/skrynja-tst-logfil-" + navn + "/skrynja-2.log";
+    QDir().mkpath(QFileInfo(path).absolutePath());
+    QFile::remove(path);
+    LogFile::instance()->setLogPathForTest(path);
+    return path;
+}
+
+QString readAll(const QString& path)
+{
+    QFile f(path);
+    if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
+        return QString();
+    return QString::fromUtf8(f.readAll());
+}
+
+void TestAcpRygrad::lineDropped_logges_i_produktion()
+{
+    QString path = logFil("linedropped");
+    AcpClient client;
+    injectTestModels(&client, this);
+    client.setTestMode(true);
+    QByteArray stor(AcpFrameReader::standardCap() + 100, 'x');
+    client.feedBytesForTest(stor + "\n");
+    QString log = readAll(path);
+    QVERIFY2(log.contains("lineDropped"), qPrintable(log));
+    QVERIFY2(log.contains("cap"), qPrintable(log));
+}
+
+void TestAcpRygrad::haleReady_logges_i_produktion()
+{
+    QString path = logFil("haleready");
+    AcpClient client;
+    injectTestModels(&client, this);
+    client.setTestMode(true);
+    client.feedBytesForTest("{\"jsonrpc\":\"2.0\",\"id\":9,\"resu");
+    client.eofForTest();
+    QString log = readAll(path);
+    QVERIFY2(log.contains("haleReady"), qPrintable(log));
 }
 
 #include "tst_acp_rygrad.moc"
