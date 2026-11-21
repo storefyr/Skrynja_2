@@ -23,22 +23,16 @@ AcpClient::AcpClient(QObject* parent)
     , m_reader(new AcpFrameReader(m_process->process(), this))
     , m_protokol(new AcpProtokol(this))
     , m_session(new AcpSession(m_protokol, this))
-    , m_conversation(new ConversationModel(this))
-    , m_toolCallModel(new ToolCallModel(this))
-    , m_permissionModel(new PermissionModel(this))
-    , m_diff(new DiffModel(this))
-    , m_configModel(new ConfigurationModel(this))
+    , m_conversation(0)
+    , m_toolCallModel(0)
+    , m_permissionModel(0)
+    , m_diff(0)
+    , m_configModel(0)
     , m_testMode(false)
 {
     connect(m_reader, SIGNAL(messageReady(QByteArray)), this, SLOT(receiveLine(QByteArray)));
     connect(m_process, SIGNAL(error(QString)), this, SLOT(receiveAgentError(QString)));
     connect(m_process, SIGNAL(finished(int)), this, SLOT(processFinished(int)));
-    connect(m_toolCallModel, SIGNAL(changed()), this, SIGNAL(toolCallsChanged()));
-    connect(m_conversation, SIGNAL(changed()), this, SIGNAL(conversationChanged()));
-    connect(m_permissionModel, SIGNAL(changed()), this, SIGNAL(permissionChanged()));
-    connect(m_diff, SIGNAL(changed()), this, SIGNAL(diffsChanged()));
-    connect(m_diff, SIGNAL(changed()), this, SIGNAL(outputsChanged()));
-    connect(m_configModel, SIGNAL(changed()), this, SIGNAL(configChanged()));
     connect(m_protokol, SIGNAL(messageOut(AcpMessage)), this, SLOT(onMessageOut(AcpMessage)));
     connect(m_protokol, SIGNAL(responseError(QString,QString)), this, SLOT(onResponseError(QString,QString)));
     connect(m_protokol, SIGNAL(initializeResponded(QJsonObject)), this, SLOT(onInitializeResponded(QJsonObject)));
@@ -58,6 +52,43 @@ AcpClient::AcpClient(QObject* parent)
 AcpClient::~AcpClient()
 {
     m_process->stopAgent();
+}
+
+void AcpClient::setConversationModel(ConversationModel* model)
+{
+    m_conversation = model;
+    if (m_conversation)
+        connect(m_conversation, SIGNAL(changed()), this, SIGNAL(conversationChanged()));
+}
+
+void AcpClient::setToolCallModel(ToolCallModel* model)
+{
+    m_toolCallModel = model;
+    if (m_toolCallModel)
+        connect(m_toolCallModel, SIGNAL(changed()), this, SIGNAL(toolCallsChanged()));
+}
+
+void AcpClient::setPermissionModel(PermissionModel* model)
+{
+    m_permissionModel = model;
+    if (m_permissionModel)
+        connect(m_permissionModel, SIGNAL(changed()), this, SIGNAL(permissionChanged()));
+}
+
+void AcpClient::setDiffModel(DiffModel* model)
+{
+    m_diff = model;
+    if (m_diff) {
+        connect(m_diff, SIGNAL(changed()), this, SIGNAL(diffsChanged()));
+        connect(m_diff, SIGNAL(changed()), this, SIGNAL(outputsChanged()));
+    }
+}
+
+void AcpClient::setConfigurationModel(ConfigurationModel* model)
+{
+    m_configModel = model;
+    if (m_configModel)
+        connect(m_configModel, SIGNAL(changed()), this, SIGNAL(configChanged()));
 }
 
 bool AcpClient::startAgent()
@@ -107,32 +138,33 @@ ToolCallModel* AcpClient::toolCallModel() const
 
 QVariantList AcpClient::toolCalls() const
 {
-    return m_toolCallModel->toolCalls();
+    return m_toolCallModel ? m_toolCallModel->toolCalls() : QVariantList();
 }
 
 QString AcpClient::conversationText() const
 {
-    return m_conversation->lastText();
+    return m_conversation ? m_conversation->lastText() : QString();
 }
 
 int AcpClient::conversationRound() const
 {
-    return m_conversation->round();
+    return m_conversation ? m_conversation->round() : 0;
 }
 
 QString AcpClient::conversationStatus() const
 {
-    return m_conversation->status();
+    return m_conversation ? m_conversation->status() : QString();
 }
 
 void AcpClient::acknowledgeToolCall(const QString& toolCallId)
 {
-    m_toolCallModel->acknowledge(toolCallId);
+    if (m_toolCallModel)
+        m_toolCallModel->acknowledge(toolCallId);
 }
 
 bool AcpClient::answerPermission(const QString& optionId)
 {
-    if (!m_permissionModel->isPending())
+    if (!m_permissionModel || !m_permissionModel->isPending())
         return false;
     QJsonObject outcome;
     outcome.insert("outcome", "selected");
@@ -146,7 +178,7 @@ bool AcpClient::answerPermission(const QString& optionId)
 
 bool AcpClient::declinePermission()
 {
-    if (!m_permissionModel->isPending())
+    if (!m_permissionModel || !m_permissionModel->isPending())
         return false;
     QJsonObject outcome;
     outcome.insert("outcome", "cancelled");
@@ -174,12 +206,12 @@ PermissionModel* AcpClient::permissionModel() const
 
 QVariantMap AcpClient::pendingPermission() const
 {
-    return m_permissionModel->pendingPermission();
+    return m_permissionModel ? m_permissionModel->pendingPermission() : QVariantMap();
 }
 
 int AcpClient::permissionCount() const
 {
-    return m_permissionModel->requests();
+    return m_permissionModel ? m_permissionModel->requests() : 0;
 }
 
 DiffModel* AcpClient::diffModel() const
@@ -189,12 +221,12 @@ DiffModel* AcpClient::diffModel() const
 
 QVariantList AcpClient::diffs() const
 {
-    return m_diff->diffs();
+    return m_diff ? m_diff->diffs() : QVariantList();
 }
 
 QVariantList AcpClient::outputs() const
 {
-    return m_diff->outputs();
+    return m_diff ? m_diff->outputs() : QVariantList();
 }
 
 ConfigurationModel* AcpClient::configurationModel() const
@@ -341,50 +373,59 @@ void AcpClient::onInitializeResponded(const QJsonObject& result)
     m_configOptions.clear();
     for (int i = 0; i < options.size(); ++i)
         m_configOptions.append(options.at(i).toObject().toVariantMap());
-    m_configModel->setConfigOptions(m_configOptions);
+    if (m_configModel)
+        m_configModel->setConfigOptions(m_configOptions);
     emit initializeResponse(result);
     emit agentReady();
 }
 
 void AcpClient::onPromptStarted()
 {
-    m_conversation->startRound();
+    if (m_conversation)
+        m_conversation->startRound();
 }
 
 void AcpClient::onPermissionRequest(qint64 requestId, const QJsonObject& params)
 {
-    m_permissionModel->setRequest(requestId, params);
+    if (m_permissionModel)
+        m_permissionModel->setRequest(requestId, params);
     emit permissionRequested();
 }
 
 void AcpClient::onAgentMessageChunk(const QString& text)
 {
-    m_conversation->addChunk(text);
+    if (m_conversation)
+        m_conversation->addChunk(text);
 }
 
 void AcpClient::onToolCallAdded(const QString& toolCallId, const QString& title, const QString& status)
 {
-    m_toolCallModel->addToolCall(toolCallId, title, status);
+    if (m_toolCallModel)
+        m_toolCallModel->addToolCall(toolCallId, title, status);
 }
 
 void AcpClient::onToolCallUpdated(const QString& toolCallId, const QString& status, const QString& title)
 {
-    m_toolCallModel->updateToolCall(toolCallId, status, title);
+    if (m_toolCallModel)
+        m_toolCallModel->updateToolCall(toolCallId, status, title);
 }
 
 void AcpClient::onDiffContent(const QString& path, const QString& diff)
 {
-    m_diff->addDiff(path, diff);
+    if (m_diff)
+        m_diff->addDiff(path, diff);
 }
 
 void AcpClient::onOutputContent(const QString& text)
 {
-    m_diff->addOutput(text);
+    if (m_diff)
+        m_diff->addOutput(text);
 }
 
 void AcpClient::onRoundEnded()
 {
-    m_conversation->endRound();
+    if (m_conversation)
+        m_conversation->endRound();
     emit roundFinished();
 }
 

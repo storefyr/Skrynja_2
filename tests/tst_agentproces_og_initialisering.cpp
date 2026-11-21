@@ -47,6 +47,7 @@ void TestAgentprocesOgInitialisering::standard_agentsti_er_vibe_acp()
 void TestAgentprocesOgInitialisering::initialize_payload_protocolversion_1()
 {
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     QSignalSpy sendt(&client, SIGNAL(messageSent(QByteArray)));
     client.sendInitialize();
@@ -59,6 +60,7 @@ void TestAgentprocesOgInitialisering::initialize_payload_protocolversion_1()
 void TestAgentprocesOgInitialisering::initialize_payload_tom_clientCapabilities()
 {
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     QSignalSpy sendt(&client, SIGNAL(messageSent(QByteArray)));
     client.sendInitialize();
@@ -72,6 +74,7 @@ void TestAgentprocesOgInitialisering::initialize_payload_tom_clientCapabilities(
 void TestAgentprocesOgInitialisering::initialize_svar_parses_og_giver_config_options()
 {
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     QSignalSpy sendt(&client, SIGNAL(messageSent(QByteArray)));
     QSignalSpy klar(&client, SIGNAL(agentReady()));
@@ -108,6 +111,7 @@ void TestAgentprocesOgInitialisering::startfejl_giver_lastError_uden_haeng()
     QVERIFY(!process.isRunning());
 
     AcpClient client;
+    injectTestModels(&client, this);
     client.agentProcess()->setAgentPath("/definitivt/ikke/eksisterende-agent");
     QVERIFY(!client.startAgent());
     QVERIFY(!client.lastError().isEmpty());

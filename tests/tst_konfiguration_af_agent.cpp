@@ -74,6 +74,7 @@ QByteArray TestKonfigurationAfAgent::responseJson(qint64 id, const QJsonObject& 
 void TestKonfigurationAfAgent::config_options_fra_initialize_svar()
 {
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     client.sendInitialize();
     client.feedBytesForTest(readFixture("fixture_initialize_config.ndjson"));
@@ -87,6 +88,7 @@ void TestKonfigurationAfAgent::config_options_fra_initialize_svar()
 void TestKonfigurationAfAgent::set_config_option_payload()
 {
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     client.sendSessionNew("/tmp");
     qint64 id = idOf(client.lastSentForTest());
@@ -109,6 +111,7 @@ void TestKonfigurationAfAgent::agentsti_override_fra_settings()
     s.clear();
     s.sync();
     AcpClient client;
+    injectTestModels(&client, this);
     client.setAgentsti("/tmp/min-agent");
     QCOMPARE(client.agentPath(), QString("/tmp/min-agent"));
     AgentProcess process;
@@ -129,6 +132,7 @@ void TestKonfigurationAfAgent::standard_agentsti_er_vibe_acp()
 void TestKonfigurationAfAgent::clientCapabilities_fortsat_tom()
 {
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     client.sendInitialize();
     QJsonObject params = jsonObj(client.lastSentForTest()).value("params").toObject();

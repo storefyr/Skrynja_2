@@ -59,6 +59,7 @@ QByteArray TestTilladelsesdialog::readFixture(const QString& name)
 void TestTilladelsesdialog::anmodning_parses_til_pendingPermission()
 {
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     QSignalSpy requested(&client, SIGNAL(permissionRequested()));
     client.feedBytesForTest(readFixture("fixture_tilladelse.ndjson"));
@@ -72,6 +73,7 @@ void TestTilladelsesdialog::anmodning_parses_til_pendingPermission()
 void TestTilladelsesdialog::options_liste_med_optionId()
 {
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     client.feedBytesForTest(readFixture("fixture_tilladelse.ndjson"));
     QVariantMap pending = client.permissionModel()->pendingPermission();
@@ -85,6 +87,7 @@ void TestTilladelsesdialog::options_liste_med_optionId()
 void TestTilladelsesdialog::svar_payload_selected_optionId()
 {
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     client.feedBytesForTest(readFixture("fixture_tilladelse.ndjson"));
     QVERIFY(client.answerPermission("allow"));
@@ -98,6 +101,7 @@ void TestTilladelsesdialog::svar_payload_selected_optionId()
 void TestTilladelsesdialog::afvisning_giver_outcome_cancelled()
 {
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     client.feedBytesForTest(readFixture("fixture_tilladelse.ndjson"));
     QVERIFY(client.declinePermission());
@@ -109,6 +113,7 @@ void TestTilladelsesdialog::afvisning_giver_outcome_cancelled()
 void TestTilladelsesdialog::ingen_dobbelt_svar()
 {
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     client.feedBytesForTest(readFixture("fixture_tilladelse.ndjson"));
     QCOMPARE(client.permissionModel()->requests(), 1);

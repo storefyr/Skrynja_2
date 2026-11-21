@@ -72,6 +72,7 @@ QByteArray TestPromptOgSvar::responseJson(qint64 id, const QJsonObject& result)
 void TestPromptOgSvar::session_new_payload_cwd()
 {
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     client.sendSessionNew("/tmp/arbejde");
     QJsonObject o = jsonObj(client.lastSentForTest());
@@ -82,6 +83,7 @@ void TestPromptOgSvar::session_new_payload_cwd()
 void TestPromptOgSvar::prompt_payload_content_blokke()
 {
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     client.sendSessionNew("/tmp");
     qint64 id = idOf(client.lastSentForTest());
@@ -104,6 +106,7 @@ void TestPromptOgSvar::prompt_payload_content_blokke()
 void TestPromptOgSvar::chunk_akkumuleres_til_lastText()
 {
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     client.feedBytesForTest(readFixture("fixture_prompt_svar.ndjson"));
     QCOMPARE(client.conversationModel()->lastText(), QString("Hej verden"));
@@ -112,6 +115,7 @@ void TestPromptOgSvar::chunk_akkumuleres_til_lastText()
 void TestPromptOgSvar::svar_korreleres_paa_request_id()
 {
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     client.sendSessionNew("/tmp");
     qint64 id = idOf(client.lastSentForTest());
@@ -136,6 +140,7 @@ void TestPromptOgSvar::svar_korreleres_paa_request_id()
 void TestPromptOgSvar::end_turn_afslutter_runde()
 {
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     QSignalSpy afsluttet(&client, SIGNAL(roundFinished()));
     client.sendSessionNew("/tmp");

@@ -42,6 +42,12 @@ public:
     AgentProcess* agentProcess() const;
     QVariantList configOptions() const;
 
+    void setConversationModel(ConversationModel* model);
+    void setToolCallModel(ToolCallModel* model);
+    void setPermissionModel(PermissionModel* model);
+    void setDiffModel(DiffModel* model);
+    void setConfigurationModel(ConfigurationModel* model);
+
     Q_INVOKABLE void startSession();
     Q_INVOKABLE void sendSessionNew(const QString& cwd);
     Q_INVOKABLE void sendSessionPrompt(const QString& prompt);

@@ -96,6 +96,7 @@ void TestGenoptagelseAfSamtale::load_med_gemt_session_id()
     SessionStore store;
     store.saveSessionId("sess-gammel");
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     client.startSession();
     QJsonObject o = jsonObj(client.lastSentForTest());
@@ -111,6 +112,7 @@ void TestGenoptagelseAfSamtale::fallback_til_new_ved_load_fejl()
     SessionStore store;
     store.saveSessionId("sess-gammel");
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     client.startSession();
     qint64 id = idOf(client.lastSentForTest());
@@ -128,6 +130,7 @@ void TestGenoptagelseAfSamtale::hadRestoredHistory_saettes_korrekt()
     SessionStore store;
     store.saveSessionId("sess-gammel");
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     client.startSession();
     qint64 id = idOf(client.lastSentForTest());

@@ -200,6 +200,7 @@ void TestArkitekturOpdelingProtokol::acpclient_har_ingen_dispatch()
     QCOMPARE(kilde.count("set_config_option"), 1);
 
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     QSignalSpy initSpy(&client, SIGNAL(initializeResponse(QJsonObject)));
     QSignalSpy readySpy(&client, SIGNAL(agentReady()));

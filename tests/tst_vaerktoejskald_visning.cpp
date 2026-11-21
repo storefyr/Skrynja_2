@@ -50,6 +50,7 @@ QByteArray TestVaerktoejskaldVisning::readFixture(const QString& name)
 void TestVaerktoejskaldVisning::tool_call_felter_parses()
 {
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     client.feedBytesForTest(readFixture("fixture_værktøjskald.ndjson"));
     ToolCallModel* model = client.toolCallModel();
@@ -63,6 +64,7 @@ void TestVaerktoejskaldVisning::tool_call_felter_parses()
 void TestVaerktoejskaldVisning::tool_call_update_opdaterer_status()
 {
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     client.feedBytesForTest(readFixture("fixture_værktøjskald.ndjson"));
     ToolCallModel* model = client.toolCallModel();
@@ -73,6 +75,7 @@ void TestVaerktoejskaldVisning::tool_call_update_opdaterer_status()
 void TestVaerktoejskaldVisning::ui_kvitterer_sete_kald()
 {
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     client.feedBytesForTest(readFixture("fixture_værktøjskald.ndjson"));
     ToolCallModel* model = client.toolCallModel();
@@ -85,6 +88,7 @@ void TestVaerktoejskaldVisning::ui_kvitterer_sete_kald()
 void TestVaerktoejskaldVisning::flere_kald_i_raekkefoelge()
 {
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     client.feedBytesForTest(readFixture("fixture_værktøjskald.ndjson"));
     QVariantList call = client.toolCallModel()->toolCalls();

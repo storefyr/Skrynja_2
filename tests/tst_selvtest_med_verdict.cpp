@@ -96,6 +96,7 @@ void TestSelvtestMedVerdict::verdict_pass_ved_end_turn_og_exit_0()
 {
     QFile::remove(verdictPath());
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     SelfTest selfTest(&client);
     QSignalSpy finished(&selfTest, SIGNAL(finished(int)));
@@ -113,6 +114,7 @@ void TestSelvtestMedVerdict::verdict_fail_uden_toolcall()
 {
     QFile::remove(verdictPath());
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     SelfTest selfTest(&client);
     QSignalSpy finished(&selfTest, SIGNAL(finished(int)));
@@ -128,6 +130,7 @@ void TestSelvtestMedVerdict::ingen_dobbelt_verdict()
 {
     QFile::remove(verdictPath());
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     SelfTest selfTest(&client);
     QSignalSpy finished(&selfTest, SIGNAL(finished(int)));
@@ -152,6 +155,7 @@ void TestSelvtestMedVerdict::verdict_ved_agentdoed()
 {
     QFile::remove(verdictPath());
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     SelfTest selfTest(&client);
     QSignalSpy finished(&selfTest, SIGNAL(finished(int)));
@@ -170,6 +174,7 @@ void TestSelvtestMedVerdict::verdict_ved_startfejl()
     s.clear();
     s.sync();
     AcpClient client;
+    injectTestModels(&client, this);
     client.setAgentsti("/definitivt/ikke/eksisterende-agent-selvtest");
     SelfTest selfTest(&client);
     QSignalSpy finished(&selfTest, SIGNAL(finished(int)));
@@ -186,6 +191,7 @@ void TestSelvtestMedVerdict::verdict_fil_skrives_og_laeses_tilbage()
 {
     QFile::remove(verdictPath());
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     SelfTest selfTest(&client);
     QSignalSpy finished(&selfTest, SIGNAL(finished(int)));

@@ -9,8 +9,23 @@
 #include <QUrl>
 
 #include "acpclient.h"
+#include "diffmodel.h"
+#include "konfigurationsmodel.h"
 #include "logfil.h"
 #include "selvtest.h"
+#include "samtalemodel.h"
+#include "tilladelsesmodel.h"
+#include "vaerktoejskaldsmodel.h"
+
+static void injectModels(AcpClient& client, ConversationModel* samtale, ToolCallModel* vaerktoejskald,
+                         PermissionModel* tilladelse, DiffModel* diff, ConfigurationModel* konfiguration)
+{
+    client.setConversationModel(samtale);
+    client.setToolCallModel(vaerktoejskald);
+    client.setPermissionModel(tilladelse);
+    client.setDiffModel(diff);
+    client.setConfigurationModel(konfiguration);
+}
 
 int main(int argc, char *argv[])
 {
@@ -24,7 +39,13 @@ int main(int argc, char *argv[])
         QCoreApplication::setOrganizationName("harbour");
         QCoreApplication::setApplicationName("harbour-skrynja-2");
         LogFile::instance()->writeLine("selfTest");
+        ConversationModel samtale;
+        ToolCallModel vaerktoejskald;
+        PermissionModel tilladelse;
+        DiffModel diff;
+        ConfigurationModel konfiguration;
         AcpClient client;
+        injectModels(client, &samtale, &vaerktoejskald, &tilladelse, &diff, &konfiguration);
         QString base = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
         if (base.isEmpty())
             base = QDir::tempPath();
@@ -43,7 +64,13 @@ int main(int argc, char *argv[])
 
     LogFile::instance()->writeLine("start");
 
+    ConversationModel samtale;
+    ToolCallModel vaerktoejskald;
+    PermissionModel tilladelse;
+    DiffModel diff;
+    ConfigurationModel konfiguration;
     AcpClient client;
+    injectModels(client, &samtale, &vaerktoejskald, &tilladelse, &diff, &konfiguration);
 
     QString qmlPath = QCoreApplication::applicationDirPath()
                      + "/../share/harbour-skrynja-2/qml/harbour-skrynja-2.qml";

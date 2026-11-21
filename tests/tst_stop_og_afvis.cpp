@@ -76,6 +76,7 @@ QByteArray TestStopOgAfvis::responseJson(qint64 id, const QJsonObject& result)
 void TestStopOgAfvis::cancel_notification_payload()
 {
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     client.sendSessionNew("/tmp");
     qint64 id = idOf(client.lastSentForTest());
@@ -93,6 +94,7 @@ void TestStopOgAfvis::cancel_notification_payload()
 void TestStopOgAfvis::afvisning_outcome_cancelled()
 {
     AcpClient client;
+    injectTestModels(&client, this);
     client.setTestMode(true);
     client.feedBytesForTest(readFixture("fixture_tilladelse.ndjson"));
     QVERIFY(client.declinePermission());
