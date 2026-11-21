@@ -514,7 +514,8 @@
           "outputs_akkumuleres",
           "diff_vises_mens_det_sker"
         ,
-          "diff_test_paastaaer_kun_diff"],
+          "diff_test_paastaaer_kun_diff",
+          "diffmodel_uden_acpframereader_include"],
         "fixtures": [
           "tests/fixtures/fixture_diff.ndjson",
           "tests/fixtures/fixture_uddata.ndjson"

@@ -10,6 +10,8 @@
 
 #include "acpclient.h"
 #include "acpframereader.h"
+#include "acpprotokol.h"
+#include "acpframereader.h"
 #include "diffmodel.h"
 #include "conversationmodel.h"
 #include "testregistrering.h"
