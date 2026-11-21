@@ -23,7 +23,7 @@
     "agentsti": "/home/defaultuser/.local/bin/vibe-acp",
     "acp": "ACP over stdio, protocolVersion 1, tom clientCapabilities ved initialize — agenten må ikke kalde fs/* eller terminal/*",
     "prøver": "QtTest i tests/ uden Silica-afhængighed (QT += core testlib); prøven indskrives før kilden; nye kildefiler registreres i harbour-skrynja-2.pro; nye QML-filer registreres til installation",
-    "sprog": "Kode og kommentarer er engelske; dokumentation, brugerflade og indskrivningsbeskeder (commits) er danske — ændret 2026-11-20 på den menneskelige orkestrators ønske, som eneste kilde til strategiske ønsker; JSON-nøgler er dansk snake_case med æøå; C++-identifikatorer (testklasser og testslots) er ascii, fordi moc ikke håndterer æøå",
+    "sprog": "Kode og kommentarer er engelske; dokumentation, brugerflade og indskrivningsbeskeder (commits) er danske — ændret 2026-11-20 på den menneskelige orkestrators ønske, som eneste kilde til strategiske ønsker; JSON-nøgler er dansk snake_case med ægte æøå; C++-identifikatorer (testklasser og testslots) er ascii, fordi moc ikke håndterer æøå. Ortografi-reglen: udvanding ae/oe/aa tæller som fejl i nøgler, filnavne og dansk prosa — ægte lånord undtages kun med begrundelse; ascii-udvanding er kun tilladt i C++-identifikatorer",
     "sprog_eskalering": "besvaret af Strategistokastikeren 2026-11-20 via PR #5 (draft, commit 10396c3, branch vibe/sprog-eskalering-df693a): sprog-linjen i projektbeskrivelse.adoc revideret til 'kode og kommentarer er engelske; dokumentation, brugerflade og commits er danske' — plan og manifest er kohærente, når PR #5 merges til main",
     "hemmeligheder": "Ingen nøgler, tokens eller samtale-transskripter må nogensinde ind i depotet"
   },
@@ -35,7 +35,9 @@
     "Ved genoptagelse af en arbejdsgang: kør pwd og git status, kør git log --oneline -20, læs dette manifest, og vælg den første funktion i rækken med passerer: false.",
     "Nye kildefiler registreres i harbour-skrynja-2.pro; nye QML-filer registreres til installation.",
     "Efter hver arbejdsgang indskrives ændringerne med en beskrivende besked, så næste samtale kan læse fremdriften i git-historikken.",
-    "Ingen nøgler, tokens eller samtale-transskripter ind i depotet."
+    "Ingen nøgler, tokens eller samtale-transskripter ind i depotet.",
+    "Værtsløkke (host/CI): qmake + make + hele QtTest-suiten i tests/ kører på host og dækker kodekvalitet — host-resultater tæller ikke som mål.",
+    "Enhedsløkke (mål): kun aarch64/Qt 5.6 mål-byg i Sailfish SDK og on-device kørsel på Jolla Phone 2026 tæller som mål; passerer for mål-afhængige funktioner (f.eks. distributionsartefakt_rpm) sættes først efter målt enhedsløkke."
   ],
   "triage_logik": {
     "input": "vurdering_af_realiseringsartefaktets_arkitektur_fragilitet_og_støjindhold_for_stokastikere.json (faktisk filnavn på main med ø; projektbeskrivelse.adoc refererer stadig med ascii 'stoejindhold' — dokumentationsstøj for Strategistokastikeren)",
@@ -1104,6 +1106,7 @@
       "id": "distributionsartefakt_rpm",
       "navn": "Distributionsartefakt: mål-byg, .rpm og on-device succeskriterium",
       "beskrivelse": "Byg distributionsartefaktet som mål-byg: aarch64/Qt 5.6 i Sailfish SDK (sfdk/mb2 med harbour-skrynja-2.yaml, eller rpmbuild med rpm/harbour-skrynja-2.spec + Source0-tarball) → harbour-skrynja-2-<version>.aarch64.rpm; installér på Jolla Phone 2026; kør succeskriteriet on-device (prompt sendt → tilladelse spurgt → besvaret → fil skrevet → end_turn → exit 0). Resultatet er det målbare grundlag for Slutbrugeranvendelighedssonderingsstokastikerens vurderings-JSON'er. Kan ikke bygges i sandbox (ingen sfdk/rpmbuild/qmake, host x86_64) — mål-byg hører til SDK mål-miljøet. Strategisk begrundelse: anbefalet af Strategistokastikeren 2026-11-21 (plan-revision af projektbeskrivelse.adoc ligger hos Strategistokastikeren).",
+      "release_leverance": "Release/udgivelse: kun aarch64-RPM'en (harbour-skrynja-2-<version>-<release>.aarch64.rpm) leveres ud — til Harbour/store eller direkte til mål-enheden, efter mål-byg rc=0 og on-device exit 0; host-byg (x86_64/Qt 5.15) må aldrig udgives.",
       "filer": [
         "rpm/harbour-skrynja-2.spec",
         "harbour-skrynja-2.yaml",
