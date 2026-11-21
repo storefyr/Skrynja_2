@@ -1097,7 +1097,7 @@
           "forventet_uddata": "4 sti-linjer under /usr/share/icons/hicolor/*/apps/harbour-skrynja-2.png"
         }
       ],
-      "passerer": false
+      "passerer": true
     }
   ]
 }
