@@ -1,6 +1,7 @@
 #include "acpbesked.h"
 
 #include <QJsonDocument>
+#include <QVariant>
 
 AcpMessage::AcpMessage()
     : m_type(Invalid)
