@@ -4,11 +4,14 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QSettings>
+#include <QSignalSpy>
 #include <QVariantMap>
 
 #include "acpclient.h"
 #include "agentprocess.h"
 #include "configurationmodel.h"
+#include "konfiguration.h"
+#include "sessionstore.h"
 #include "testregistrering.h"
 
 class TestKonfigurationAfAgent : public QObject
@@ -22,6 +25,7 @@ private slots:
     void standard_agentsti_er_vibe_acp();
     void clientCapabilities_fortsat_tom();
     void set_config_option_debounced();
+    void en_config_ejer_med_signaler();
 private:
 };
 
@@ -103,6 +107,59 @@ void TestKonfigurationAfAgent::set_config_option_debounced()
     QVERIFY2(qml.contains("restart()"), "onTextChanged kalder ikke timer.restart()");
     QVERIFY2(qml.contains("onTriggered: acp.setConfigOption"), "setConfigOption ligger ikke i onTriggered");
     QVERIFY2(!qml.contains("onTextChanged: acp.setConfigOption"), "onTextChanged sender stadig pr. tastetryk");
+}
+
+void TestKonfigurationAfAgent::en_config_ejer_med_signaler()
+{
+    QString agentSrc = testReadSource("src/agentprocess.cpp");
+    QString storeSrc = testReadSource("src/sessionstore.cpp");
+    QString storeHdr = testReadSource("src/sessionstore.h");
+    QString cfgHdr = testReadSource("src/konfiguration.h");
+    QString cfgSrc = testReadSource("src/konfiguration.cpp");
+    QVERIFY2(!agentSrc.contains("QSettings"), "agentprocess.cpp reads QSettings directly");
+    QVERIFY2(!storeSrc.contains("QSettings"), "sessionstore.cpp reads QSettings directly");
+    QVERIFY2(!storeHdr.contains("QSettings"), "sessionstore.h still has a QSettings member");
+    QVERIFY2(!cfgHdr.isEmpty() && !cfgSrc.isEmpty(), "konfiguration.h/.cpp missing");
+    QVERIFY2(cfgHdr.contains("agentPath") && cfgHdr.contains("sessionId"), "config owner lacks agentPath/sessionId");
+    QVERIFY2(cfgHdr.contains("agentPathChanged") && cfgHdr.contains("sessionIdChanged"), "config owner lacks change signals");
+
+    QSettings s;
+    s.clear();
+    s.sync();
+
+    Konfiguration* ejer = Konfiguration::instance();
+    QVERIFY(ejer != 0);
+    QSignalSpy stiSpy(ejer, SIGNAL(agentPathChanged()));
+    QSignalSpy sessionSpy(ejer, SIGNAL(sessionIdChanged()));
+
+    AgentProcess process;
+    process.setAgentPath("/tmp/config-ejer-agent");
+    QCOMPARE(ejer->agentPath(), QString("/tmp/config-ejer-agent"));
+    QCOMPARE(process.agentPath(), QString("/tmp/config-ejer-agent"));
+    QCOMPARE(stiSpy.count(), 1);
+
+    SessionStore store;
+    QVERIFY(!store.hasSessionId());
+    store.saveSessionId("cfg-s1");
+    QCOMPARE(ejer->sessionId(), QString("cfg-s1"));
+    QCOMPARE(store.sessionId(), QString("cfg-s1"));
+    QVERIFY(store.hasSessionId());
+    QCOMPARE(sessionSpy.count(), 1);
+
+    TestClient client;
+    injectTestModels(&client, this);
+    client.setTestMode(true);
+    client.setAgentsti("/tmp/config-ejer-agent-2");
+    QCOMPARE(client.agentPath(), QString("/tmp/config-ejer-agent-2"));
+    QCOMPARE(ejer->agentPath(), QString("/tmp/config-ejer-agent-2"));
+    QCOMPARE(stiSpy.count(), 2);
+
+    client.sendInitialize();
+    client.feedBytesForTest(testReadFixture("fixture_initialize_config.ndjson"));
+    QCOMPARE(client.configOptions().size(), 2);
+
+    s.clear();
+    s.sync();
 }
 
 #include "tst_konfiguration_af_agent.moc"
