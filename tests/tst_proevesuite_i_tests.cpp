@@ -5,6 +5,8 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QMap>
+#include <QRegExp>
 
 #include "testregistrering.h"
 
@@ -17,6 +19,7 @@ private slots:
     void ingen_silica_afhaengighed_i_tests_pro();
     void suite_omfatter_alle_13_testklasser();
     void faelles_hjaelpere_i_testregistrering_h();
+    void ingen_dublerede_slots_paa_tvaers();
 private:
     QJsonObject readManifest();
     QString readTestsPro();
@@ -122,6 +125,31 @@ void TestProevesuiteITests::faelles_hjaelpere_i_testregistrering_h()
     QCOMPARE(r.value("id").toVariant().toLongLong(), qint64(7));
     QVERIFY(testErrorResponseJson(8, -1, "x").contains("error"));
     QVERIFY(!testReadFixture("fixture_rygrad.ndjson").isEmpty());
+}
+
+void TestProevesuiteITests::ingen_dublerede_slots_paa_tvaers()
+{
+    QDir dir(testRepoRoot() + "/tests");
+    QStringList filer = dir.entryList(QStringList() << "tst_*.cpp", QDir::Files);
+    QVERIFY(filer.size() >= 16);
+    QMap<QString, QStringList> prFil;
+    for (int i = 0; i < filer.size(); ++i) {
+        QFile f(dir.filePath(filer.at(i)));
+        QVERIFY(f.open(QIODevice::ReadOnly));
+        QString src = QString::fromUtf8(f.readAll());
+        QRegExp defRe("void Test\\w+::(\\w+)\\(");
+        int pos = 0;
+        while ((pos = defRe.indexIn(src, pos)) != -1) {
+            QString slot = defRe.cap(1);
+            if (slot != "initTestCase" && slot != "cleanupTestCase")
+                prFil[slot].append(filer.at(i));
+            pos += defRe.matchedLength();
+        }
+    }
+    for (QMap<QString, QStringList>::const_iterator it = prFil.constBegin(); it != prFil.constEnd(); ++it) {
+        QVERIFY2(it.value().size() == 1,
+                 qPrintable("dubleret slot " + it.key() + " i " + it.value().join(",")));
+    }
 }
 
 #include "tst_proevesuite_i_tests.moc"
