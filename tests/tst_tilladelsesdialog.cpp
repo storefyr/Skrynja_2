@@ -22,6 +22,9 @@ private slots:
     void svar_payload_selected_optionId();
     void afvisning_giver_outcome_cancelled();
     void ingen_dobbelt_svar();
+    void fejl_paa_prompt_signaleres();
+    void ukendt_svar_id_signaleres();
+    void permissionRequested_forbundet_i_qml();
 private:
 };
 
@@ -104,6 +107,42 @@ void TestTilladelsesdialog::ingen_dobbelt_svar()
             ++responseCount;
     }
     QCOMPARE(responseCount, 1);
+}
+
+void TestTilladelsesdialog::fejl_paa_prompt_signaleres()
+{
+    AcpClient client;
+    injectTestModels(&client, this);
+    client.setTestMode(true);
+    QSignalSpy fejlSpy(&client, SIGNAL(agentError(QString)));
+    client.sendSessionNew("/tmp");
+    qint64 newId = testIdOf(client.lastSentForTest());
+    QJsonObject newResult;
+    newResult.insert("sessionId", "sess-1");
+    client.feedBytesForTest(testResponseJson(newId, newResult) + "\n");
+    client.sendSessionPrompt("Hej");
+    qint64 promptId = testIdOf(client.lastSentForTest());
+    client.feedBytesForTest(testErrorResponseJson(promptId, -32000, "prompt afbrudt") + "\n");
+    QCOMPARE(client.lastError(), QString("prompt afbrudt"));
+    QVERIFY2(fejlSpy.count() >= 1, "agentError ikke emitteret for fejl på session/prompt");
+}
+
+void TestTilladelsesdialog::ukendt_svar_id_signaleres()
+{
+    AcpClient client;
+    injectTestModels(&client, this);
+    client.setTestMode(true);
+    QSignalSpy fejlSpy(&client, SIGNAL(agentError(QString)));
+    client.feedBytesForTest(testResponseJson(999, QJsonObject()) + "\n");
+    QVERIFY2(fejlSpy.count() >= 1, "agentError ikke emitteret for ukendt svar-id");
+}
+
+void TestTilladelsesdialog::permissionRequested_forbundet_i_qml()
+{
+    QString qml = testReadSource("qml/harbour-skrynja-2.qml");
+    QVERIFY(!qml.isEmpty());
+    QVERIFY2(qml.contains("onPermissionRequested"), "permissionRequested ikke forbundet i QML");
+    QVERIFY2(qml.contains("onAgentError"), "agentError ikke forbundet i QML");
 }
 
 #include "tst_tilladelsesdialog.moc"

@@ -364,13 +364,7 @@
       "parret_test": {
         "testfil": "tests/tst_tilladelsesdialog.cpp",
         "testklasse": "TestTilladelsesdialog",
-        "testslots": [
-          "anmodning_parses_til_pendingPermission",
-          "options_liste_med_optionId",
-          "svar_payload_selected_optionId",
-          "afvisning_giver_outcome_cancelled",
-          "ingen_dobbelt_svar"
-        ],
+        "testslots": ["anmodning_parses_til_pendingPermission", "options_liste_med_optionId", "svar_payload_selected_optionId", "afvisning_giver_outcome_cancelled", "ingen_dobbelt_svar", "fejl_paa_prompt_signaleres", "ukendt_svar_id_signaleres", "permissionRequested_forbundet_i_qml"],
         "fixtures": [
           "tests/fixtures/fixture_tilladelse.ndjson"
         ],
