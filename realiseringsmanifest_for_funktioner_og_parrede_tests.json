@@ -184,7 +184,8 @@
           "lineDropped_logges_i_produktion",
           "haleReady_logges_i_produktion"
         ,
-          "afskaaren_hale_logges"],
+          "afskaaren_hale_logges",
+          "besked_id_korrelation_mod_fixture_wireformat"],
         "fixtures": [
           "tests/fixtures/fixture_rygrad.ndjson",
           "tests/fixtures/fixture_rygrad_sammenklæbning.ndjson",
@@ -308,7 +309,8 @@
           "fallback_til_new_ved_load_fejl",
           "hadRestoredHistory_saettes_korrekt",
           "resumeregel_laeser_manifest_og_finder_foerste_false"
-        ],
+        ,
+          "resumeregel_koerer_git_kommandoer_mod_fixture"],
         "fixtures": [],
         "bemærkning": "Prøven indskrives før src/sessionlager.cpp; QSettings køres mod en midlertidig lokation i prøven"
       },
@@ -474,7 +476,8 @@
           "diff_linjer_cappes",
           "outputs_akkumuleres",
           "diff_vises_mens_det_sker"
-        ],
+        ,
+          "diff_test_paastaaer_kun_diff"],
         "fixtures": [
           "tests/fixtures/fixture_diff.ndjson",
           "tests/fixtures/fixture_uddata.ndjson"
@@ -597,7 +600,8 @@
           "suite_omfatter_alle_13_testklasser",
           "manifest_har_13_parrede_tests"
         ,
-          "ingen_global_settings_mutation_i_tests"],
+          "ingen_global_settings_mutation_i_tests",
+          "meta_test_afledt_af_manifest_ikke_hardkodet"],
         "fixtures": [],
         "bemærkning": "Meta-prøve: læser manifestet og tests.pro og tjekker parringen 1:1"
       },

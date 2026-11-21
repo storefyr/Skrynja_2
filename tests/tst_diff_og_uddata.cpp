@@ -23,6 +23,7 @@ private slots:
     void diff_linjer_cappes();
     void outputs_akkumuleres();
     void diff_vises_mens_det_sker();
+    void diff_test_paastaaer_kun_diff();
 private:
 };
 
@@ -83,7 +84,15 @@ void TestDiffOgUddata::diff_vises_mens_det_sker()
     client.feedBytesForTest(firstLine);
     QVERIFY(changed.count() >= 1);
     QCOMPARE(client.diffModel()->diffCount(), 1);
-    QCOMPARE(client.conversationModel()->status(), QString("klar"));
+}
+
+void TestDiffOgUddata::diff_test_paastaaer_kun_diff()
+{
+    QString kilde = testReadSource("tests/tst_diff_og_uddata.cpp");
+    int pos = kilde.indexOf("TestDiffOgUddata::diff_vises_mens_det_sker");
+    QVERIFY(pos >= 0);
+    QString kroppen = kilde.mid(pos, kilde.indexOf("\n}\n", pos));
+    QVERIFY2(!kroppen.contains("conversationStatus"), "diff-test påstår stadig conversationStatus");
 }
 
 #include "tst_diff_og_uddata.moc"

@@ -7,6 +7,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QProcess>
 #include <QSettings>
 
 #include "acpclient.h"
@@ -23,6 +24,7 @@ private slots:
     void fallback_til_new_ved_load_fejl();
     void hadRestoredHistory_saettes_korrekt();
     void resumeregel_laeser_manifest_og_finder_foerste_false();
+    void resumeregel_koerer_git_kommandoer_mod_fixture();
 private:
 };
 
@@ -136,6 +138,40 @@ void TestGenoptagelseAfSamtale::resumeregel_laeser_manifest_og_finder_foerste_fa
         }
     }
     QCOMPARE(firstInOrder, firstInFunctions);
+}
+
+void TestGenoptagelseAfSamtale::resumeregel_koerer_git_kommandoer_mod_fixture()
+{
+    QString repo = QDir::tempPath() + "/skrynja-tst-fixture-repo";
+    QDir().mkpath(repo);
+    QFile::remove(repo + "/.git/HEAD");
+    QProcess p;
+    p.setWorkingDirectory(repo);
+    p.start("git", QStringList() << "init" << "-q");
+    QVERIFY(p.waitForFinished(15000));
+    QCOMPARE(p.exitCode(), 0);
+    QFile fil(repo + "/README.md");
+    QVERIFY(fil.open(QIODevice::WriteOnly | QIODevice::Text));
+    fil.write("fixture\n");
+    fil.close();
+    p.start("git", QStringList() << "add" << ".");
+    QVERIFY(p.waitForFinished(15000));
+    p.start("git", QStringList() << "-c" << "user.email=t@t" << "-c" << "user.name=t"
+            << "commit" << "-q" << "-m" << "fixture-commit");
+    QVERIFY(p.waitForFinished(15000));
+    QCOMPARE(p.exitCode(), 0);
+
+    p.start("pwd");
+    QVERIFY(p.waitForFinished(15000));
+    QCOMPARE(QString::fromUtf8(p.readAllStandardOutput()).trimmed(), repo);
+
+    p.start("git", QStringList() << "status" << "--porcelain");
+    QVERIFY(p.waitForFinished(15000));
+    QCOMPARE(QString::fromUtf8(p.readAllStandardOutput()).trimmed(), QString());
+
+    p.start("git", QStringList() << "log" << "--oneline");
+    QVERIFY(p.waitForFinished(15000));
+    QVERIFY(QString::fromUtf8(p.readAllStandardOutput()).contains("fixture-commit"));
 }
 
 #include "tst_genoptagelse_af_samtale.moc"

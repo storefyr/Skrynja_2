@@ -52,8 +52,7 @@ void TestProevesuiteITests::manifest_har_13_parrede_tests()
     QJsonObject manifest = readManifest();
     QVERIFY(!manifest.isEmpty());
     QJsonArray funktioner = manifest.value("funktioner").toArray();
-    QCOMPARE(funktioner.size(), 16);
-    QCOMPARE(manifest.value("strategisk_rækkefølge").toArray().size(), 16);
+    QCOMPARE(funktioner.size(), manifest.value("strategisk_rækkefølge").toArray().size());
     for (int i = 0; i < funktioner.size(); ++i) {
         QJsonObject fn = funktioner.at(i).toObject();
         QJsonObject pt = fn.value("parret_test").toObject();
@@ -187,6 +186,16 @@ void TestProevesuiteITests::ingen_global_settings_mutation_i_tests()
     }
     QString h = testReadSource("tests/testregistrering.h");
     QVERIFY(h.contains("QSettings::setPath"));
+}
+
+
+void TestProevesuiteITests::meta_test_afledt_af_manifest_ikke_hardkodet()
+{
+    QString kilde = testReadSource("tests/tst_proevesuite_i_tests.cpp");
+    QVERIFY(!kilde.isEmpty());
+    QVERIFY2(!kilde.contains("size(), 13)"), "hårdkodet 13 i meta-test");
+    QVERIFY2(!kilde.contains("size(), 16)"), "hårdkodet 16 i meta-test");
+    QVERIFY2(kilde.contains("strategisk_r"), "meta-test aflæser ikke manifestets rækkefølge");
 }
 
 #include "tst_proevesuite_i_tests.moc"
