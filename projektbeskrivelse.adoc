@@ -219,6 +219,8 @@ Denne plan fastlægger 23 funktioner i følgende rækkefølge (svarende til mani
 
 *Trin:* `arkitektur_fjern_testkroge` (funktion 17, mål_funktion `prøvesuite_i_tests`) — flyt alle `*ForTest`-metoder og `m_testMode`-grenen i `write()` ud af `acpclient`, `acpframereader`, `agentprocess` og `logfile` og ind i en separat test-harness under `tests/`. Parret test: ny slot `ingen_testkroge_i_produktionsklasser` i `tests/tst_proevesuite_i_tests.cpp`.
 
+*Status:* LUKKET — gennemført som funktion 17 (`arkitektur_fjern_testkroge`), `passerer: sand` på `main` @ `45e339e` (kildesondrings-triage 26/26 lukket).
+
 === ark-3 — Magiske metode-strenge ved svar-korrelation (alvorlighed: middel)
 
 *Kilde:* vurderings-JSON id `ark-3`, eskaleret i manifestet. Audit på `main`: efter ark-1-trin 1 ligger metoderne som navngivne konstanter i `AcpProtokol` (`src/acpprotokol.h:14-20`), men `src/acpsession.cpp:10` har stadig et lokalt `kSessionCancel`-literal.
@@ -226,6 +228,8 @@ Denne plan fastlægger 23 funktioner i følgende rækkefølge (svarende til mani
 *Beslutning:* Plan-revision — ark-3 accepteres ikke, før alle metode-strenge ligger ét sted.
 
 *Trin:* `arkitektur_alle_metoder_konstanter` (funktion 18, mål_funktion `acp_rygrad`) — flyt resterende lokale metode-literaler (f.eks. `kSessionCancel` i `acpsession.cpp`) ind i `AcpProtokol`'s konstantsæt, så en omdøbning ét sted ikke kan give stille korrelationsfejl. Parret test: ny slot `alle_metoder_er_konstanter` i `tests/tst_acp_rygrad.cpp`.
+
+*Status:* LUKKET — gennemført som funktion 18 (`arkitektur_alle_metoder_konstanter`), `passerer: sand` på `main` @ `45e339e`.
 
 === ark-4 — UI-model afhænger af transport-laget (alvorlighed: middel)
 
@@ -235,6 +239,8 @@ Denne plan fastlægger 23 funktioner i følgende rækkefølge (svarende til mani
 
 *Trin:* `arkitektur_diffmodel_uden_transport` (funktion 19, mål_funktion `diff_og_uddata`) — fjern `#include "acpframereader.h"` fra `diffmodel`; flyt cap-konstanten til det fælles konstant-header (eller giv den som parameter), så UI-laget ikke kender transport-laget. Parret test: ny slot `diffmodel_uden_acpframereader_include` i `tests/tst_diff_og_uddata.cpp`.
 
+*Status:* LUKKET — gennemført som funktion 19 (`arkitektur_diffmodel_uden_transport`), `passerer: sand` på `main` @ `45e339e`.
+
 === ark-5 — QSettings som skjult global tilstand læst i gettere (alvorlighed: lav)
 
 *Kilde:* vurderings-JSON id `ark-5`, eskaleret i manifestet. Evidens verificeret på `main`: `src/agentprocess.cpp:19,25` læser QSettings pr. kald; `src/sessionstore.h:17` har eget QSettings-medlem.
@@ -242,6 +248,8 @@ Denne plan fastlægger 23 funktioner i følgende rækkefølge (svarende til mani
 *Beslutning:* Plan-revision — ark-5 accepteres ikke; konfiguration skal have én ejer med change-signaler.
 
 *Trin:* `arkitektur_en_config_ejer` (funktion 20, mål_funktion `konfiguration_af_agent`) — centralisér agentsti og session-id i én konfigurationsklasse med change-signaler; fjern QSettings-læsninger fra spredte gettere. Parret test: ny slot `en_config_ejer_med_signaler` i `tests/tst_konfiguration_af_agent.cpp`.
+
+*Status:* LUKKET — gennemført som funktion 20 (`arkitektur_en_config_ejer`), `passerer: sand` på `main` @ `45e339e`.
 
 === ark-6 — Dobbelt model-lag uden konsument (alvorlighed: lav)
 
@@ -251,7 +259,9 @@ Denne plan fastlægger 23 funktioner i følgende rækkefølge (svarende til mani
 
 *Trin:* `arkitektur_fjern_ubrugte_roller` (funktion 21, mål_funktion `værktøjskald_visning`) — fjern det ubrugte QAbstractListModel-lag fra de tre modeller (rene data-holdere); QML fortsætter uændret med QVariantList-properties. Parret test: ny slot `qml_bruger_en_eneste_model_mekanisme` i `tests/tst_vaerktoejskald_visning.cpp`.
 
-*Verifikation af ark-2..6-trinnene:* hvert trin uden ny funktionalitet; `python3 tjek_manifest_parrede_tests.py` grøn før og efter (baseline på `main` @ `64b3d8e`: exit 0, 16/16), host-test 136 PASS / 0 FAIL bevares, aarch64/Qt 5.6 mål-byg med 0 fejl. Projektstokastikeren registrerer trinnene i manifestet som funktion 17–21 — eksisterende verifikations_trin må ikke fjernes jf. redigeringsreglen.
+*Status:* LUKKET — gennemført som funktion 21 (`arkitektur_fjern_ubrugte_roller`), `passerer: sand` på `main` @ `45e339e`.
+
+*Verifikation af ark-2..6-trinnene:* hvert trin uden ny funktionalitet; `python3 tjek_manifest_parrede_tests.py` grøn før og efter (senest på `main` @ `45e339e`: exit 0, 23/23 parrede tests), host-test grøn, aarch64/Qt 5.6 mål-byg med 0 fejl. Trinnene er registreret i manifestet som funktion 17–21 — eksisterende verifikations_trin blev ikke fjernet jf. redigeringsreglen.
 
 == Distributionsartefakt — mål-byg, .rpm og on-device succeskriterium (funktion 22–23)
 
