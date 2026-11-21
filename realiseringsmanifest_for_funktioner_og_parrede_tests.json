@@ -53,7 +53,8 @@
         "id": "ark-1",
         "alvorlighed": "høj",
         "titel": "AcpClient er et god-objekt med hård kobling (ejer AgentProcess, AcpFrameReader og fem modeller; 10 Q_PROPERTYs; protokol-dispatch + id-bogføring + signal-videresendelse i én klasse)",
-        "beslutning": "Eskaleret til Strategistokastikeren jf. triage_logik: enten accepteres ark-1 med sporbar begrundelse i projektbeskrivelse.adoc, eller planen tilføjer et arkitektur-opdelings-trin (protokol-dispatch, session-håndtering og UI-modeller i hver sin klasse)."
+        "beslutning": "Eskaleret til Strategistokastikeren jf. triage_logik: enten accepteres ark-1 med sporbar begrundelse i projektbeskrivelse.adoc, eller planen tilføjer et arkitektur-opdelings-trin (protokol-dispatch, session-håndtering og UI-modeller i hver sin klasse).",
+        "besvarelse": "Besvaret af Strategistokastikeren via PR #10 (draft, commit bac0603, branch vibe/ark-1-opdeling-df693a): plan-revision — ark-1 accepteres ikke. Tre opdelings-trin er registreret i dette manifest som funktion 14-16 (arkitektur_opdeling_protokol, arkitektur_opdeling_session, arkitektur_opdeling_ui_modeller). ark-1 lukkes, når PR #10 er merged, og de tre funktioner har passerer: sand."
       }
     ],
     "ordrer_til_realiseringsstokastikeren": [
@@ -85,7 +86,7 @@
       {"id": "ark-6", "type": "arkitektur", "mål_funktion": "værktøjskald_visning", "ordre": "Enten fjern de ubrugte QAbstractListModel-roller fra ConversationModel/ToolCallModel/DiffModel, eller skift QML til at bruge model-rollerne — ikke begge dele.", "parret_test": "tests/tst_vaerktoejskald_visning.cpp + ny slot: qml_bruger_en_eneste_model_mekanisme"}
     ]
   },
-  "succeskriterium": "prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0, samtidig med at alle 13 funktioner har passerer: sand og alle parrede tests i tests/ er grønne.",
+  "succeskriterium": "prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0, samtidig med at alle 16 funktioner (13 oprindelige + 3 arkitektur-opdelings-trin fra PR #10) har passerer: sand og alle parrede tests i tests/ er grønne.",
   "strategisk_rækkefølge": [
     "byggesti_og_logfil",
     "acp_rygrad",
@@ -99,7 +100,10 @@
     "konfiguration_af_agent",
     "selvtest_med_verdict",
     "prøvesuite_i_tests",
-    "oprydning_af_træ"
+    "oprydning_af_træ",
+    "arkitektur_opdeling_protokol",
+    "arkitektur_opdeling_session",
+    "arkitektur_opdeling_ui_modeller"
   ],
   "funktioner": [
     {
@@ -635,6 +639,142 @@
         }
       ],
       "passerer": true
+    },
+    {
+      "id": "arkitektur_opdeling_protokol",
+      "navn": "Arkitektur-opdeling: protokol",
+      "beskrivelse": "Udtræk protokol-dispatch og request-id-bogføring (handleMessage/handleSessionUpdate) fra AcpClient til en ny klasse AcpProtokol; AcpClient videresender kun. Ingen ny funktionalitet — trin fra plan-revisionen i PR #10 (svar på ark-1).",
+      "filer": [
+        "src/acpprotokol.h",
+        "src/acpprotokol.cpp",
+        "src/acpclient.h",
+        "src/acpclient.cpp",
+        "tests/tst_arkitektur_opdeling_protokol.cpp"
+      ],
+      "parret_test": {
+        "testfil": "tests/tst_arkitektur_opdeling_protokol.cpp",
+        "testklasse": "TestArkitekturOpdelingProtokol",
+        "testslots": [
+          "acp_protokol_haandterer_dispatch",
+          "request_id_bogfoering_i_acp_protokol",
+          "acpclient_har_ingen_dispatch",
+          "eksisterende_rygrad_tests_stadig_groenne"
+        ],
+        "fixtures": [
+          "tests/fixtures/fixture_rygrad.ndjson"
+        ],
+        "bemærkning": "Prøven indskrives før src/acpprotokol.cpp; QtTest uden Silica"
+      },
+      "verifikations_trin": [
+        {
+          "trin": "Eksisterende parrede tests forbliver grønne",
+          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "forventet_uddata": "ALL TESTS PASSED (inkl. TestAcpRygrad og TestArkitekturOpdelingProtokol)"
+        },
+        {
+          "trin": "Manifest-tjek grøn før og efter",
+          "kommando": "python3 tjek_manifest_parrede_tests.py",
+          "forventet_uddata": "rækkefølge ok; exit 0"
+        },
+        {
+          "trin": "Mål-byg uden fejl",
+          "kommando": "aarch64/Qt 5.6 mål-byg: qmake harbour-skrynja-2.pro && make",
+          "forventet_uddata": "0 fejl; binær er ELF AArch64"
+        }
+      ],
+      "passerer": false
+    },
+    {
+      "id": "arkitektur_opdeling_session",
+      "navn": "Arkitektur-opdeling: session",
+      "beskrivelse": "Udtræk session-håndtering (initialize, session/new, session/load, session/prompt, session/cancel samt sessionId-lagring via SessionLager) fra AcpClient til en ny klasse AcpSession. Ingen ny funktionalitet — trin fra plan-revisionen i PR #10 (svar på ark-1).",
+      "filer": [
+        "src/acpsession.h",
+        "src/acpsession.cpp",
+        "src/acpclient.h",
+        "src/acpclient.cpp",
+        "src/sessionlager.h",
+        "src/sessionlager.cpp",
+        "tests/tst_arkitektur_opdeling_session.cpp"
+      ],
+      "parret_test": {
+        "testfil": "tests/tst_arkitektur_opdeling_session.cpp",
+        "testklasse": "TestArkitekturOpdelingSession",
+        "testslots": [
+          "acp_session_haandterer_initialize_new_load_prompt_cancel",
+          "session_id_lagres_i_sessionlager",
+          "acpclient_har_ingen_sessionlogik",
+          "eksisterende_session_tests_stadig_groenne"
+        ],
+        "fixtures": [
+          "tests/fixtures/fixture_prompt_svar.ndjson",
+          "tests/fixtures/fixture_end_turn.ndjson"
+        ],
+        "bemærkning": "Prøven indskrives før src/acpsession.cpp; QtTest uden Silica"
+      },
+      "verifikations_trin": [
+        {
+          "trin": "Eksisterende parrede tests forbliver grønne",
+          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "forventet_uddata": "ALL TESTS PASSED (inkl. TestGenoptagelseAfSamtale, TestPromptOgSvar og TestArkitekturOpdelingSession)"
+        },
+        {
+          "trin": "Manifest-tjek grøn før og efter",
+          "kommando": "python3 tjek_manifest_parrede_tests.py",
+          "forventet_uddata": "rækkefølge ok; exit 0"
+        },
+        {
+          "trin": "Mål-byg uden fejl",
+          "kommando": "aarch64/Qt 5.6 mål-byg: qmake harbour-skrynja-2.pro && make",
+          "forventet_uddata": "0 fejl; binær er ELF AArch64"
+        }
+      ],
+      "passerer": false
+    },
+    {
+      "id": "arkitektur_opdeling_ui_modeller",
+      "navn": "Arkitektur-opdeling: UI-modeller",
+      "beskrivelse": "Frigør de fem modeller (samtale, værktøjskald, tilladelse, diff, konfiguration) fra AcpClient-ejerskab; AcpClient reduceres til en tynd façade, der kun udstiller Q_PROPERTYs og videresender signaler til QML. Ingen ny funktionalitet — trin fra plan-revisionen i PR #10 (svar på ark-1).",
+      "filer": [
+        "src/acpclient.h",
+        "src/acpclient.cpp",
+        "src/samtalemodel.h",
+        "src/vaerktoejskaldsmodel.h",
+        "src/tilladelsesmodel.h",
+        "src/diffmodel.h",
+        "src/konfigurationsmodel.h",
+        "tests/tst_arkitektur_opdeling_ui_modeller.cpp"
+      ],
+      "parret_test": {
+        "testfil": "tests/tst_arkitektur_opdeling_ui_modeller.cpp",
+        "testklasse": "TestArkitekturOpdelingUiModeller",
+        "testslots": [
+          "acpclient_er_tynd_facade",
+          "fem_modeller_uden_acpclient_ejerskab",
+          "q_properties_uenaendret_for_qml",
+          "eksisterende_model_tests_stadig_groenne"
+        ],
+        "fixtures": [],
+        "bemærkning": "Prøven indskrives før ændringen i src/acpclient.cpp; QtTest uden Silica"
+      },
+      "verifikations_trin": [
+        {
+          "trin": "Eksisterende parrede tests forbliver grønne",
+          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "forventet_uddata": "ALL TESTS PASSED (inkl. model-testklasserne og TestArkitekturOpdelingUiModeller)"
+        },
+        {
+          "trin": "Manifest-tjek grøn før og efter",
+          "kommando": "python3 tjek_manifest_parrede_tests.py",
+          "forventet_uddata": "rækkefølge ok; exit 0"
+        },
+        {
+          "trin": "Mål-byg uden fejl",
+          "kommando": "aarch64/Qt 5.6 mål-byg: qmake harbour-skrynja-2.pro && make",
+          "forventet_uddata": "0 fejl; binær er ELF AArch64"
+        }
+      ],
+      "passerer": false
     }
   ]
 }
