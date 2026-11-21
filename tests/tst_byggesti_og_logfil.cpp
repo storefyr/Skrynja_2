@@ -18,6 +18,8 @@ private slots:
     void logfil_appender_uden_at_overskrive();
     void logfil_roerer_ikke_transskripter();
     void src_filnavne_matcher_klassenavne();
+    void manglende_qml_giver_ikke_exit_0();
+    void startAgent_fejl_signaleres();
 private:
     QString readLines(int& count);
     QString m_path;
@@ -129,6 +131,22 @@ void TestByggestiOgLogfil::src_filnavne_matcher_klassenavne()
             QVERIFY2(QFileInfo::exists(srcDir.filePath(base + ".h")), qPrintable(base + ".h mangler"));
         QVERIFY2(QFileInfo::exists(srcDir.filePath(base + ".cpp")), qPrintable(base + ".cpp mangler"));
     }
+}
+
+void TestByggestiOgLogfil::manglende_qml_giver_ikke_exit_0()
+{
+    QString main = testReadSource("src/main.cpp");
+    QVERIFY(!main.isEmpty());
+    QVERIFY2(main.contains("return 2"), "main.cpp giver ikke exit != 0 ved manglende QML-fil");
+    QVERIFY2(main.contains("qWarning"), "main.cpp skriver ikke besked ved manglende QML-fil");
+}
+
+void TestByggestiOgLogfil::startAgent_fejl_signaleres()
+{
+    QString main = testReadSource("src/main.cpp");
+    QVERIFY(!main.isEmpty());
+    QVERIFY2(main.contains("if (!client.startAgent())"), "main.cpp tjekker ikke startAgent()-resultatet");
+    QVERIFY2(main.contains("return 3"), "main.cpp giver ikke exit != 0 ved startAgent-fejl");
 }
 
 #include "tst_byggesti_og_logfil.moc"

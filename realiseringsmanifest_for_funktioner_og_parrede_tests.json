@@ -123,7 +123,14 @@
       "parret_test": {
         "testfil": "tests/tst_byggesti_og_logfil.cpp",
         "testklasse": "TestByggestiOgLogfil",
-        "testslots": ["logfil_oprettes_ved_foerste_linje", "logfil_linje_har_iso_tidsstempel", "logfil_appender_uden_at_overskrive", "logfil_roerer_ikke_transskripter", "manglende_qml_giver_ikke_exit_0", "startAgent_fejl_signaleres"],
+        "testslots": [
+          "logfil_oprettes_ved_foerste_linje",
+          "logfil_linje_har_iso_tidsstempel",
+          "logfil_appender_uden_at_overskrive",
+          "logfil_roerer_ikke_transskripter",
+          "manglende_qml_giver_ikke_exit_0",
+          "startAgent_fejl_signaleres"
+        ],
         "fixtures": [],
         "bemærkning": "QtTest uden Silica (QT += core testlib); prøven indskrives før src/logfil.cpp og registreres i tests/tests.pro"
       },
@@ -164,7 +171,19 @@
       "parret_test": {
         "testfil": "tests/tst_acp_rygrad.cpp",
         "testklasse": "TestAcpRygrad",
-        "testslots": ["rygrad_fixture_hoved", "rygrad_sammenklaebning", "rygrad_ugyldig_ruller_tilbage", "rygrad_utf8_ugyldig", "rygrad_crlf", "rygrad_flere_paa_en_linje", "rygrad_cap_droppes", "rygrad_hale_ved_eof", "besked_id_korrelation", "lineDropped_logges_i_produktion", "haleReady_logges_i_produktion"],
+        "testslots": [
+          "rygrad_fixture_hoved",
+          "rygrad_sammenklaebning",
+          "rygrad_ugyldig_ruller_tilbage",
+          "rygrad_utf8_ugyldig",
+          "rygrad_crlf",
+          "rygrad_flere_paa_en_linje",
+          "rygrad_cap_droppes",
+          "rygrad_hale_ved_eof",
+          "besked_id_korrelation",
+          "lineDropped_logges_i_produktion",
+          "haleReady_logges_i_produktion"
+        ],
         "fixtures": [
           "tests/fixtures/fixture_rygrad.ndjson",
           "tests/fixtures/fixture_rygrad_sammenklæbning.ndjson",
@@ -242,7 +261,14 @@
       "parret_test": {
         "testfil": "tests/tst_prompt_og_svar.cpp",
         "testklasse": "TestPromptOgSvar",
-        "testslots": ["session_new_payload_cwd", "prompt_payload_content_blokke", "chunk_akkumuleres_til_lastText", "svar_korreleres_paa_request_id", "end_turn_afslutter_runde", "messageSent_kun_ved_faktisk_skrevet"],
+        "testslots": [
+          "session_new_payload_cwd",
+          "prompt_payload_content_blokke",
+          "chunk_akkumuleres_til_lastText",
+          "svar_korreleres_paa_request_id",
+          "end_turn_afslutter_runde",
+          "messageSent_kun_ved_faktisk_skrevet"
+        ],
         "fixtures": [
           "tests/fixtures/fixture_prompt_svar.ndjson"
         ],
@@ -353,7 +379,16 @@
       "parret_test": {
         "testfil": "tests/tst_tilladelsesdialog.cpp",
         "testklasse": "TestTilladelsesdialog",
-        "testslots": ["anmodning_parses_til_pendingPermission", "options_liste_med_optionId", "svar_payload_selected_optionId", "afvisning_giver_outcome_cancelled", "ingen_dobbelt_svar", "fejl_paa_prompt_signaleres", "ukendt_svar_id_signaleres", "permissionRequested_forbundet_i_qml"],
+        "testslots": [
+          "anmodning_parses_til_pendingPermission",
+          "options_liste_med_optionId",
+          "svar_payload_selected_optionId",
+          "afvisning_giver_outcome_cancelled",
+          "ingen_dobbelt_svar",
+          "fejl_paa_prompt_signaleres",
+          "ukendt_svar_id_signaleres",
+          "permissionRequested_forbundet_i_qml"
+        ],
         "fixtures": [
           "tests/fixtures/fixture_tilladelse.ndjson"
         ],
