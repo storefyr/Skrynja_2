@@ -7,12 +7,12 @@
 #include <QJsonObject>
 
 #include "acpclient.h"
-#include "acpbesked.h"
-#include "konfigurationsmodel.h"
+#include "acpmessage.h"
+#include "configurationmodel.h"
 #include "diffmodel.h"
-#include "samtalemodel.h"
-#include "tilladelsesmodel.h"
-#include "vaerktoejskaldsmodel.h"
+#include "conversationmodel.h"
+#include "permissionmodel.h"
+#include "toolcallmodel.h"
 #include "testregistrering.h"
 
 class TestArkitekturOpdelingUiModeller : public QObject

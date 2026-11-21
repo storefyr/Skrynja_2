@@ -6,7 +6,7 @@
 #include <QObject>
 #include <QVariantList>
 
-#include "acpbesked.h"
+#include "acpmessage.h"
 
 class AcpFrameReader;
 class AcpProtokol;

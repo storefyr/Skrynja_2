@@ -1,4 +1,4 @@
-#include "agentproces.h"
+#include "agentprocess.h"
 
 #include <QFileInfo>
 #include <QProcess>

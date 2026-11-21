@@ -7,7 +7,7 @@
 
 #include "acpclient.h"
 #include "testregistrering.h"
-#include "vaerktoejskaldsmodel.h"
+#include "toolcallmodel.h"
 
 class TestVaerktoejskaldVisning : public QObject
 {
@@ -81,7 +81,7 @@ void TestVaerktoejskaldVisning::flere_kald_i_raekkefoelge()
 
 void TestVaerktoejskaldVisning::enkelt_projektion_i_toolkaldsmodel()
 {
-    QString kilde = testReadSource("src/vaerktoejskaldsmodel.cpp");
+    QString kilde = testReadSource("src/toolcallmodel.cpp");
     QVERIFY(!kilde.isEmpty());
     QVERIFY(kilde.contains("projektion"));
     QCOMPARE(kilde.count("m.insert(\"toolCallId\""), 1);

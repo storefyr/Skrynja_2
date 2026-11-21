@@ -1,4 +1,4 @@
-#include "vaerktoejskaldsmodel.h"
+#include "toolcallmodel.h"
 
 ToolCallModel::ToolCallModel(QObject* parent)
     : QAbstractListModel(parent)

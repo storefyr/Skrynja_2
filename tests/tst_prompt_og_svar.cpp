@@ -6,7 +6,7 @@
 #include <QSettings>
 
 #include "acpclient.h"
-#include "samtalemodel.h"
+#include "conversationmodel.h"
 #include "testregistrering.h"
 
 class TestPromptOgSvar : public QObject

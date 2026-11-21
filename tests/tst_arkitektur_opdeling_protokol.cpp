@@ -5,7 +5,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-#include "acpbesked.h"
+#include "acpmessage.h"
 #include "acpclient.h"
 #include "acpframereader.h"
 #include "acpprotokol.h"

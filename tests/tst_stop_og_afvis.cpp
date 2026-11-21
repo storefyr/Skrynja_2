@@ -10,7 +10,7 @@
 #include <QSettings>
 
 #include "acpclient.h"
-#include "agentproces.h"
+#include "agentprocess.h"
 #include "testregistrering.h"
 
 class TestStopOgAfvis : public QObject

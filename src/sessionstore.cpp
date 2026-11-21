@@ -1,4 +1,4 @@
-#include "sessionlager.h"
+#include "sessionstore.h"
 
 SessionStore::SessionStore()
     : m_settings()

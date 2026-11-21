@@ -6,7 +6,7 @@
 #include <QSettings>
 
 #include "acpclient.h"
-#include "selvtest.h"
+#include "selftest.h"
 #include "testregistrering.h"
 
 class TestSelvtestMedVerdict : public QObject

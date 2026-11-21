@@ -5,7 +5,7 @@
 #include <QJsonObject>
 
 #include "acpprotokol.h"
-#include "sessionlager.h"
+#include "sessionstore.h"
 
 static const QString kSessionCancel = QLatin1String("session/cancel");
 

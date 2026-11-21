@@ -7,8 +7,8 @@
 #include <QVariantMap>
 
 #include "acpclient.h"
-#include "agentproces.h"
-#include "konfigurationsmodel.h"
+#include "agentprocess.h"
+#include "configurationmodel.h"
 #include "testregistrering.h"
 
 class TestKonfigurationAfAgent : public QObject

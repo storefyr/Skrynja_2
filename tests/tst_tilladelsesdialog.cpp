@@ -10,7 +10,7 @@
 
 #include "acpclient.h"
 #include "testregistrering.h"
-#include "tilladelsesmodel.h"
+#include "permissionmodel.h"
 
 class TestTilladelsesdialog : public QObject
 {

@@ -11,7 +11,7 @@
 #include "acpclient.h"
 #include "acpframereader.h"
 #include "diffmodel.h"
-#include "samtalemodel.h"
+#include "conversationmodel.h"
 #include "testregistrering.h"
 
 class TestDiffOgUddata : public QObject

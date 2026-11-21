@@ -5,7 +5,7 @@
 #include <QObject>
 #include <QString>
 
-#include "acpbesked.h"
+#include "acpmessage.h"
 
 class AcpProtokol : public QObject
 {

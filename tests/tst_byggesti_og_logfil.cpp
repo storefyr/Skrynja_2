@@ -5,7 +5,7 @@
 #include <QFileInfo>
 #include <QStandardPaths>
 
-#include "logfil.h"
+#include "logfile.h"
 #include "testregistrering.h"
 
 class TestByggestiOgLogfil : public QObject
@@ -115,7 +115,7 @@ void TestByggestiOgLogfil::src_filnavne_matcher_klassenavne()
     QDir srcDir(testRepoRoot() + "/src");
     QStringList filer = srcDir.entryList(QStringList() << "*.h" << "*.cpp", QDir::Files);
     for (int i = 0; i < filer.size(); ++i)
-        QVERIFY2(filer.at(i) == QString::fromUtf8(filer.at(i).toUtf8()),
+        QVERIFY2(filer.at(i).toUtf8().size() == filer.at(i).size(),
                  qPrintable("ikke-ascii filnavn: " + filer.at(i)));
 
     const char* forventede[] = {
@@ -125,7 +125,8 @@ void TestByggestiOgLogfil::src_filnavne_matcher_klassenavne()
     };
     for (int i = 0; i < 15; ++i) {
         QString base = QString::fromLatin1(forventede[i]);
-        QVERIFY2(QFileInfo::exists(srcDir.filePath(base + ".h")), qPrintable(base + ".h mangler"));
+        if (base != "main")
+            QVERIFY2(QFileInfo::exists(srcDir.filePath(base + ".h")), qPrintable(base + ".h mangler"));
         QVERIFY2(QFileInfo::exists(srcDir.filePath(base + ".cpp")), qPrintable(base + ".cpp mangler"));
     }
 }

@@ -8,12 +8,12 @@
 #include "acpframereader.h"
 #include "acpprotokol.h"
 #include "acpsession.h"
-#include "agentproces.h"
+#include "agentprocess.h"
 #include "diffmodel.h"
-#include "konfigurationsmodel.h"
-#include "samtalemodel.h"
-#include "tilladelsesmodel.h"
-#include "vaerktoejskaldsmodel.h"
+#include "configurationmodel.h"
+#include "conversationmodel.h"
+#include "permissionmodel.h"
+#include "toolcallmodel.h"
 
 static const QString kSetConfigOption = QLatin1String("session/set_config_option");
 

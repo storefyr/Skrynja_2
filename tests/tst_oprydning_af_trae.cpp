@@ -7,7 +7,7 @@
 #include <QRegExp>
 #include <QStandardPaths>
 
-#include "logfil.h"
+#include "logfile.h"
 #include "testregistrering.h"
 
 class TestOprydningAfTrae : public QObject

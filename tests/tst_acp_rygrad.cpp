@@ -3,7 +3,7 @@
 #include <QJsonObject>
 #include <QJsonParseError>
 
-#include "acpbesked.h"
+#include "acpmessage.h"
 #include "acpframereader.h"
 #include "testregistrering.h"
 

@@ -1,4 +1,4 @@
-#include "samtalemodel.h"
+#include "conversationmodel.h"
 
 ConversationModel::ConversationModel(QObject* parent)
     : QAbstractListModel(parent)

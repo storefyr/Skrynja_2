@@ -1,4 +1,4 @@
-#include "selvtest.h"
+#include "selftest.h"
 
 #include <QDateTime>
 #include <QDir>

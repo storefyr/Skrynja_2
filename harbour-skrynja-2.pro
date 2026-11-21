@@ -6,36 +6,36 @@ CONFIG += c++11
 
 SOURCES += \
     src/main.cpp \
-    src/logfil.cpp \
+    src/logfile.cpp \
     src/acpframereader.cpp \
-    src/acpbesked.cpp \
-    src/agentproces.cpp \
+    src/acpmessage.cpp \
+    src/agentprocess.cpp \
     src/acpprotokol.cpp \
     src/acpsession.cpp \
     src/acpclient.cpp \
-    src/samtalemodel.cpp \
-    src/sessionlager.cpp \
-    src/vaerktoejskaldsmodel.cpp \
-    src/tilladelsesmodel.cpp \
+    src/conversationmodel.cpp \
+    src/sessionstore.cpp \
+    src/toolcallmodel.cpp \
+    src/permissionmodel.cpp \
     src/diffmodel.cpp \
-    src/konfigurationsmodel.cpp \
-    src/selvtest.cpp
+    src/configurationmodel.cpp \
+    src/selftest.cpp
 
 HEADERS += \
-    src/logfil.h \
+    src/logfile.h \
     src/acpframereader.h \
-    src/acpbesked.h \
-    src/agentproces.h \
+    src/acpmessage.h \
+    src/agentprocess.h \
     src/acpprotokol.h \
     src/acpsession.h \
     src/acpclient.h \
-    src/samtalemodel.h \
-    src/sessionlager.h \
-    src/vaerktoejskaldsmodel.h \
-    src/tilladelsesmodel.h \
+    src/conversationmodel.h \
+    src/sessionstore.h \
+    src/toolcallmodel.h \
+    src/permissionmodel.h \
     src/diffmodel.h \
-    src/konfigurationsmodel.h \
-    src/selvtest.h
+    src/configurationmodel.h \
+    src/selftest.h
 
 OTHER_FILES += \
     harbour-skrynja-2.desktop \

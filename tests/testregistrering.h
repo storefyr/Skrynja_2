@@ -14,12 +14,12 @@
 #include <QString>
 
 #include "acpclient.h"
-#include "agentproces.h"
-#include "konfigurationsmodel.h"
+#include "agentprocess.h"
+#include "configurationmodel.h"
 #include "diffmodel.h"
-#include "samtalemodel.h"
-#include "tilladelsesmodel.h"
-#include "vaerktoejskaldsmodel.h"
+#include "conversationmodel.h"
+#include "permissionmodel.h"
+#include "toolcallmodel.h"
 
 typedef QObject* (*TestFabrik)();
 

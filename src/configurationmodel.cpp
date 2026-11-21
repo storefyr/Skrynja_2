@@ -1,4 +1,4 @@
-#include "konfigurationsmodel.h"
+#include "configurationmodel.h"
 
 ConfigurationModel::ConfigurationModel(QObject* parent)
     : QObject(parent)

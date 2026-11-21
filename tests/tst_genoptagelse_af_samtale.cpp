@@ -10,7 +10,7 @@
 #include <QSettings>
 
 #include "acpclient.h"
-#include "sessionlager.h"
+#include "sessionstore.h"
 #include "testregistrering.h"
 
 class TestGenoptagelseAfSamtale : public QObject

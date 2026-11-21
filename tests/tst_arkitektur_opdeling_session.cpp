@@ -9,11 +9,11 @@
 #include <QSettings>
 #include <QStandardPaths>
 
-#include "acpbesked.h"
+#include "acpmessage.h"
 #include "acpclient.h"
 #include "acpprotokol.h"
 #include "acpsession.h"
-#include "samtalemodel.h"
+#include "conversationmodel.h"
 #include "testregistrering.h"
 
 Q_DECLARE_METATYPE(AcpMessage)

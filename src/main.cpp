@@ -10,12 +10,12 @@
 
 #include "acpclient.h"
 #include "diffmodel.h"
-#include "konfigurationsmodel.h"
-#include "logfil.h"
-#include "selvtest.h"
-#include "samtalemodel.h"
-#include "tilladelsesmodel.h"
-#include "vaerktoejskaldsmodel.h"
+#include "configurationmodel.h"
+#include "logfile.h"
+#include "selftest.h"
+#include "conversationmodel.h"
+#include "permissionmodel.h"
+#include "toolcallmodel.h"
 
 static void injectModels(AcpClient& client, ConversationModel* samtale, ToolCallModel* vaerktoejskald,
                          PermissionModel* tilladelse, DiffModel* diff, ConfigurationModel* konfiguration)
