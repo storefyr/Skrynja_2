@@ -31,6 +31,15 @@ Page {
                 onClicked: acp.setAgentsti(stiFelt.text)
             }
 
+            Timer {
+                id: configDebounce
+                interval: 300
+                repeat: false
+                property string configId: ""
+                property string vaerdi: ""
+                onTriggered: acp.setConfigOption(configId, vaerdi)
+            }
+
             Repeater {
                 model: acp.configOptions
                 delegate: Column {
@@ -44,7 +53,11 @@ Page {
                         width: parent.width
                         label: modelData.configId
                         text: String(modelData.value)
-                        onTextChanged: acp.setConfigOption(modelData.configId, text)
+                        onTextChanged: {
+                            configDebounce.configId = modelData.configId
+                            configDebounce.vaerdi = text
+                            configDebounce.restart()
+                        }
                     }
                 }
             }

@@ -388,7 +388,8 @@
           "fejl_paa_prompt_signaleres",
           "ukendt_svar_id_signaleres",
           "permissionRequested_forbundet_i_qml"
-        ],
+        ,
+          "dialog_tjekker_svar_retvaerdi"],
         "fixtures": [
           "tests/fixtures/fixture_tilladelse.ndjson"
         ],
@@ -512,7 +513,8 @@
           "agentsti_override_fra_settings",
           "standard_agentsti_er_vibe_acp",
           "clientCapabilities_fortsat_tom"
-        ],
+        ,
+          "set_config_option_debounced"],
         "fixtures": [
           "tests/fixtures/fixture_initialize_config.ndjson"
         ],

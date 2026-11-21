@@ -41,6 +41,28 @@ Page {
                 onClicked: acp.sendSessionPrompt(promptFelt.text)
             }
 
+            Row {
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: Theme.paddingMedium
+
+                Button {
+                    text: "Konfiguration"
+                    onClicked: pageStack.push(Qt.resolvedUrl("KonfigurationsSide.qml"))
+                }
+                Button {
+                    text: "Diff"
+                    onClicked: pageStack.push(Qt.resolvedUrl("DiffVisning.qml"))
+                }
+                Button {
+                    text: "Stop runde"
+                    onClicked: acp.sessionCancel()
+                }
+                Button {
+                    text: "Stop agent"
+                    onClicked: acp.stopAgent()
+                }
+            }
+
             Label {
                 x: Theme.horizontalPageMargin
                 text: "Status: " + acp.conversationStatus + " (runde " + acp.conversationRound + ")"

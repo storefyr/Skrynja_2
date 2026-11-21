@@ -25,6 +25,7 @@ private slots:
     void fejl_paa_prompt_signaleres();
     void ukendt_svar_id_signaleres();
     void permissionRequested_forbundet_i_qml();
+    void dialog_tjekker_svar_retvaerdi();
 private:
 };
 
@@ -143,6 +144,14 @@ void TestTilladelsesdialog::permissionRequested_forbundet_i_qml()
     QVERIFY(!qml.isEmpty());
     QVERIFY2(qml.contains("onPermissionRequested"), "permissionRequested ikke forbundet i QML");
     QVERIFY2(qml.contains("onAgentError"), "agentError ikke forbundet i QML");
+}
+
+void TestTilladelsesdialog::dialog_tjekker_svar_retvaerdi()
+{
+    QString qml = testReadSource("qml/pages/TilladelsesDialog.qml");
+    QVERIFY(!qml.isEmpty());
+    QVERIFY2(qml.contains("if (acp.answerPermission("), "dialog tjekker ikke answerPermission-returværdi");
+    QVERIFY2(qml.contains("if (acp.declinePermission("), "dialog tjekker ikke declinePermission-returværdi");
 }
 
 #include "tst_tilladelsesdialog.moc"

@@ -23,6 +23,8 @@ private slots:
     void stopAgent_terminerer_proces();
     void ingen_haengende_proces_efter_stop();
     void stop_og_afvis_er_obligatorisk_i_raekkefoelge();
+    void alle_qml_sider_reachable();
+    void stopAgent_kaldes_fra_qml();
 private:
 };
 
@@ -101,6 +103,28 @@ void TestStopOgAfvis::stop_og_afvis_er_obligatorisk_i_raekkefoelge()
     QString output = QString::fromUtf8(p.readAllStandardOutput()) + QString::fromUtf8(p.readAllStandardError());
     QCOMPARE(p.exitCode(), 0);
     QVERIFY2(output.contains("stop_og_afvis ikke sprunget over"), qPrintable(output));
+}
+
+void TestStopOgAfvis::alle_qml_sider_reachable()
+{
+    QString root = testReadSource("qml/harbour-skrynja-2.qml");
+    QString start = testReadSource("qml/pages/StartSide.qml");
+    QVERIFY(!root.isEmpty());
+    QVERIFY(!start.isEmpty());
+    QStringList sider;
+    sider << "StartSide" << "KonfigurationsSide" << "DiffVisning" << "TilladelsesDialog";
+    for (int i = 0; i < sider.size(); ++i) {
+        bool naabar = root.contains(sider.at(i)) || start.contains(sider.at(i));
+        QVERIFY2(naabar, qPrintable("siden ikke nåbar fra initialPage/navigation: " + sider.at(i)));
+    }
+}
+
+void TestStopOgAfvis::stopAgent_kaldes_fra_qml()
+{
+    QString start = testReadSource("qml/pages/StartSide.qml");
+    QVERIFY(!start.isEmpty());
+    QVERIFY2(start.contains("acp.sessionCancel("), "sessionCancel ikke kaldt fra QML");
+    QVERIFY2(start.contains("acp.stopAgent("), "stopAgent ikke kaldt fra QML");
 }
 
 #include "tst_stop_og_afvis.moc"

@@ -33,8 +33,8 @@ Dialog {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: modelData.label
                     onClicked: {
-                        acp.answerPermission(modelData.optionId)
-                        dialog.accept()
+                        if (acp.answerPermission(modelData.optionId))
+                            dialog.accept()
                     }
                 }
             }
@@ -43,8 +43,8 @@ Dialog {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: "Afvis"
                 onClicked: {
-                    acp.declinePermission()
-                    dialog.accept()
+                    if (acp.declinePermission())
+                        dialog.accept()
                 }
             }
         }

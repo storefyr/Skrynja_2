@@ -21,6 +21,7 @@ private slots:
     void agentsti_override_fra_settings();
     void standard_agentsti_er_vibe_acp();
     void clientCapabilities_fortsat_tom();
+    void set_config_option_debounced();
 private:
 };
 
@@ -92,6 +93,16 @@ void TestKonfigurationAfAgent::clientCapabilities_fortsat_tom()
     QJsonValue cap = testInitializeParams(client).value("clientCapabilities");
     QVERIFY(cap.isObject());
     QVERIFY(cap.toObject().isEmpty());
+}
+
+void TestKonfigurationAfAgent::set_config_option_debounced()
+{
+    QString qml = testReadSource("qml/pages/KonfigurationsSide.qml");
+    QVERIFY(!qml.isEmpty());
+    QVERIFY2(qml.contains("Timer"), "ingen debounce-Timer i KonfigurationsSide");
+    QVERIFY2(qml.contains("restart()"), "onTextChanged kalder ikke timer.restart()");
+    QVERIFY2(qml.contains("onTriggered: acp.setConfigOption"), "setConfigOption ligger ikke i onTriggered");
+    QVERIFY2(!qml.contains("onTextChanged: acp.setConfigOption"), "onTextChanged sender stadig pr. tastetryk");
 }
 
 #include "tst_konfiguration_af_agent.moc"
