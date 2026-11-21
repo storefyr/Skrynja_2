@@ -191,8 +191,12 @@ void TestArkitekturOpdelingProtokol::acpclient_har_ingen_dispatch()
     QVERIFY(!kilde.contains("AcpClient::handleNotification"));
     QVERIFY(!kilde.contains("m_pendingRequests"));
 
-    QCOMPARE(kilde.count("session/prompt"), 1);
-    QCOMPARE(kilde.count("session/cancel"), 1);
+    QString protokolKilde = readSource("src/acpprotokol.cpp");
+    QString sessionKilde = readSource("src/acpsession.cpp");
+    QCOMPARE(kilde.count("session/prompt"), 0);
+    QCOMPARE(kilde.count("session/cancel"), 0);
+    QCOMPARE(protokolKilde.count("session/prompt"), 1);
+    QCOMPARE(sessionKilde.count("session/cancel"), 1);
     QCOMPARE(kilde.count("set_config_option"), 1);
 
     AcpClient client;

@@ -213,8 +213,10 @@ void TestArkitekturOpdelingSession::acpclient_har_ingen_sessionlogik()
     QString header = readSource("src/acpclient.h");
     QString kilde = readSource("src/acpclient.cpp");
     QString protokolKilde = readSource("src/acpprotokol.cpp");
+    QString sessionKilde = readSource("src/acpsession.cpp");
     QVERIFY(!header.isEmpty());
     QVERIFY(!kilde.isEmpty());
+    QVERIFY(!sessionKilde.isEmpty());
     QVERIFY(!header.contains("m_sessionId"));
     QVERIFY(!header.contains("m_store"));
     QVERIFY(!header.contains("SessionStore"));
@@ -228,7 +230,9 @@ void TestArkitekturOpdelingSession::acpclient_har_ingen_sessionlogik()
     QCOMPARE(kilde.count("session/prompt"), 0);
     QCOMPARE(kilde.count("session/cancel"), 0);
     QCOMPARE(protokolKilde.count("session/prompt"), 1);
-    QCOMPARE(protokolKilde.count("session/cancel"), 1);
+    QCOMPARE(sessionKilde.count("session/cancel"), 1);
+    QCOMPARE(sessionKilde.count("session/new"), 0);
+    QCOMPARE(sessionKilde.count("session/load"), 0);
     QCOMPARE(kilde.count("set_config_option"), 1);
 
     AcpClient client;
@@ -242,6 +246,10 @@ void TestArkitekturOpdelingSession::acpclient_har_ingen_sessionlogik()
 
 void TestArkitekturOpdelingSession::eksisterende_session_tests_stadig_groenne()
 {
+    QSettings s;
+    s.clear();
+    s.sync();
+
     AcpClient client;
     client.setTestMode(true);
     QSignalSpy roundSpy(&client, SIGNAL(roundFinished()));

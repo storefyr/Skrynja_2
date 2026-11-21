@@ -10,11 +10,11 @@
 
 class AcpFrameReader;
 class AcpProtokol;
+class AcpSession;
 class AgentProcess;
 class DiffModel;
 class ConfigurationModel;
 class ConversationModel;
-class SessionStore;
 class PermissionModel;
 class ToolCallModel;
 
@@ -98,16 +98,14 @@ signals:
 
 protected:
     qint64 sendRequest(const QString& method, const QJsonObject& params);
-    void sendSessionLoad(const QString& sessionId);
-    void sendNotification(const QString& method, const QJsonObject& params);
     void sendMessage(const AcpMessage& message);
     void write(const QByteArray& line);
 
     AgentProcess* m_process;
     AcpFrameReader* m_reader;
     AcpProtokol* m_protokol;
+    AcpSession* m_session;
     ConversationModel* m_conversation;
-    SessionStore* m_store;
     ToolCallModel* m_toolCallModel;
     PermissionModel* m_permissionModel;
     DiffModel* m_diff;
@@ -115,9 +113,6 @@ protected:
     bool m_testMode;
     QList<QByteArray> m_sendte;
     QString m_lastError;
-    QString m_sessionId;
-    QString m_stopReason;
-    bool m_hadRestoredHistory;
     QVariantList m_configOptions;
 
 private slots:
@@ -127,9 +122,7 @@ private slots:
     void onMessageOut(const AcpMessage& message);
     void onResponseError(const QString& method, const QString& message);
     void onInitializeResponded(const QJsonObject& result);
-    void onSessionLoadFailed();
-    void onSessionEstablished(const QString& sessionId, bool restored);
-    void onPromptResponded(const QString& stopReason);
+    void onPromptStarted();
     void onPermissionRequest(qint64 requestId, const QJsonObject& params);
     void onAgentMessageChunk(const QString& text);
     void onToolCallAdded(const QString& toolCallId, const QString& title, const QString& status);

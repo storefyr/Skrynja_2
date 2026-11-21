@@ -11,6 +11,14 @@ class AcpProtokol : public QObject
 {
     Q_OBJECT
 public:
+    static const QString kInitialize;
+    static const QString kSessionLoad;
+    static const QString kSessionNew;
+    static const QString kSessionPrompt;
+    static const QString kSessionUpdate;
+    static const QString kEndTurn;
+    static const QString kRequestPermission;
+
     explicit AcpProtokol(QObject* parent = 0);
 
     qint64 nextId();

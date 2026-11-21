@@ -3,13 +3,13 @@
 #include <QJsonArray>
 #include <QJsonObject>
 
-static const QString kInitialize = QLatin1String("initialize");
-static const QString kSessionLoad = QLatin1String("session/load");
-static const QString kSessionNew = QLatin1String("session/new");
-static const QString kSessionPrompt = QLatin1String("session/prompt");
-static const QString kSessionUpdate = QLatin1String("session/update");
-static const QString kEndTurn = QLatin1String("end_turn");
-static const QString kRequestPermission = QLatin1String("session/request_permission");
+const QString AcpProtokol::kInitialize = QLatin1String("initialize");
+const QString AcpProtokol::kSessionLoad = QLatin1String("session/load");
+const QString AcpProtokol::kSessionNew = QLatin1String("session/new");
+const QString AcpProtokol::kSessionPrompt = QLatin1String("session/prompt");
+const QString AcpProtokol::kSessionUpdate = QLatin1String("session/update");
+const QString AcpProtokol::kEndTurn = QLatin1String("end_turn");
+const QString AcpProtokol::kRequestPermission = QLatin1String("session/request_permission");
 
 AcpProtokol::AcpProtokol(QObject* parent)
     : QObject(parent)

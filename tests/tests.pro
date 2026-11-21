@@ -29,6 +29,7 @@ SOURCES += \
     ../src/acpbesked.cpp \
     ../src/agentproces.cpp \
     ../src/acpprotokol.cpp \
+    ../src/acpsession.cpp \
     ../src/acpclient.cpp \
     ../src/samtalemodel.cpp \
     ../src/sessionlager.cpp \
@@ -45,6 +46,7 @@ HEADERS += \
     ../src/acpbesked.h \
     ../src/agentproces.h \
     ../src/acpprotokol.h \
+    ../src/acpsession.h \
     ../src/acpclient.h \
     ../src/samtalemodel.h \
     ../src/sessionlager.h \
