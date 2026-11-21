@@ -2,7 +2,8 @@
 
 #include <QFileInfo>
 #include <QProcess>
-#include <QSettings>
+
+#include "konfiguration.h"
 
 AgentProcess::AgentProcess(QObject* parent)
     : QObject(parent)
@@ -28,15 +29,12 @@ AgentProcess::AgentProcess(const QString& program, const QStringList& args, QObj
 
 QString AgentProcess::agentPath() const
 {
-    QSettings settings;
-    return settings.value("agent/sti", "/home/defaultuser/.local/bin/vibe-acp").toString();
+    return Konfiguration::instance()->agentPath();
 }
 
 void AgentProcess::setAgentPath(const QString& path)
 {
-    QSettings settings;
-    settings.setValue("agent/sti", path);
-    settings.sync();
+    Konfiguration::instance()->setAgentPath(path);
 }
 
 bool AgentProcess::start()

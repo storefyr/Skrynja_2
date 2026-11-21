@@ -38,6 +38,7 @@ SOURCES += \
     ../src/permissionmodel.cpp \
     ../src/diffmodel.cpp \
     ../src/configurationmodel.cpp \
+    ../src/konfiguration.cpp \
     ../src/selftest.cpp
 
 HEADERS += \
@@ -55,4 +56,5 @@ HEADERS += \
     ../src/permissionmodel.h \
     ../src/diffmodel.h \
     ../src/configurationmodel.h \
+    ../src/konfiguration.h \
     ../src/selftest.h
