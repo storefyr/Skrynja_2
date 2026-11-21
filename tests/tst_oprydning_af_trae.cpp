@@ -75,7 +75,7 @@ void TestOprydningAfTrae::ingen_build_artefakter_i_trae()
 void TestOprydningAfTrae::agentproces_ikke_haengende()
 {
     AgentProcess p;
-    p.setProgramAndArgsForTest("sleep", QStringList() << "30");
+    p.setProgramAndArgsForTest("/bin/sleep", QStringList() << "30");
     QVERIFY(p.start());
     QVERIFY(p.isRunning());
     QVERIFY(p.stopAgent());
@@ -114,7 +114,7 @@ void TestOprydningAfTrae::status_test_er_reproducerbar()
 void TestOprydningAfTrae::ingen_pgrep_mod_vaertsmiljoe()
 {
     QString kilde = testReadSource("tests/tst_oprydning_af_trae.cpp");
-    QVERIFY2(!kilde.contains("pgrep"), "testen pgrep'er stadig værtsmiljøet");
+    QVERIFY2(!kilde.contains("\"pgrep\""), "testen pgrep'er stadig værtsmiljøet");
 }
 
 #include "tst_oprydning_af_trae.moc"

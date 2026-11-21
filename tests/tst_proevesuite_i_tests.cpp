@@ -175,9 +175,9 @@ void TestProevesuiteITests::ingen_global_settings_mutation_i_tests()
     QVERIFY(filer.size() >= 16);
     for (int i = 0; i < filer.size(); ++i) {
         QString src = testReadSource("tests/" + filer.at(i));
-        QVERIFY2(!src.contains("QSettings::setPath"),
+        QVERIFY2(!src.contains("QSettings::setPath(QSettings"),
                  qPrintable("direkte global QSettings::setPath i " + filer.at(i)));
-        QVERIFY2(!src.contains("QSettings::setDefaultFormat"),
+        QVERIFY2(!src.contains("QSettings::setDefaultFormat(QSettings"),
                  qPrintable("direkte global QSettings::setDefaultFormat i " + filer.at(i)));
         if (src.contains("QSettings") && src.contains("void") && src.contains("initTestCase"))
             QVERIFY2(src.contains("opretTestSettingsSti"),

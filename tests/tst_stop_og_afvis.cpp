@@ -139,7 +139,7 @@ void TestStopOgAfvis::stopAgent_rapporterer_overlevende_proces()
     QVERIFY2(kroppen.contains("emit error"), "stopAgent rapporterer ikke overlevende proces");
 
     AgentProcess p;
-    p.setProgramAndArgsForTest("sleep", QStringList() << "30");
+    p.setProgramAndArgsForTest("/bin/sleep", QStringList() << "30");
     QVERIFY(p.start());
     QVERIFY(p.stopAgent());
     QVERIFY(!p.isRunning());
