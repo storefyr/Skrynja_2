@@ -221,7 +221,8 @@
           "haleReady_logges_i_produktion"
         ,
           "afskaaren_hale_logges",
-          "besked_id_korrelation_mod_fixture_wireformat"],
+          "besked_id_korrelation_mod_fixture_wireformat",
+          "alle_metoder_er_konstanter"],
         "fixtures": [
           "tests/fixtures/fixture_rygrad.ndjson",
           "tests/fixtures/fixture_rygrad_sammenklæbning.ndjson",

@@ -10,6 +10,7 @@
 #include "acpclient.h"
 #include "acpmessage.h"
 #include "acpframereader.h"
+#include "acpprotokol.h"
 #include "logfile.h"
 #include "testregistrering.h"
 
