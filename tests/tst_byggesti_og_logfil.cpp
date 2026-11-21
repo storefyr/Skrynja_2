@@ -20,6 +20,8 @@ private slots:
     void src_filnavne_matcher_klassenavne();
     void manglende_qml_giver_ikke_exit_0();
     void startAgent_fejl_signaleres();
+    void ikoner_findes_i_fire_stoerrelser_og_er_png();
+    void ikoner_wired_i_pro_spec_og_yaml();
 private:
     QString readLines(int& count);
     QString m_path;
@@ -147,6 +149,53 @@ void TestByggestiOgLogfil::startAgent_fejl_signaleres()
     QVERIFY(!main.isEmpty());
     QVERIFY2(main.contains("if (!client.startAgent())"), "main.cpp tjekker ikke startAgent()-resultatet");
     QVERIFY2(main.contains("return 3"), "main.cpp giver ikke exit != 0 ved startAgent-fejl");
+}
+
+void TestByggestiOgLogfil::ikoner_findes_i_fire_stoerrelser_og_er_png()
+{
+    const char* stoerrelser[] = {"86x86", "108x108", "128x128", "172x172"};
+    for (int i = 0; i < 4; ++i) {
+        QString path = testRepoRoot() + "/icons/" + stoerrelser[i] + "/harbour-skrynja-2.png";
+        QVERIFY2(QFileInfo::exists(path), qPrintable("mangler " + path));
+        QFile f(path);
+        QVERIFY(f.open(QIODevice::ReadOnly));
+        QByteArray head = f.read(24);
+        f.close();
+        QCOMPARE(head.size(), 24);
+        QVERIFY2(head.startsWith(QByteArray("\x89PNG\r\n\x1a\n")), qPrintable("ikke PNG: " + path));
+        QCOMPARE(QString::fromLatin1(head.mid(12, 4)), QString("IHDR"));
+        int w = ((quint8)head.at(16) << 24) | ((quint8)head.at(17) << 16) | ((quint8)head.at(18) << 8) | (quint8)head.at(19);
+        int h = ((quint8)head.at(20) << 24) | ((quint8)head.at(21) << 16) | ((quint8)head.at(22) << 8) | (quint8)head.at(23);
+        int forventet = QString(stoerrelser[i]).split('x').at(0).toInt();
+        QCOMPARE(w, forventet);
+        QCOMPARE(h, forventet);
+    }
+}
+
+void TestByggestiOgLogfil::ikoner_wired_i_pro_spec_og_yaml()
+{
+    QString pro = testReadSource("harbour-skrynja-2.pro");
+    QVERIFY2(!pro.isEmpty(), "harbour-skrynja-2.pro mangler");
+    const char* stoerrelser[] = {"86x86", "108x108", "128x128", "172x172"};
+    for (int i = 0; i < 4; ++i) {
+        QString s = stoerrelser[i];
+        QVERIFY2(pro.contains("icons/" + s + "/harbour-skrynja-2.png"),
+                 qPrintable("pro mangler ikonfil " + s));
+        QVERIFY2(pro.contains("/usr/share/icons/hicolor/" + s + "/apps"),
+                 qPrintable("pro mangler install-path for " + s));
+    }
+
+    QString spec = testReadSource("rpm/harbour-skrynja-2.spec");
+    QVERIFY2(!spec.isEmpty(), "spec mangler");
+    QVERIFY2(spec.contains("%{_datadir}/icons/hicolor"), "spec mangler icons-hicolor i %files");
+    QVERIFY2(spec.contains("%{name}.png"), "spec mangler %{name}.png");
+
+    QString yaml = testReadSource("harbour-skrynja-2.yaml");
+    QVERIFY2(!yaml.isEmpty(), "yaml mangler");
+    QVERIFY2(yaml.contains("icons"), "yaml Files mangler icons");
+
+    QString desktop = testReadSource("harbour-skrynja-2.desktop");
+    QVERIFY2(desktop.contains("Icon=harbour-skrynja-2"), "desktop skal beholde Icon=harbour-skrynja-2");
 }
 
 #include "tst_byggesti_og_logfil.moc"
