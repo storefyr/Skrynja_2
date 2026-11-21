@@ -38,7 +38,7 @@ void TestStopOgAfvis::initTestCase()
 
 void TestStopOgAfvis::cancel_notification_payload()
 {
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.sendSessionNew("/tmp");
@@ -56,7 +56,7 @@ void TestStopOgAfvis::cancel_notification_payload()
 
 void TestStopOgAfvis::afvisning_outcome_cancelled()
 {
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.feedBytesForTest(testReadFixture("fixture_tilladelse.ndjson"));
@@ -69,8 +69,7 @@ void TestStopOgAfvis::afvisning_outcome_cancelled()
 void TestStopOgAfvis::stopAgent_terminerer_proces()
 {
     QVERIFY(QFileInfo::exists("/bin/sleep"));
-    AgentProcess process;
-    process.setProgramAndArgsForTest("/bin/sleep", QStringList() << "30");
+    AgentProcess process("/bin/sleep", QStringList() << "30");
     QVERIFY(process.start());
     QVERIFY(process.isRunning());
     QElapsedTimer ur;
@@ -82,8 +81,7 @@ void TestStopOgAfvis::stopAgent_terminerer_proces()
 
 void TestStopOgAfvis::ingen_haengende_proces_efter_stop()
 {
-    AgentProcess process;
-    process.setProgramAndArgsForTest("/bin/sleep", QStringList() << "30");
+    AgentProcess process("/bin/sleep", QStringList() << "30");
     QVERIFY(process.start());
     QVERIFY(process.isRunning());
     process.stopAgent();
@@ -138,8 +136,7 @@ void TestStopOgAfvis::stopAgent_rapporterer_overlevende_proces()
     QVERIFY2(kroppen.contains("waitForFinished"), "stopAgent tjekker ikke waitForFinished");
     QVERIFY2(kroppen.contains("emit error"), "stopAgent rapporterer ikke overlevende proces");
 
-    AgentProcess p;
-    p.setProgramAndArgsForTest("/bin/sleep", QStringList() << "30");
+    AgentProcess p("/bin/sleep", QStringList() << "30");
     QVERIFY(p.start());
     QVERIFY(p.stopAgent());
     QVERIFY(!p.isRunning());

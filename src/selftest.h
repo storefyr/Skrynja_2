@@ -15,7 +15,6 @@ public:
     explicit SelfTest(AcpClient* client, QObject* parent = 0);
 
     void start(const QString& prompt, const QString& verdictPath);
-    void setWatchdogMsForTest(int ms);
     bool verdictWritten() const;
     QJsonObject verdict() const;
     QString verdictPath() const;
@@ -34,6 +33,9 @@ private slots:
     void onDiffsChanged();
     void onWatchdogTimeout();
 
+protected:
+    int m_watchdogMs;
+
 private:
     void writeVerdict(bool pass, const QString& reason);
     void finish(bool pass, const QString& reason);
@@ -46,7 +48,6 @@ private:
     bool m_permissionAnswered;
     bool m_fileWritten;
     QTimer* m_watchdog;
-    int m_watchdogMs;
 };
 
 #endif

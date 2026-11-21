@@ -34,7 +34,7 @@ void TestKonfigurationAfAgent::initTestCase()
 
 void TestKonfigurationAfAgent::config_options_fra_initialize_svar()
 {
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.sendInitialize();
@@ -48,7 +48,7 @@ void TestKonfigurationAfAgent::config_options_fra_initialize_svar()
 
 void TestKonfigurationAfAgent::set_config_option_payload()
 {
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.sendSessionNew("/tmp");
@@ -71,7 +71,7 @@ void TestKonfigurationAfAgent::agentsti_override_fra_settings()
     QSettings s;
     s.clear();
     s.sync();
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setAgentsti("/tmp/min-agent");
     QCOMPARE(client.agentPath(), QString("/tmp/min-agent"));
@@ -88,7 +88,7 @@ void TestKonfigurationAfAgent::standard_agentsti_er_vibe_acp()
 
 void TestKonfigurationAfAgent::clientCapabilities_fortsat_tom()
 {
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     QJsonValue cap = testInitializeParams(client).value("clientCapabilities");
     QVERIFY(cap.isObject());

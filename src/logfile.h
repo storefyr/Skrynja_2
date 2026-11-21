@@ -12,13 +12,13 @@ public:
 
     QString logPath() const;
     bool writeLine(const QString& event);
-    void setLogPathForTest(const QString& path);
+    void setLogPath(const QString& path);
 
 private:
     explicit LogFile(QObject* parent = 0);
 
     QString m_logPath;
-    bool m_testPath;
+    bool m_customPath;
 };
 
 #endif

@@ -36,7 +36,7 @@ void TestDiffOgUddata::initTestCase()
 
 void TestDiffOgUddata::diff_blok_parses()
 {
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.feedBytesForTest(testReadFixture("fixture_diff.ndjson"));
@@ -63,7 +63,7 @@ void TestDiffOgUddata::diff_linjer_cappes()
 
 void TestDiffOgUddata::outputs_akkumuleres()
 {
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.feedBytesForTest(testReadFixture("fixture_uddata.ndjson"));
@@ -75,7 +75,7 @@ void TestDiffOgUddata::outputs_akkumuleres()
 
 void TestDiffOgUddata::diff_vises_mens_det_sker()
 {
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     QSignalSpy changed(client.diffModel(), SIGNAL(changed()));

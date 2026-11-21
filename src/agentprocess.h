@@ -11,6 +11,7 @@ class AgentProcess : public QObject
     Q_OBJECT
 public:
     explicit AgentProcess(QObject* parent = 0);
+    AgentProcess(const QString& program, const QStringList& args, QObject* parent = 0);
 
     QString agentPath() const;
     void setAgentPath(const QString& path);
@@ -20,8 +21,6 @@ public:
     bool isRunning() const;
     QString lastError() const;
     QProcess* process() const;
-
-    void setProgramAndArgsForTest(const QString& program, const QStringList& argumenter);
 
 signals:
     void error(const QString& message);
@@ -34,8 +33,8 @@ private slots:
 private:
     QProcess* m_process;
     QString m_lastError;
-    QString m_programForTest;
-    QStringList m_argsForTest;
+    QString m_program;
+    QStringList m_args;
 };
 
 #endif

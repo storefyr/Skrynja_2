@@ -31,7 +31,7 @@ void TestVaerktoejskaldVisning::initTestCase()
 
 void TestVaerktoejskaldVisning::tool_call_felter_parses()
 {
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.feedBytesForTest(testReadFixture("fixture_værktøjskald.ndjson"));
@@ -45,7 +45,7 @@ void TestVaerktoejskaldVisning::tool_call_felter_parses()
 
 void TestVaerktoejskaldVisning::tool_call_update_opdaterer_status()
 {
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.feedBytesForTest(testReadFixture("fixture_værktøjskald.ndjson"));
@@ -56,7 +56,7 @@ void TestVaerktoejskaldVisning::tool_call_update_opdaterer_status()
 
 void TestVaerktoejskaldVisning::ui_kvitterer_sete_kald()
 {
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.feedBytesForTest(testReadFixture("fixture_værktøjskald.ndjson"));
@@ -69,7 +69,7 @@ void TestVaerktoejskaldVisning::ui_kvitterer_sete_kald()
 
 void TestVaerktoejskaldVisning::flere_kald_i_raekkefoelge()
 {
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.feedBytesForTest(testReadFixture("fixture_værktøjskald.ndjson"));
@@ -86,7 +86,7 @@ void TestVaerktoejskaldVisning::enkelt_projektion_i_toolkaldsmodel()
     QVERIFY(kilde.contains("projektion"));
     QCOMPARE(kilde.count("m.insert(\"toolCallId\""), 1);
 
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.feedBytesForTest(testReadFixture("fixture_v\u00e6rkt\u00f8jskald.ndjson"));

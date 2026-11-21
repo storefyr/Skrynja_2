@@ -32,7 +32,7 @@ void TestPromptOgSvar::initTestCase()
 
 void TestPromptOgSvar::session_new_payload_cwd()
 {
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.sendSessionNew("/tmp/arbejde");
@@ -43,7 +43,7 @@ void TestPromptOgSvar::session_new_payload_cwd()
 
 void TestPromptOgSvar::prompt_payload_content_blokke()
 {
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.sendSessionNew("/tmp");
@@ -66,7 +66,7 @@ void TestPromptOgSvar::prompt_payload_content_blokke()
 
 void TestPromptOgSvar::chunk_akkumuleres_til_lastText()
 {
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.feedBytesForTest(testReadFixture("fixture_prompt_svar.ndjson"));
@@ -75,7 +75,7 @@ void TestPromptOgSvar::chunk_akkumuleres_til_lastText()
 
 void TestPromptOgSvar::svar_korreleres_paa_request_id()
 {
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.sendSessionNew("/tmp");
@@ -100,7 +100,7 @@ void TestPromptOgSvar::svar_korreleres_paa_request_id()
 
 void TestPromptOgSvar::end_turn_afslutter_runde()
 {
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     QSignalSpy afsluttet(&client, SIGNAL(roundFinished()));
@@ -121,19 +121,17 @@ void TestPromptOgSvar::end_turn_afslutter_runde()
 
 void TestPromptOgSvar::messageSent_kun_ved_faktisk_skrevet()
 {
-    AcpClient client;
-    injectTestModels(&client, this);
-    client.setTestMode(true);
-    QSignalSpy sendtSpy(&client, SIGNAL(messageSent(QByteArray)));
-    client.sendSessionNew("/tmp");
+    AcpClient udenEnhed;
+    QSignalSpy sendtSpy(&udenEnhed, SIGNAL(messageSent(QByteArray)));
+    udenEnhed.sendSessionNew("/tmp");
     QCOMPARE(sendtSpy.count(), 0);
-    QVERIFY(!client.lastSentForTest().isEmpty());
 
-    AcpClient lukket;
-    injectTestModels(&lukket, this);
-    QSignalSpy sendtSpy2(&lukket, SIGNAL(messageSent(QByteArray)));
-    lukket.sendSessionNew("/tmp");
-    QCOMPARE(sendtSpy2.count(), 0);
+    TestClient client;
+    injectTestModels(&client, this);
+    QSignalSpy sendtSpy2(&client, SIGNAL(messageSent(QByteArray)));
+    client.sendSessionNew("/tmp");
+    QCOMPARE(sendtSpy2.count(), 1);
+    QVERIFY(!client.lastSentForTest().isEmpty());
 }
 
 #include "tst_prompt_og_svar.moc"

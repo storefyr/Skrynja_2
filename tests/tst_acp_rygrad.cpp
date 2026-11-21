@@ -38,7 +38,7 @@ REGISTER_TEST(TestAcpRygrad)
 
 void TestAcpRygrad::rygrad_fixture_hoved()
 {
-    AcpFrameReader reader(0);
+    TestFrameReader reader;
     QSignalSpy klar(&reader, SIGNAL(messageReady(QByteArray)));
     QSignalSpy droppet(&reader, SIGNAL(lineDropped(QByteArray,QString)));
     reader.feedBytesForTest(testReadFixture("fixture_rygrad.ndjson"));
@@ -55,7 +55,7 @@ void TestAcpRygrad::rygrad_fixture_hoved()
 
 void TestAcpRygrad::rygrad_sammenklaebning()
 {
-    AcpFrameReader reader(0);
+    TestFrameReader reader;
     QSignalSpy klar(&reader, SIGNAL(messageReady(QByteArray)));
     QSignalSpy droppet(&reader, SIGNAL(lineDropped(QByteArray,QString)));
     QByteArray data = testReadFixture("fixture_rygrad_sammenklæbning.ndjson");
@@ -73,7 +73,7 @@ void TestAcpRygrad::rygrad_sammenklaebning()
 
 void TestAcpRygrad::rygrad_ugyldig_ruller_tilbage()
 {
-    AcpFrameReader reader(0);
+    TestFrameReader reader;
     QSignalSpy klar(&reader, SIGNAL(messageReady(QByteArray)));
     QSignalSpy droppet(&reader, SIGNAL(lineDropped(QByteArray,QString)));
     reader.feedBytesForTest(testReadFixture("fixture_rygrad_ugyldig.ndjson"));
@@ -86,7 +86,7 @@ void TestAcpRygrad::rygrad_ugyldig_ruller_tilbage()
 
 void TestAcpRygrad::rygrad_utf8_ugyldig()
 {
-    AcpFrameReader reader(0);
+    TestFrameReader reader;
     QSignalSpy klar(&reader, SIGNAL(messageReady(QByteArray)));
     QSignalSpy droppet(&reader, SIGNAL(lineDropped(QByteArray,QString)));
     QByteArray data = testReadFixture("fixture_rygrad_utf8_ugyldig.ndjson");
@@ -99,7 +99,7 @@ void TestAcpRygrad::rygrad_utf8_ugyldig()
 
 void TestAcpRygrad::rygrad_crlf()
 {
-    AcpFrameReader reader(0);
+    TestFrameReader reader;
     QSignalSpy klar(&reader, SIGNAL(messageReady(QByteArray)));
     reader.feedBytesForTest("{\"a\":1}\r\n{\"b\":2}\r\n");
     QCOMPARE(klar.count(), 2);
@@ -109,7 +109,7 @@ void TestAcpRygrad::rygrad_crlf()
 
 void TestAcpRygrad::rygrad_flere_paa_en_linje()
 {
-    AcpFrameReader reader(0);
+    TestFrameReader reader;
     QSignalSpy klar(&reader, SIGNAL(messageReady(QByteArray)));
     reader.feedBytesForTest("{\"a\":1}{\"b\":2}\n");
     QCOMPARE(klar.count(), 2);
@@ -119,7 +119,7 @@ void TestAcpRygrad::rygrad_flere_paa_en_linje()
 
 void TestAcpRygrad::rygrad_cap_droppes()
 {
-    AcpFrameReader reader(0);
+    TestFrameReader reader;
     reader.setCap(16);
     QSignalSpy klar(&reader, SIGNAL(messageReady(QByteArray)));
     QSignalSpy droppet(&reader, SIGNAL(lineDropped(QByteArray,QString)));
@@ -132,7 +132,7 @@ void TestAcpRygrad::rygrad_cap_droppes()
 
 void TestAcpRygrad::rygrad_hale_ved_eof()
 {
-    AcpFrameReader reader(0);
+    TestFrameReader reader;
     QSignalSpy klar(&reader, SIGNAL(messageReady(QByteArray)));
     QSignalSpy hale(&reader, SIGNAL(haleReady(QByteArray)));
     reader.feedBytesForTest("{\"delvis\":1");
@@ -189,7 +189,7 @@ QString TestAcpRygrad::logFil(const QString& navn)
     QString path = QDir::tempPath() + "/skrynja-tst-logfil-" + navn + "/skrynja-2.log";
     QDir().mkpath(QFileInfo(path).absolutePath());
     QFile::remove(path);
-    LogFile::instance()->setLogPathForTest(path);
+    LogFile::instance()->setLogPath(path);
     return path;
 }
 
@@ -204,7 +204,7 @@ QString readAll(const QString& path)
 void TestAcpRygrad::lineDropped_logges_i_produktion()
 {
     QString path = logFil("linedropped");
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     QByteArray stor(AcpFrameReader::standardCap() + 100, 'x');
@@ -217,7 +217,7 @@ void TestAcpRygrad::lineDropped_logges_i_produktion()
 void TestAcpRygrad::haleReady_logges_i_produktion()
 {
     QString path = logFil("haleready");
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.feedBytesForTest("{\"jsonrpc\":\"2.0\",\"id\":9,\"resu");
@@ -229,7 +229,7 @@ void TestAcpRygrad::haleReady_logges_i_produktion()
 void TestAcpRygrad::afskaaren_hale_logges()
 {
     QString path = logFil("afskaaren-hale");
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.feedBytesForTest("{\"foo\":1}\n");

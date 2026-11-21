@@ -8,6 +8,7 @@
 
 #include "acpmessage.h"
 
+class QIODevice;
 class AcpFrameReader;
 class AcpProtokol;
 class AcpSession;
@@ -36,7 +37,7 @@ public:
     explicit AcpClient(QObject* parent = 0);
     ~AcpClient();
 
-    bool startAgent();
+    virtual bool startAgent();
     void sendInitialize();
     QString lastError() const;
     AgentProcess* agentProcess() const;
@@ -76,14 +77,6 @@ public:
     QString stopReason() const;
     bool hadRestoredHistory() const;
 
-    void setTestMode(bool tilstand);
-    bool testMode() const;
-    void feedBytesForTest(const QByteArray& data);
-    void eofForTest();
-    void simulateAgentDeathForTest(int kode);
-    QList<QByteArray> sentForTest() const;
-    QByteArray lastSentForTest() const;
-
 signals:
     void messageSent(const QByteArray& line);
     void agentReady();
@@ -103,12 +96,15 @@ signals:
     void agentPathChanged();
 
 protected:
+    AcpClient(AcpFrameReader* reader, QIODevice* udEnhed, QObject* parent = 0);
+
     qint64 sendRequest(const QString& method, const QJsonObject& params);
     void sendMessage(const AcpMessage& message);
-    void write(const QByteArray& line);
+    virtual void write(const QByteArray& line);
 
     AgentProcess* m_process;
     AcpFrameReader* m_reader;
+    QIODevice* m_udEnhed;
     AcpProtokol* m_protokol;
     AcpSession* m_session;
     ConversationModel* m_conversation;
@@ -116,15 +112,15 @@ protected:
     PermissionModel* m_permissionModel;
     DiffModel* m_diff;
     ConfigurationModel* m_configModel;
-    bool m_testMode;
-    QList<QByteArray> m_sendte;
     QString m_lastError;
     QVariantList m_configOptions;
 
-private slots:
+protected slots:
     void receiveLine(const QByteArray& line);
-    void receiveAgentError(const QString& error);
     void processFinished(int exitKode);
+
+private slots:
+    void receiveAgentError(const QString& error);
     void onMessageOut(const AcpMessage& message);
     void onResponseError(const QString& method, const QString& message);
     void onInitializeResponded(const QJsonObject& result);

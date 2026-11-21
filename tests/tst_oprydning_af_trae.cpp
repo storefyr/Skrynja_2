@@ -74,8 +74,7 @@ void TestOprydningAfTrae::ingen_build_artefakter_i_trae()
 
 void TestOprydningAfTrae::agentproces_ikke_haengende()
 {
-    AgentProcess p;
-    p.setProgramAndArgsForTest("/bin/sleep", QStringList() << "30");
+    AgentProcess p("/bin/sleep", QStringList() << "30");
     QVERIFY(p.start());
     QVERIFY(p.isRunning());
     QVERIFY(p.stopAgent());
@@ -88,7 +87,7 @@ void TestOprydningAfTrae::logfil_uden_transskripter()
     QString path = QDir::tempPath() + "/skrynja-tst-logfil-oprydning/skrynja-2.log";
     QDir().mkpath(QFileInfo(path).absolutePath());
     QFile::remove(path);
-    LogFile::instance()->setLogPathForTest(path);
+    LogFile::instance()->setLogPath(path);
     QVERIFY(LogFile::instance()->writeLine("start"));
     QVERIFY(!LogFile::instance()->writeLine("transskript\nmed flere linjer"));
     QFile f(path);

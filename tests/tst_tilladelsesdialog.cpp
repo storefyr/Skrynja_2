@@ -38,7 +38,7 @@ void TestTilladelsesdialog::initTestCase()
 
 void TestTilladelsesdialog::anmodning_parses_til_pendingPermission()
 {
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     QSignalSpy requested(&client, SIGNAL(permissionRequested()));
@@ -52,7 +52,7 @@ void TestTilladelsesdialog::anmodning_parses_til_pendingPermission()
 
 void TestTilladelsesdialog::options_liste_med_optionId()
 {
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.feedBytesForTest(testReadFixture("fixture_tilladelse.ndjson"));
@@ -66,7 +66,7 @@ void TestTilladelsesdialog::options_liste_med_optionId()
 
 void TestTilladelsesdialog::svar_payload_selected_optionId()
 {
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.feedBytesForTest(testReadFixture("fixture_tilladelse.ndjson"));
@@ -80,7 +80,7 @@ void TestTilladelsesdialog::svar_payload_selected_optionId()
 
 void TestTilladelsesdialog::afvisning_giver_outcome_cancelled()
 {
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.feedBytesForTest(testReadFixture("fixture_tilladelse.ndjson"));
@@ -92,7 +92,7 @@ void TestTilladelsesdialog::afvisning_giver_outcome_cancelled()
 
 void TestTilladelsesdialog::ingen_dobbelt_svar()
 {
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.feedBytesForTest(testReadFixture("fixture_tilladelse.ndjson"));
@@ -112,7 +112,7 @@ void TestTilladelsesdialog::ingen_dobbelt_svar()
 
 void TestTilladelsesdialog::fejl_paa_prompt_signaleres()
 {
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     QSignalSpy fejlSpy(&client, SIGNAL(agentError(QString)));
@@ -130,7 +130,7 @@ void TestTilladelsesdialog::fejl_paa_prompt_signaleres()
 
 void TestTilladelsesdialog::ukendt_svar_id_signaleres()
 {
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     QSignalSpy fejlSpy(&client, SIGNAL(agentError(QString)));

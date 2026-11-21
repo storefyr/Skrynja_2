@@ -33,18 +33,11 @@ void AcpFrameReader::readFromDevice()
     if (!m_device)
         return;
     processBuffer(m_device->readAll());
-    if (m_device->atEnd() && !m_buffer.isEmpty()) {
-        emit haleReady(m_buffer);
-        m_buffer.clear();
-    }
+    if (m_device->atEnd())
+        flushHale();
 }
 
-void AcpFrameReader::feedBytesForTest(const QByteArray& data)
-{
-    processBuffer(data);
-}
-
-void AcpFrameReader::eofForTest()
+void AcpFrameReader::flushHale()
 {
     if (!m_buffer.isEmpty()) {
         emit haleReady(m_buffer);

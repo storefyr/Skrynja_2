@@ -33,7 +33,7 @@ void TestByggestiOgLogfil::initTestCase()
     m_path = QDir(QDir::tempPath() + "/skrynja-tst-logfil").filePath("skrynja-2.log");
     QDir().mkpath(QFileInfo(m_path).absolutePath());
     QFile::remove(m_path);
-    LogFile::instance()->setLogPathForTest(m_path);
+    LogFile::instance()->setLogPath(m_path);
 }
 
 QString TestByggestiOgLogfil::readLines(int& count)

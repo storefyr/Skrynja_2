@@ -15,13 +15,13 @@ LogFile* LogFile::instance()
 
 LogFile::LogFile(QObject* parent)
     : QObject(parent)
-    , m_testPath(false)
+    , m_customPath(false)
 {
 }
 
 QString LogFile::logPath() const
 {
-    if (m_testPath)
+    if (m_customPath)
         return m_logPath;
     QString base = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     if (base.isEmpty())
@@ -29,10 +29,10 @@ QString LogFile::logPath() const
     return base + "/skrynja-2.log";
 }
 
-void LogFile::setLogPathForTest(const QString& path)
+void LogFile::setLogPath(const QString& path)
 {
     m_logPath = path;
-    m_testPath = true;
+    m_customPath = true;
 }
 
 bool LogFile::writeLine(const QString& event)
