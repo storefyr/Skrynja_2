@@ -12,6 +12,7 @@
 #include "diffmodel.h"
 #include "configurationmodel.h"
 #include "conversationmodel.h"
+#include "logfile.h"
 #include "permissionmodel.h"
 #include "toolcallmodel.h"
 
@@ -31,6 +32,8 @@ AcpClient::AcpClient(QObject* parent)
     , m_testMode(false)
 {
     connect(m_reader, SIGNAL(messageReady(QByteArray)), this, SLOT(receiveLine(QByteArray)));
+    connect(m_reader, SIGNAL(lineDropped(QByteArray,QString)), this, SLOT(onLineDropped(QByteArray,QString)));
+    connect(m_reader, SIGNAL(haleReady(QByteArray)), this, SLOT(onHaleReady(QByteArray)));
     connect(m_process, SIGNAL(error(QString)), this, SLOT(receiveAgentError(QString)));
     connect(m_process, SIGNAL(finished(int)), this, SLOT(processFinished(int)));
     connect(m_protokol, SIGNAL(messageOut(AcpMessage)), this, SLOT(onMessageOut(AcpMessage)));
@@ -299,6 +302,11 @@ void AcpClient::feedBytesForTest(const QByteArray& data)
     m_reader->feedBytesForTest(data);
 }
 
+void AcpClient::eofForTest()
+{
+    m_reader->eofForTest();
+}
+
 void AcpClient::simulateAgentDeathForTest(int kode)
 {
     processFinished(kode);
@@ -418,6 +426,16 @@ void AcpClient::onRoundEnded()
     if (m_conversation)
         m_conversation->endRound();
     emit roundFinished();
+}
+
+void AcpClient::onLineDropped(const QByteArray& line, const QString& reason)
+{
+    LogFile::instance()->writeLine(QString("lineDropped (%1): %2 bytes").arg(reason).arg(line.size()));
+}
+
+void AcpClient::onHaleReady(const QByteArray& hale)
+{
+    LogFile::instance()->writeLine(QString("haleReady ved EOF: %1 bytes").arg(hale.size()));
 }
 
 void AcpClient::receiveAgentError(const QString& error)

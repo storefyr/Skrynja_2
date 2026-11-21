@@ -79,6 +79,7 @@ public:
     void setTestMode(bool tilstand);
     bool testMode() const;
     void feedBytesForTest(const QByteArray& data);
+    void eofForTest();
     void simulateAgentDeathForTest(int kode);
     QList<QByteArray> sentForTest() const;
     QByteArray lastSentForTest() const;
@@ -135,6 +136,8 @@ private slots:
     void onDiffContent(const QString& path, const QString& diff);
     void onOutputContent(const QString& text);
     void onRoundEnded();
+    void onLineDropped(const QByteArray& line, const QString& reason);
+    void onHaleReady(const QByteArray& hale);
 };
 
 #endif
