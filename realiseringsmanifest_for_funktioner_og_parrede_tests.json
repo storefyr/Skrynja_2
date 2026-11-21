@@ -427,7 +427,9 @@
           "stopAgent_terminerer_proces",
           "ingen_haengende_proces_efter_stop",
           "stop_og_afvis_er_obligatorisk_i_raekkefoelge"
-        ],
+        ,
+          "alle_qml_sider_reachable",
+          "stopAgent_kaldes_fra_qml"],
         "fixtures": [],
         "bemærkning": "Prøven indskrives før ændringen i src/agentproces.cpp; 'obligatorisk i rækkefølge' tjekker manifest-ordenen via tjek_manifest_parrede_tests.py"
       },
