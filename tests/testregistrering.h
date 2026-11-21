@@ -12,9 +12,12 @@
 #include <QSettings>
 #include <QStandardPaths>
 #include <QString>
+#include <QBuffer>
 
 #include "acpclient.h"
+#include "acpframereader.h"
 #include "agentprocess.h"
+#include "selftest.h"
 #include "configurationmodel.h"
 #include "diffmodel.h"
 #include "conversationmodel.h"
@@ -136,9 +139,60 @@ inline QString testStandardAgentsti()
     return process.agentPath();
 }
 
-inline QJsonObject testInitializeParams(AcpClient& client)
+class TestFrameReader : public AcpFrameReader
 {
-    client.setTestMode(true);
+public:
+    explicit TestFrameReader(QObject* parent = 0) : AcpFrameReader(0, parent) {}
+    void feedBytesForTest(const QByteArray& data) { processBuffer(data); }
+    void eofForTest() { flushHale(); }
+};
+
+class TestClient : public AcpClient
+{
+public:
+    explicit TestClient(QObject* parent = 0)
+        : AcpClient(new TestFrameReader, 0, parent)
+        , m_buf(new QBuffer(this))
+    {
+        m_buf->open(QIODevice::ReadWrite);
+        m_udEnhed = m_buf;
+    }
+
+    bool startAgent() { sendInitialize(); return true; }
+    void setTestMode(bool) {}
+    bool testMode() const { return true; }
+    void feedBytesForTest(const QByteArray& data)
+    {
+        static_cast<TestFrameReader*>(m_reader)->feedBytesForTest(data);
+    }
+    void eofForTest() { static_cast<TestFrameReader*>(m_reader)->eofForTest(); }
+    void simulateAgentDeathForTest(int kode) { processFinished(kode); }
+    QList<QByteArray> sentForTest() const
+    {
+        QList<QByteArray> linjer = m_buf->buffer().split('\n');
+        while (!linjer.isEmpty() && linjer.last().isEmpty())
+            linjer.removeLast();
+        return linjer;
+    }
+    QByteArray lastSentForTest() const
+    {
+        QList<QByteArray> linjer = sentForTest();
+        return linjer.isEmpty() ? QByteArray() : linjer.last();
+    }
+
+private:
+    QBuffer* m_buf;
+};
+
+class TestSelfTest : public SelfTest
+{
+public:
+    explicit TestSelfTest(AcpClient* client, QObject* parent = 0) : SelfTest(client, parent) {}
+    void setWatchdogMsForTest(int ms) { m_watchdogMs = ms; }
+};
+
+inline QJsonObject testInitializeParams(TestClient& client)
+{
     client.sendInitialize();
     return testJsonObj(client.lastSentForTest()).value("params").toObject();
 }

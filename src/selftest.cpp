@@ -42,11 +42,6 @@ void SelfTest::start(const QString& prompt, const QString& verdictPath)
     m_client->startAgent();
 }
 
-void SelfTest::setWatchdogMsForTest(int ms)
-{
-    m_watchdogMs = ms;
-}
-
 void SelfTest::onWatchdogTimeout()
 {
     finish(false, "watchdog: selvtest hængte (timeout udløst)");
@@ -106,19 +101,11 @@ void SelfTest::onDiffsChanged()
 
 void SelfTest::onRoundFinished()
 {
-    bool promptSendt = m_promptSent;
-    if (!promptSendt && m_client->testMode()) {
-        QList<QByteArray> sendte = m_client->sentForTest();
-        for (int i = 0; i < sendte.size(); ++i) {
-            if (sendte.at(i).contains("\"session/prompt\""))
-                promptSendt = true;
-        }
-    }
-    if (promptSendt && m_permissionAnswered && m_fileWritten)
+    if (m_promptSent && m_permissionAnswered && m_fileWritten)
         finish(true, "prompt sendt, tilladelse besvaret, fil skrevet, end_turn modtaget");
     else
         finish(false, QString("kæde ufuldstændig: prompt=%1 tilladelse=%2 fil=%3")
-               .arg(promptSendt).arg(m_permissionAnswered).arg(m_fileWritten));
+               .arg(m_promptSent).arg(m_permissionAnswered).arg(m_fileWritten));
 }
 
 void SelfTest::onAgentError(const QString& error)

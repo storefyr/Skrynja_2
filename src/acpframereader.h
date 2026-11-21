@@ -17,19 +17,19 @@ public:
     void setCap(int maksBytes);
     int cap() const;
 
-    void feedBytesForTest(const QByteArray& data);
-    void eofForTest();
-
 signals:
     void messageReady(const QByteArray& json);
     void lineDropped(const QByteArray& line, const QString& reason);
     void haleReady(const QByteArray& hale);
 
-private slots:
+protected slots:
     void readFromDevice();
 
-private:
+protected:
     void processBuffer(const QByteArray& data);
+    void flushHale();
+
+private:
     void handleLine(const QByteArray& line);
     static bool isValidUtf8(const QByteArray& bytes);
     static QList<QByteArray> splitTopLevel(const QByteArray& line);

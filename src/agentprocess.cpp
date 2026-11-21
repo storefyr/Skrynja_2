@@ -14,6 +14,18 @@ AgentProcess::AgentProcess(QObject* parent)
             this, SLOT(processFinished(int,QProcess::ExitStatus)));
 }
 
+AgentProcess::AgentProcess(const QString& program, const QStringList& args, QObject* parent)
+    : QObject(parent)
+    , m_process(new QProcess(this))
+    , m_program(program)
+    , m_args(args)
+{
+    connect(m_process, SIGNAL(errorOccurred(QProcess::ProcessError)),
+            this, SLOT(processError(QProcess::ProcessError)));
+    connect(m_process, SIGNAL(finished(int,QProcess::ExitStatus)),
+            this, SLOT(processFinished(int,QProcess::ExitStatus)));
+}
+
 QString AgentProcess::agentPath() const
 {
     QSettings settings;
@@ -30,7 +42,7 @@ void AgentProcess::setAgentPath(const QString& path)
 bool AgentProcess::start()
 {
     m_lastError.clear();
-    QString program = m_programForTest.isEmpty() ? agentPath() : m_programForTest;
+    QString program = m_program.isEmpty() ? agentPath() : m_program;
     if (!QFileInfo::exists(program)) {
         m_lastError = "agent ikke fundet: " + program;
         emit error(m_lastError);
@@ -39,7 +51,7 @@ bool AgentProcess::start()
     if (m_process->state() != QProcess::NotRunning)
         return true;
     m_process->setProgram(program);
-    m_process->setArguments(m_argsForTest);
+    m_process->setArguments(m_args);
     m_process->start();
     if (!m_process->waitForStarted(3000)) {
         m_lastError = "agent kunne ikke startes: " + program;
@@ -78,12 +90,6 @@ QString AgentProcess::lastError() const
 QProcess* AgentProcess::process() const
 {
     return m_process;
-}
-
-void AgentProcess::setProgramAndArgsForTest(const QString& program, const QStringList& argumenter)
-{
-    m_programForTest = program;
-    m_argsForTest = argumenter;
 }
 
 void AgentProcess::processError(QProcess::ProcessError errorCode)

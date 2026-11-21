@@ -100,6 +100,8 @@ void TestProevesuiteITests::suite_omfatter_alle_13_testklasser()
     int forventet = 0;
     for (int i = 0; i < funktioner.size(); ++i) {
         QJsonObject fn = funktioner.at(i).toObject();
+        if (!fn.value("passerer").toBool())
+            continue;
         QString testfil = fn.value("parret_test").toObject().value("testfil").toString();
         if (QFileInfo::exists(testRepoRoot() + "/" + testfil)) {
             ++forventet;

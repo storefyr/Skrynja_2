@@ -56,7 +56,7 @@ void TestGenoptagelseAfSamtale::load_med_gemt_session_id()
     s.sync();
     SessionStore store;
     store.saveSessionId("sess-gammel");
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.startSession();
@@ -72,7 +72,7 @@ void TestGenoptagelseAfSamtale::fallback_til_new_ved_load_fejl()
     s.sync();
     SessionStore store;
     store.saveSessionId("sess-gammel");
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.startSession();
@@ -90,7 +90,7 @@ void TestGenoptagelseAfSamtale::hadRestoredHistory_saettes_korrekt()
     s.sync();
     SessionStore store;
     store.saveSessionId("sess-gammel");
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.startSession();

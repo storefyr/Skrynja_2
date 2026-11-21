@@ -163,7 +163,7 @@ void TestArkitekturOpdelingSession::acpclient_har_ingen_sessionlogik()
     QCOMPARE(sessionKilde.count("session/load"), 0);
     QCOMPARE(kilde.count("set_config_option"), 1);
 
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.sendSessionNew("/tmp/x");
@@ -179,7 +179,7 @@ void TestArkitekturOpdelingSession::eksisterende_session_tests_stadig_groenne()
     s.clear();
     s.sync();
 
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     QSignalSpy roundSpy(&client, SIGNAL(roundFinished()));

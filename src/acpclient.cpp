@@ -19,9 +19,15 @@
 static const QString kSetConfigOption = QLatin1String("session/set_config_option");
 
 AcpClient::AcpClient(QObject* parent)
+    : AcpClient(0, 0, parent)
+{
+}
+
+AcpClient::AcpClient(AcpFrameReader* reader, QIODevice* udEnhed, QObject* parent)
     : QObject(parent)
     , m_process(new AgentProcess(this))
-    , m_reader(new AcpFrameReader(m_process->process(), this))
+    , m_reader(reader ? reader : new AcpFrameReader(m_process->process(), this))
+    , m_udEnhed(udEnhed)
     , m_protokol(new AcpProtokol(this))
     , m_session(new AcpSession(m_protokol, this))
     , m_conversation(0)
@@ -29,7 +35,6 @@ AcpClient::AcpClient(QObject* parent)
     , m_permissionModel(0)
     , m_diff(0)
     , m_configModel(0)
-    , m_testMode(false)
 {
     connect(m_reader, SIGNAL(messageReady(QByteArray)), this, SLOT(receiveLine(QByteArray)));
     connect(m_reader, SIGNAL(lineDropped(QByteArray,QString)), this, SLOT(onLineDropped(QByteArray,QString)));
@@ -96,10 +101,6 @@ void AcpClient::setConfigurationModel(ConfigurationModel* model)
 
 bool AcpClient::startAgent()
 {
-    if (m_testMode) {
-        sendInitialize();
-        return true;
-    }
     if (!m_process->start()) {
         m_lastError = m_process->lastError();
         emit agentError(m_lastError);
@@ -288,43 +289,6 @@ QVariantList AcpClient::configOptions() const
     return m_configOptions;
 }
 
-void AcpClient::setTestMode(bool tilstand)
-{
-    m_testMode = tilstand;
-}
-
-bool AcpClient::testMode() const
-{
-    return m_testMode;
-}
-
-void AcpClient::feedBytesForTest(const QByteArray& data)
-{
-    m_reader->feedBytesForTest(data);
-}
-
-void AcpClient::eofForTest()
-{
-    m_reader->eofForTest();
-}
-
-void AcpClient::simulateAgentDeathForTest(int kode)
-{
-    processFinished(kode);
-}
-
-QList<QByteArray> AcpClient::sentForTest() const
-{
-    return m_sendte;
-}
-
-QByteArray AcpClient::lastSentForTest() const
-{
-    if (m_sendte.isEmpty())
-        return QByteArray();
-    return m_sendte.last();
-}
-
 qint64 AcpClient::sendRequest(const QString& method, const QJsonObject& params)
 {
     qint64 id = m_protokol->registerRequest(method);
@@ -339,10 +303,9 @@ void AcpClient::sendMessage(const AcpMessage& message)
 
 void AcpClient::write(const QByteArray& line)
 {
-    if (m_testMode) {
-        m_sendte.append(line);
-    } else if (m_process->process()->isOpen()) {
-        m_process->process()->write(line);
+    QIODevice* ud = m_udEnhed ? m_udEnhed : m_process->process();
+    if (ud && ud->isOpen()) {
+        ud->write(line);
         emit messageSent(line);
     }
 }

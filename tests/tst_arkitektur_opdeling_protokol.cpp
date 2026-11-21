@@ -169,7 +169,7 @@ void TestArkitekturOpdelingProtokol::acpclient_har_ingen_dispatch()
     QCOMPARE(sessionKilde.count("session/cancel"), 1);
     QCOMPARE(kilde.count("set_config_option"), 1);
 
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     QSignalSpy initSpy(&client, SIGNAL(initializeResponse(QJsonObject)));
@@ -183,7 +183,7 @@ void TestArkitekturOpdelingProtokol::acpclient_har_ingen_dispatch()
 
 void TestArkitekturOpdelingProtokol::eksisterende_rygrad_tests_stadig_groenne()
 {
-    AcpFrameReader reader(0);
+    TestFrameReader reader;
     QSignalSpy klar(&reader, SIGNAL(messageReady(QByteArray)));
     QSignalSpy droppet(&reader, SIGNAL(lineDropped(QByteArray,QString)));
     reader.feedBytesForTest(testReadFixture("fixture_rygrad.ndjson"));

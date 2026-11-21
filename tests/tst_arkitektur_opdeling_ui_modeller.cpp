@@ -47,7 +47,7 @@ void TestArkitekturOpdelingUiModeller::acpclient_er_tynd_facade()
     QVERIFY(header.contains("setDiffModel"));
     QVERIFY(header.contains("setConfigurationModel"));
 
-    AcpClient client;
+    TestClient client;
     const char* properties[] = {
         "hadRestoredHistory", "toolCalls", "conversationText", "conversationRound",
         "conversationStatus", "pendingPermission", "permissionCount", "diffs",
@@ -66,7 +66,7 @@ void TestArkitekturOpdelingUiModeller::fem_modeller_uden_acpclient_ejerskab()
     DiffModel diff(&ejer);
     ConfigurationModel konfiguration(&ejer);
 
-    AcpClient client;
+    TestClient client;
     client.setConversationModel(&samtale);
     client.setToolCallModel(&vaerktoejskald);
     client.setPermissionModel(&tilladelse);
@@ -103,7 +103,7 @@ void TestArkitekturOpdelingUiModeller::q_properties_uenaendret_for_qml()
     QCOMPARE(header.count("Q_PROPERTY(QVariantList configOptions"), 1);
     QCOMPARE(header.count("Q_PROPERTY(QString agentPath"), 1);
 
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
     QSignalSpy convSpy(&client, SIGNAL(conversationChanged()));
@@ -128,7 +128,7 @@ void TestArkitekturOpdelingUiModeller::q_properties_uenaendret_for_qml()
 
 void TestArkitekturOpdelingUiModeller::eksisterende_model_tests_stadig_groenne()
 {
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
 

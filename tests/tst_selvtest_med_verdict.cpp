@@ -23,7 +23,7 @@ private slots:
     void watchdog_udloeser_verdict_fail_ved_haeng();
 private:
     QString verdictPath() const;
-    void runChainToSession(AcpClient& client);
+    void runChainToSession(TestClient& client);
 };
 
 REGISTER_TEST(TestSelvtestMedVerdict)
@@ -39,7 +39,7 @@ QString TestSelvtestMedVerdict::verdictPath() const
     return QDir::tempPath() + "/skrynja-tst-selvtest/verdict.json";
 }
 
-void TestSelvtestMedVerdict::runChainToSession(AcpClient& client)
+void TestSelvtestMedVerdict::runChainToSession(TestClient& client)
 {
     QJsonObject initResult;
     initResult.insert("protocolVersion", 1);
@@ -56,10 +56,10 @@ void TestSelvtestMedVerdict::runChainToSession(AcpClient& client)
 void TestSelvtestMedVerdict::verdict_pass_ved_end_turn_og_exit_0()
 {
     QFile::remove(verdictPath());
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
-    SelfTest selfTest(&client);
+    TestSelfTest selfTest(&client);
     QSignalSpy finished(&selfTest, SIGNAL(finished(int)));
     selfTest.start("selvtest-prompt", verdictPath());
     runChainToSession(client);
@@ -74,10 +74,10 @@ void TestSelvtestMedVerdict::verdict_pass_ved_end_turn_og_exit_0()
 void TestSelvtestMedVerdict::verdict_fail_uden_toolcall()
 {
     QFile::remove(verdictPath());
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
-    SelfTest selfTest(&client);
+    TestSelfTest selfTest(&client);
     QSignalSpy finished(&selfTest, SIGNAL(finished(int)));
     selfTest.start("selvtest-prompt", verdictPath());
     runChainToSession(client);
@@ -90,10 +90,10 @@ void TestSelvtestMedVerdict::verdict_fail_uden_toolcall()
 void TestSelvtestMedVerdict::ingen_dobbelt_verdict()
 {
     QFile::remove(verdictPath());
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
-    SelfTest selfTest(&client);
+    TestSelfTest selfTest(&client);
     QSignalSpy finished(&selfTest, SIGNAL(finished(int)));
     selfTest.start("selvtest-prompt", verdictPath());
     runChainToSession(client);
@@ -115,10 +115,10 @@ void TestSelvtestMedVerdict::ingen_dobbelt_verdict()
 void TestSelvtestMedVerdict::verdict_ved_agentdoed()
 {
     QFile::remove(verdictPath());
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
-    SelfTest selfTest(&client);
+    TestSelfTest selfTest(&client);
     QSignalSpy finished(&selfTest, SIGNAL(finished(int)));
     selfTest.start("selvtest-prompt", verdictPath());
     client.simulateAgentDeathForTest(1);
@@ -135,9 +135,8 @@ void TestSelvtestMedVerdict::verdict_ved_startfejl()
     s.clear();
     s.sync();
     AcpClient client;
-    injectTestModels(&client, this);
     client.setAgentsti("/definitivt/ikke/eksisterende-agent-selvtest");
-    SelfTest selfTest(&client);
+    TestSelfTest selfTest(&client);
     QSignalSpy finished(&selfTest, SIGNAL(finished(int)));
     selfTest.start("selvtest-prompt", verdictPath());
     QCOMPARE(finished.count(), 1);
@@ -151,10 +150,10 @@ void TestSelvtestMedVerdict::verdict_ved_startfejl()
 void TestSelvtestMedVerdict::verdict_fil_skrives_og_laeses_tilbage()
 {
     QFile::remove(verdictPath());
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
-    SelfTest selfTest(&client);
+    TestSelfTest selfTest(&client);
     QSignalSpy finished(&selfTest, SIGNAL(finished(int)));
     selfTest.start("selvtest-prompt", verdictPath());
     runChainToSession(client);
@@ -175,10 +174,10 @@ void TestSelvtestMedVerdict::verdict_fil_skrives_og_laeses_tilbage()
 void TestSelvtestMedVerdict::watchdog_udloeser_verdict_fail_ved_haeng()
 {
     QFile::remove(verdictPath());
-    AcpClient client;
+    TestClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
-    SelfTest selfTest(&client);
+    TestSelfTest selfTest(&client);
     selfTest.setWatchdogMsForTest(50);
     QSignalSpy finished(&selfTest, SIGNAL(finished(int)));
     selfTest.start("prompt-uden-svar", verdictPath());
