@@ -18,6 +18,7 @@ private slots:
     void tool_call_update_opdaterer_status();
     void ui_kvitterer_sete_kald();
     void flere_kald_i_raekkefoelge();
+    void enkelt_projektion_i_toolkaldsmodel();
 private:
 };
 
@@ -76,6 +77,24 @@ void TestVaerktoejskaldVisning::flere_kald_i_raekkefoelge()
     QCOMPARE(call.size(), 2);
     QCOMPARE(call.at(0).toMap().value("toolCallId").toString(), QString("tc-1"));
     QCOMPARE(call.at(1).toMap().value("toolCallId").toString(), QString("tc-2"));
+}
+
+void TestVaerktoejskaldVisning::enkelt_projektion_i_toolkaldsmodel()
+{
+    QString kilde = testReadSource("src/vaerktoejskaldsmodel.cpp");
+    QVERIFY(!kilde.isEmpty());
+    QVERIFY(kilde.contains("projektion"));
+    QCOMPARE(kilde.count("m.insert(\"toolCallId\""), 1);
+
+    AcpClient client;
+    injectTestModels(&client, this);
+    client.setTestMode(true);
+    client.feedBytesForTest(testReadFixture("fixture_v\u00e6rkt\u00f8jskald.ndjson"));
+    ToolCallModel* model = client.toolCallModel();
+    QCOMPARE(model->toolCalls().size(), model->count());
+    QVariantMap viaList = model->toolCalls().at(0).toMap();
+    QVariantMap viaFind = model->find(viaList.value("toolCallId").toString());
+    QCOMPARE(viaList, viaFind);
 }
 
 #include "tst_vaerktoejskald_visning.moc"
