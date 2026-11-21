@@ -117,7 +117,7 @@
       {"id": "ark-6", "type": "arkitektur", "mål_funktion": "værktøjskald_visning", "ordre": "Enten fjern de ubrugte QAbstractListModel-roller fra ConversationModel/ToolCallModel/DiffModel, eller skift QML til at bruge model-rollerne — ikke begge dele.", "parret_test": "tests/tst_vaerktoejskald_visning.cpp + ny slot: qml_bruger_en_eneste_model_mekanisme", "gennemfoert": true}
     ]
   },
-  "succeskriterium": "prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0, samtidig med at alle 21 funktioner (13 oprindelige + 3 ark-1-opdelinger fra PR #10 + 5 ark-2..6-trin fra PR #18) har passerer: sand og alle parrede tests i tests/ er grønne.",
+  "succeskriterium": "prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0, samtidig med at alle 22 funktioner (13 oprindelige + 3 ark-1-opdelinger fra PR #10 + 5 ark-2..6-trin fra PR #18 + 1 distributionsartefakt-trin) har passerer: sand og alle parrede tests i tests/ er grønne.",
   "strategisk_rækkefølge": [
     "byggesti_og_logfil",
     "acp_rygrad",
@@ -139,7 +139,8 @@
     "arkitektur_alle_metoder_konstanter",
     "arkitektur_diffmodel_uden_transport",
     "arkitektur_en_config_ejer",
-    "arkitektur_fjern_ubrugte_roller"
+    "arkitektur_fjern_ubrugte_roller",
+    "distributionsartefakt_ikoner"
   ],
   "funktioner": [
     {
@@ -1045,6 +1046,58 @@
         }
       ],
       "passerer": true
+    },
+    {
+      "id": "distributionsartefakt_ikoner",
+      "navn": "Distributionsartefakt: ikoner",
+      "beskrivelse": "Luk ikon-hullet i packaging-kæden ved at genbruge ikonerne fra forælderprojektet storefyr/Skrynja-1 (licens GPL-3.0 — samme licens som dette depot, så genbrug er licens-mæssigt i orden): kopier icons/{86x86,108x108,128x128,172x172}/harbour-skrynja-1.png til icons/<stoerrelse>/harbour-skrynja-2.png, og wire dem i harbour-skrynja-2.pro (icons.path = /usr/share/icons/hicolor/<stoerrelse>/apps), rpm/harbour-skrynja-2.spec (%files: %{_datadir}/icons/hicolor/*/apps/%{name}.png) og harbour-skrynja-2.yaml (Files: icons). .desktop beholder Icon=harbour-skrynja-2. Udføres af Realiseringsstokastikeren; denne post er ordren.",
+      "filer": [
+        "icons/86x86/harbour-skrynja-2.png",
+        "icons/108x108/harbour-skrynja-2.png",
+        "icons/128x128/harbour-skrynja-2.png",
+        "icons/172x172/harbour-skrynja-2.png",
+        "harbour-skrynja-2.pro",
+        "rpm/harbour-skrynja-2.spec",
+        "harbour-skrynja-2.yaml"
+      ],
+      "parret_test": {
+        "testfil": "tests/tst_byggesti_og_logfil.cpp",
+        "testklasse": "TestByggestiOgLogfil",
+        "testslots": [
+          "ikoner_findes_i_fire_stoerrelser_og_er_png",
+          "ikoner_wired_i_pro_spec_og_yaml"
+        ],
+        "fixtures": [],
+        "bemærkning": "Nye slots i byggesti-funktionens eksisterende parrede testfil; prøven opdateres før packaging-filerne ændres"
+      },
+      "verifikations_trin": [
+        {
+          "trin": "Ikon-filer findes i de fire størrelser og er gyldige PNG",
+          "kommando": "file icons/*/harbour-skrynja-2.png",
+          "forventet_uddata": "4 PNG image data: 86x86, 108x108, 128x128, 172x172"
+        },
+        {
+          "trin": "Ikoner er wired i .pro, spec og yaml",
+          "kommando": "grep -c 'icons' harbour-skrynja-2.pro rpm/harbour-skrynja-2.spec harbour-skrynja-2.yaml",
+          "forventet_uddata": "forekomst i alle tre filer"
+        },
+        {
+          "trin": "Parret test og hele suiten grøn",
+          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "forventet_uddata": "ALL TESTS PASSED (inkl. TestByggestiOgLogfil nye slots)"
+        },
+        {
+          "trin": "Manifest-tjek grøn",
+          "kommando": "python3 tjek_manifest_parrede_tests.py",
+          "forventet_uddata": "rækkefølge ok; exit 0"
+        },
+        {
+          "trin": "RPM-byg i Sailfish SDK indeholder ikonerne (mål-miljø)",
+          "kommando": "sfdk build / mb2 && rpm -qpl harbour-skrynja-2-*.aarch64.rpm | grep icons",
+          "forventet_uddata": "4 sti-linjer under /usr/share/icons/hicolor/*/apps/harbour-skrynja-2.png"
+        }
+      ],
+      "passerer": false
     }
   ]
 }
