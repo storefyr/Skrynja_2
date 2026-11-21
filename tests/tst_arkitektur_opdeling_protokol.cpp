@@ -23,9 +23,6 @@ private slots:
     void acpclient_har_ingen_dispatch();
     void eksisterende_rygrad_tests_stadig_groenne();
 private:
-    QString repoRoot() const;
-    QString readSource(const QString& rel) const;
-    QByteArray readFixture(const QString& name) const;
 };
 
 REGISTER_TEST(TestArkitekturOpdelingProtokol)
@@ -33,33 +30,6 @@ REGISTER_TEST(TestArkitekturOpdelingProtokol)
 void TestArkitekturOpdelingProtokol::initTestCase()
 {
     qRegisterMetaType<AcpMessage>("AcpMessage");
-}
-
-QString TestArkitekturOpdelingProtokol::repoRoot() const
-{
-    QString root = QCoreApplication::applicationDirPath() + "/..";
-    if (!QFileInfo::exists(root + "/realiseringsmanifest_for_funktioner_og_parrede_tests.json"))
-        root = "..";
-    return root;
-}
-
-QString TestArkitekturOpdelingProtokol::readSource(const QString& rel) const
-{
-    QFile f(repoRoot() + "/" + rel);
-    if (!f.open(QIODevice::ReadOnly))
-        return QString();
-    return QString::fromUtf8(f.readAll());
-}
-
-QByteArray TestArkitekturOpdelingProtokol::readFixture(const QString& name) const
-{
-    QString path = QFINDTESTDATA("fixtures/" + name);
-    if (path.isEmpty())
-        path = "fixtures/" + name;
-    QFile f(path);
-    if (!f.open(QIODevice::ReadOnly))
-        return QByteArray();
-    return f.readAll();
 }
 
 void TestArkitekturOpdelingProtokol::acp_protokol_haandterer_dispatch()
@@ -179,8 +149,8 @@ void TestArkitekturOpdelingProtokol::request_id_bogfoering_i_acp_protokol()
 
 void TestArkitekturOpdelingProtokol::acpclient_har_ingen_dispatch()
 {
-    QString header = readSource("src/acpclient.h");
-    QString kilde = readSource("src/acpclient.cpp");
+    QString header = testReadSource("src/acpclient.h");
+    QString kilde = testReadSource("src/acpclient.cpp");
     QVERIFY(!header.isEmpty());
     QVERIFY(!kilde.isEmpty());
     QVERIFY(!header.contains("m_pendingRequests"));
@@ -191,8 +161,8 @@ void TestArkitekturOpdelingProtokol::acpclient_har_ingen_dispatch()
     QVERIFY(!kilde.contains("AcpClient::handleNotification"));
     QVERIFY(!kilde.contains("m_pendingRequests"));
 
-    QString protokolKilde = readSource("src/acpprotokol.cpp");
-    QString sessionKilde = readSource("src/acpsession.cpp");
+    QString protokolKilde = testReadSource("src/acpprotokol.cpp");
+    QString sessionKilde = testReadSource("src/acpsession.cpp");
     QCOMPARE(kilde.count("session/prompt"), 0);
     QCOMPARE(kilde.count("session/cancel"), 0);
     QCOMPARE(protokolKilde.count("session/prompt"), 1);
@@ -216,7 +186,7 @@ void TestArkitekturOpdelingProtokol::eksisterende_rygrad_tests_stadig_groenne()
     AcpFrameReader reader(0);
     QSignalSpy klar(&reader, SIGNAL(messageReady(QByteArray)));
     QSignalSpy droppet(&reader, SIGNAL(lineDropped(QByteArray,QString)));
-    reader.feedBytesForTest(readFixture("fixture_rygrad.ndjson"));
+    reader.feedBytesForTest(testReadFixture("fixture_rygrad.ndjson"));
     QCOMPARE(klar.count(), 5);
     QCOMPARE(droppet.count(), 0);
     for (int i = 0; i < klar.count(); ++i) {

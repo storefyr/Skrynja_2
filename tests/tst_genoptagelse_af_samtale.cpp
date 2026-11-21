@@ -24,54 +24,13 @@ private slots:
     void hadRestoredHistory_saettes_korrekt();
     void resumeregel_laeser_manifest_og_finder_foerste_false();
 private:
-    qint64 idOf(const QByteArray& json);
-    QByteArray errorResponseJson(qint64 id, int kode, const QString& message);
-    QByteArray responseJson(qint64 id, const QJsonObject& result);
 };
 
 REGISTER_TEST(TestGenoptagelseAfSamtale)
 
-static QJsonObject jsonObj(const QByteArray& json)
-{
-    return QJsonDocument::fromJson(json).object();
-}
-
 void TestGenoptagelseAfSamtale::initTestCase()
 {
-    QStandardPaths::setTestModeEnabled(true);
-    QString path = QDir::tempPath() + "/skrynja-tst-settings-genoptag";
-    QDir().mkpath(path);
-    QSettings::setDefaultFormat(QSettings::IniFormat);
-    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, path);
-    QSettings s;
-    s.clear();
-    s.sync();
-}
-
-qint64 TestGenoptagelseAfSamtale::idOf(const QByteArray& json)
-{
-    return jsonObj(json).value("id").toVariant().toLongLong();
-}
-
-QByteArray TestGenoptagelseAfSamtale::errorResponseJson(qint64 id, int kode, const QString& message)
-{
-    QJsonObject error;
-    error.insert("code", kode);
-    error.insert("message", message);
-    QJsonObject o;
-    o.insert("jsonrpc", "2.0");
-    o.insert("id", QJsonValue(id));
-    o.insert("error", error);
-    return QJsonDocument(o).toJson(QJsonDocument::Compact);
-}
-
-QByteArray TestGenoptagelseAfSamtale::responseJson(qint64 id, const QJsonObject& result)
-{
-    QJsonObject o;
-    o.insert("jsonrpc", "2.0");
-    o.insert("id", QJsonValue(id));
-    o.insert("result", result);
-    return QJsonDocument(o).toJson(QJsonDocument::Compact);
+    opretTestSettingsSti("/skrynja-tst-settings-genoptag");
 }
 
 void TestGenoptagelseAfSamtale::session_id_gemmes_i_settings()
@@ -99,7 +58,7 @@ void TestGenoptagelseAfSamtale::load_med_gemt_session_id()
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.startSession();
-    QJsonObject o = jsonObj(client.lastSentForTest());
+    QJsonObject o = testJsonObj(client.lastSentForTest());
     QCOMPARE(o.value("method").toString(), QString("session/load"));
     QCOMPARE(o.value("params").toObject().value("sessionId").toString(), QString("sess-gammel"));
 }
@@ -115,9 +74,9 @@ void TestGenoptagelseAfSamtale::fallback_til_new_ved_load_fejl()
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.startSession();
-    qint64 id = idOf(client.lastSentForTest());
-    client.feedBytesForTest(errorResponseJson(id, -32602, "ukendt session") + "\n");
-    QJsonObject o = jsonObj(client.lastSentForTest());
+    qint64 id = testIdOf(client.lastSentForTest());
+    client.feedBytesForTest(testErrorResponseJson(id, -32602, "ukendt session") + "\n");
+    QJsonObject o = testJsonObj(client.lastSentForTest());
     QCOMPARE(o.value("method").toString(), QString("session/new"));
     QVERIFY(!client.hadRestoredHistory());
 }
@@ -133,11 +92,11 @@ void TestGenoptagelseAfSamtale::hadRestoredHistory_saettes_korrekt()
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.startSession();
-    qint64 id = idOf(client.lastSentForTest());
+    qint64 id = testIdOf(client.lastSentForTest());
     QVERIFY(!client.hadRestoredHistory());
     QJsonObject result;
     result.insert("sessionId", "sess-gammel");
-    client.feedBytesForTest(responseJson(id, result) + "\n");
+    client.feedBytesForTest(testResponseJson(id, result) + "\n");
     QVERIFY(client.hadRestoredHistory());
     QCOMPARE(client.sessionId(), QString("sess-gammel"));
 }

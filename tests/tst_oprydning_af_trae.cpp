@@ -20,24 +20,15 @@ private slots:
     void agentproces_ikke_haengende();
     void logfil_uden_transskripter();
 private:
-    QString repoRoot();
     QString runGit(const QStringList& argumenter);
 };
 
 REGISTER_TEST(TestOprydningAfTrae)
 
-QString TestOprydningAfTrae::repoRoot()
-{
-    QString root = QCoreApplication::applicationDirPath() + "/..";
-    if (!QFileInfo::exists(root + "/tjek_manifest_parrede_tests.py"))
-        root = "..";
-    return root;
-}
-
 QString TestOprydningAfTrae::runGit(const QStringList& argumenter)
 {
     QProcess p;
-    p.setWorkingDirectory(repoRoot());
+    p.setWorkingDirectory(testRepoRoot());
     p.start("git", argumenter);
     p.waitForFinished(15000);
     return QString::fromUtf8(p.readAllStandardOutput());

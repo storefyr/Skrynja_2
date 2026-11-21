@@ -24,32 +24,13 @@ private slots:
     void outputs_akkumuleres();
     void diff_vises_mens_det_sker();
 private:
-    QByteArray readFixture(const QString& name);
 };
 
 REGISTER_TEST(TestDiffOgUddata)
 
 void TestDiffOgUddata::initTestCase()
 {
-    QStandardPaths::setTestModeEnabled(true);
-    QString path = QDir::tempPath() + "/skrynja-tst-settings-diff";
-    QDir().mkpath(path);
-    QSettings::setDefaultFormat(QSettings::IniFormat);
-    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, path);
-    QSettings s;
-    s.clear();
-    s.sync();
-}
-
-QByteArray TestDiffOgUddata::readFixture(const QString& name)
-{
-    QString path = QFINDTESTDATA("fixtures/" + name);
-    if (path.isEmpty())
-        path = "fixtures/" + name;
-    QFile f(path);
-    if (!f.open(QIODevice::ReadOnly))
-        return QByteArray();
-    return f.readAll();
+    opretTestSettingsSti("/skrynja-tst-settings-diff");
 }
 
 void TestDiffOgUddata::diff_blok_parses()
@@ -57,7 +38,7 @@ void TestDiffOgUddata::diff_blok_parses()
     AcpClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
-    client.feedBytesForTest(readFixture("fixture_diff.ndjson"));
+    client.feedBytesForTest(testReadFixture("fixture_diff.ndjson"));
     DiffModel* model = client.diffModel();
     QCOMPARE(model->diffCount(), 2);
     QVariantList diffs = model->diffs();
@@ -84,7 +65,7 @@ void TestDiffOgUddata::outputs_akkumuleres()
     AcpClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
-    client.feedBytesForTest(readFixture("fixture_uddata.ndjson"));
+    client.feedBytesForTest(testReadFixture("fixture_uddata.ndjson"));
     DiffModel* model = client.diffModel();
     QCOMPARE(model->outputCount(), 2);
     QVERIFY(model->outputs().contains("kommando kørte fint"));
@@ -97,7 +78,7 @@ void TestDiffOgUddata::diff_vises_mens_det_sker()
     injectTestModels(&client, this);
     client.setTestMode(true);
     QSignalSpy changed(client.diffModel(), SIGNAL(changed()));
-    QByteArray all = readFixture("fixture_diff.ndjson");
+    QByteArray all = testReadFixture("fixture_diff.ndjson");
     QByteArray firstLine = all.left(all.indexOf('\n') + 1);
     client.feedBytesForTest(firstLine);
     QVERIFY(changed.count() >= 1);

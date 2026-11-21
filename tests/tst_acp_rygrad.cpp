@@ -21,28 +21,16 @@ private slots:
     void rygrad_hale_ved_eof();
     void besked_id_korrelation();
 private:
-    QByteArray readFixture(const QString& name);
 };
 
 REGISTER_TEST(TestAcpRygrad)
-
-QByteArray TestAcpRygrad::readFixture(const QString& name)
-{
-    QString path = QFINDTESTDATA("fixtures/" + name);
-    if (path.isEmpty())
-        path = "fixtures/" + name;
-    QFile f(path);
-    if (!f.open(QIODevice::ReadOnly))
-        return QByteArray();
-    return f.readAll();
-}
 
 void TestAcpRygrad::rygrad_fixture_hoved()
 {
     AcpFrameReader reader(0);
     QSignalSpy klar(&reader, SIGNAL(messageReady(QByteArray)));
     QSignalSpy droppet(&reader, SIGNAL(lineDropped(QByteArray,QString)));
-    reader.feedBytesForTest(readFixture("fixture_rygrad.ndjson"));
+    reader.feedBytesForTest(testReadFixture("fixture_rygrad.ndjson"));
     QCOMPARE(klar.count(), 5);
     QCOMPARE(droppet.count(), 0);
     for (int i = 0; i < klar.count(); ++i) {
@@ -59,7 +47,7 @@ void TestAcpRygrad::rygrad_sammenklaebning()
     AcpFrameReader reader(0);
     QSignalSpy klar(&reader, SIGNAL(messageReady(QByteArray)));
     QSignalSpy droppet(&reader, SIGNAL(lineDropped(QByteArray,QString)));
-    QByteArray data = readFixture("fixture_rygrad_sammenklæbning.ndjson");
+    QByteArray data = testReadFixture("fixture_rygrad_sammenklæbning.ndjson");
     QVERIFY(!data.isEmpty());
     for (int i = 0; i < data.size(); i += 7)
         reader.feedBytesForTest(data.mid(i, 7));
@@ -77,7 +65,7 @@ void TestAcpRygrad::rygrad_ugyldig_ruller_tilbage()
     AcpFrameReader reader(0);
     QSignalSpy klar(&reader, SIGNAL(messageReady(QByteArray)));
     QSignalSpy droppet(&reader, SIGNAL(lineDropped(QByteArray,QString)));
-    reader.feedBytesForTest(readFixture("fixture_rygrad_ugyldig.ndjson"));
+    reader.feedBytesForTest(testReadFixture("fixture_rygrad_ugyldig.ndjson"));
     QCOMPARE(klar.count(), 3);
     QCOMPARE(droppet.count(), 2);
     reader.feedBytesForTest("{\"jsonrpc\":\"2.0\",\"id\":3,\"result\":{}}\n");
@@ -90,7 +78,7 @@ void TestAcpRygrad::rygrad_utf8_ugyldig()
     AcpFrameReader reader(0);
     QSignalSpy klar(&reader, SIGNAL(messageReady(QByteArray)));
     QSignalSpy droppet(&reader, SIGNAL(lineDropped(QByteArray,QString)));
-    QByteArray data = readFixture("fixture_rygrad_utf8_ugyldig.ndjson");
+    QByteArray data = testReadFixture("fixture_rygrad_utf8_ugyldig.ndjson");
     QVERIFY(!data.isEmpty());
     reader.feedBytesForTest(data);
     QCOMPARE(klar.count(), 2);

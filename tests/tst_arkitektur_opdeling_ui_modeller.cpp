@@ -24,54 +24,14 @@ private slots:
     void q_properties_uenaendret_for_qml();
     void eksisterende_model_tests_stadig_groenne();
 private:
-    QString repoRoot() const;
-    QString readSource(const QString& rel) const;
-    QJsonObject jsonObj(const QByteArray& json) const;
-    qint64 idOf(const QByteArray& json) const;
-    QByteArray responseJson(qint64 id, const QJsonObject& result) const;
 };
 
 REGISTER_TEST(TestArkitekturOpdelingUiModeller)
 
-QString TestArkitekturOpdelingUiModeller::repoRoot() const
-{
-    QString root = QCoreApplication::applicationDirPath() + "/..";
-    if (!QFileInfo::exists(root + "/realiseringsmanifest_for_funktioner_og_parrede_tests.json"))
-        root = "..";
-    return root;
-}
-
-QString TestArkitekturOpdelingUiModeller::readSource(const QString& rel) const
-{
-    QFile f(repoRoot() + "/" + rel);
-    if (!f.open(QIODevice::ReadOnly))
-        return QString();
-    return QString::fromUtf8(f.readAll());
-}
-
-QJsonObject TestArkitekturOpdelingUiModeller::jsonObj(const QByteArray& json) const
-{
-    return QJsonDocument::fromJson(json).object();
-}
-
-qint64 TestArkitekturOpdelingUiModeller::idOf(const QByteArray& json) const
-{
-    return jsonObj(json).value("id").toVariant().toLongLong();
-}
-
-QByteArray TestArkitekturOpdelingUiModeller::responseJson(qint64 id, const QJsonObject& result) const
-{
-    QJsonObject o;
-    o.insert("jsonrpc", "2.0");
-    o.insert("id", QJsonValue(id));
-    o.insert("result", result);
-    return QJsonDocument(o).toJson(QJsonDocument::Compact);
-}
-
 void TestArkitekturOpdelingUiModeller::acpclient_er_tynd_facade()
 {
-    QString header = readSource("src/acpclient.h");
-    QString kilde = readSource("src/acpclient.cpp");
+    QString header = testReadSource("src/acpclient.h");
+    QString kilde = testReadSource("src/acpclient.cpp");
     QVERIFY(!header.isEmpty());
     QVERIFY(!kilde.isEmpty());
 
@@ -129,7 +89,7 @@ void TestArkitekturOpdelingUiModeller::fem_modeller_uden_acpclient_ejerskab()
 
 void TestArkitekturOpdelingUiModeller::q_properties_uenaendret_for_qml()
 {
-    QString header = readSource("src/acpclient.h");
+    QString header = testReadSource("src/acpclient.h");
     QVERIFY(!header.isEmpty());
     QCOMPARE(header.count("Q_PROPERTY(bool hadRestoredHistory"), 1);
     QCOMPARE(header.count("Q_PROPERTY(QVariantList toolCalls"), 1);
@@ -173,7 +133,7 @@ void TestArkitekturOpdelingUiModeller::eksisterende_model_tests_stadig_groenne()
     client.setTestMode(true);
 
     client.sendInitialize();
-    qint64 initId = idOf(client.lastSentForTest());
+    qint64 initId = testIdOf(client.lastSentForTest());
     QJsonObject option;
     option.insert("configId", "model");
     option.insert("name", "Model");
@@ -182,7 +142,7 @@ void TestArkitekturOpdelingUiModeller::eksisterende_model_tests_stadig_groenne()
     QJsonObject initResult;
     initResult.insert("protocolVersion", 1);
     initResult.insert("configOptions", options);
-    client.feedBytesForTest(responseJson(initId, initResult) + "\n");
+    client.feedBytesForTest(testResponseJson(initId, initResult) + "\n");
     QCOMPARE(client.configOptions().size(), 1);
     QCOMPARE(client.configurationModel()->configOptions().size(), 1);
 

@@ -24,53 +24,13 @@ private slots:
     void ingen_haengende_proces_efter_stop();
     void stop_og_afvis_er_obligatorisk_i_raekkefoelge();
 private:
-    QByteArray readFixture(const QString& name);
-    qint64 idOf(const QByteArray& json);
-    QByteArray responseJson(qint64 id, const QJsonObject& result);
 };
 
 REGISTER_TEST(TestStopOgAfvis)
 
-static QJsonObject jsonObj(const QByteArray& json)
-{
-    return QJsonDocument::fromJson(json).object();
-}
-
 void TestStopOgAfvis::initTestCase()
 {
-    QStandardPaths::setTestModeEnabled(true);
-    QString path = QDir::tempPath() + "/skrynja-tst-settings-stop";
-    QDir().mkpath(path);
-    QSettings::setDefaultFormat(QSettings::IniFormat);
-    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, path);
-    QSettings s;
-    s.clear();
-    s.sync();
-}
-
-QByteArray TestStopOgAfvis::readFixture(const QString& name)
-{
-    QString path = QFINDTESTDATA("fixtures/" + name);
-    if (path.isEmpty())
-        path = "fixtures/" + name;
-    QFile f(path);
-    if (!f.open(QIODevice::ReadOnly))
-        return QByteArray();
-    return f.readAll();
-}
-
-qint64 TestStopOgAfvis::idOf(const QByteArray& json)
-{
-    return jsonObj(json).value("id").toVariant().toLongLong();
-}
-
-QByteArray TestStopOgAfvis::responseJson(qint64 id, const QJsonObject& result)
-{
-    QJsonObject o;
-    o.insert("jsonrpc", "2.0");
-    o.insert("id", QJsonValue(id));
-    o.insert("result", result);
-    return QJsonDocument(o).toJson(QJsonDocument::Compact);
+    opretTestSettingsSti("/skrynja-tst-settings-stop");
 }
 
 void TestStopOgAfvis::cancel_notification_payload()
@@ -79,13 +39,13 @@ void TestStopOgAfvis::cancel_notification_payload()
     injectTestModels(&client, this);
     client.setTestMode(true);
     client.sendSessionNew("/tmp");
-    qint64 id = idOf(client.lastSentForTest());
+    qint64 id = testIdOf(client.lastSentForTest());
     QJsonObject result;
     result.insert("sessionId", "s1");
-    client.feedBytesForTest(responseJson(id, result) + "\n");
+    client.feedBytesForTest(testResponseJson(id, result) + "\n");
 
     client.sessionCancel();
-    QJsonObject o = jsonObj(client.lastSentForTest());
+    QJsonObject o = testJsonObj(client.lastSentForTest());
     QCOMPARE(o.value("method").toString(), QString("session/cancel"));
     QVERIFY(!o.contains("id"));
     QCOMPARE(o.value("params").toObject().value("sessionId").toString(), QString("s1"));
@@ -96,9 +56,9 @@ void TestStopOgAfvis::afvisning_outcome_cancelled()
     AcpClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
-    client.feedBytesForTest(readFixture("fixture_tilladelse.ndjson"));
+    client.feedBytesForTest(testReadFixture("fixture_tilladelse.ndjson"));
     QVERIFY(client.declinePermission());
-    QJsonObject o = jsonObj(client.lastSentForTest());
+    QJsonObject o = testJsonObj(client.lastSentForTest());
     QCOMPARE(o.value("result").toObject().value("outcome").toObject().value("outcome").toString(),
              QString("cancelled"));
 }

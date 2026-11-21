@@ -19,32 +19,13 @@ private slots:
     void ui_kvitterer_sete_kald();
     void flere_kald_i_raekkefoelge();
 private:
-    QByteArray readFixture(const QString& name);
 };
 
 REGISTER_TEST(TestVaerktoejskaldVisning)
 
 void TestVaerktoejskaldVisning::initTestCase()
 {
-    QStandardPaths::setTestModeEnabled(true);
-    QString path = QDir::tempPath() + "/skrynja-tst-settings-vaerktoej";
-    QDir().mkpath(path);
-    QSettings::setDefaultFormat(QSettings::IniFormat);
-    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, path);
-    QSettings s;
-    s.clear();
-    s.sync();
-}
-
-QByteArray TestVaerktoejskaldVisning::readFixture(const QString& name)
-{
-    QString path = QFINDTESTDATA("fixtures/" + name);
-    if (path.isEmpty())
-        path = "fixtures/" + name;
-    QFile f(path);
-    if (!f.open(QIODevice::ReadOnly))
-        return QByteArray();
-    return f.readAll();
+    opretTestSettingsSti("/skrynja-tst-settings-vaerktoej");
 }
 
 void TestVaerktoejskaldVisning::tool_call_felter_parses()
@@ -52,7 +33,7 @@ void TestVaerktoejskaldVisning::tool_call_felter_parses()
     AcpClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
-    client.feedBytesForTest(readFixture("fixture_værktøjskald.ndjson"));
+    client.feedBytesForTest(testReadFixture("fixture_værktøjskald.ndjson"));
     ToolCallModel* model = client.toolCallModel();
     QCOMPARE(model->count(), 2);
     QVariantMap tc1 = model->find("tc-1");
@@ -66,7 +47,7 @@ void TestVaerktoejskaldVisning::tool_call_update_opdaterer_status()
     AcpClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
-    client.feedBytesForTest(readFixture("fixture_værktøjskald.ndjson"));
+    client.feedBytesForTest(testReadFixture("fixture_værktøjskald.ndjson"));
     ToolCallModel* model = client.toolCallModel();
     QCOMPARE(model->find("tc-1").value("status").toString(), QString("completed"));
     QCOMPARE(model->find("tc-2").value("status").toString(), QString("in_progress"));
@@ -77,7 +58,7 @@ void TestVaerktoejskaldVisning::ui_kvitterer_sete_kald()
     AcpClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
-    client.feedBytesForTest(readFixture("fixture_værktøjskald.ndjson"));
+    client.feedBytesForTest(testReadFixture("fixture_værktøjskald.ndjson"));
     ToolCallModel* model = client.toolCallModel();
     QVERIFY(model->acknowledge("tc-1"));
     QVERIFY(model->find("tc-1").value("set").toBool());
@@ -90,7 +71,7 @@ void TestVaerktoejskaldVisning::flere_kald_i_raekkefoelge()
     AcpClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
-    client.feedBytesForTest(readFixture("fixture_værktøjskald.ndjson"));
+    client.feedBytesForTest(testReadFixture("fixture_værktøjskald.ndjson"));
     QVariantList call = client.toolCallModel()->toolCalls();
     QCOMPARE(call.size(), 2);
     QCOMPARE(call.at(0).toMap().value("toolCallId").toString(), QString("tc-1"));

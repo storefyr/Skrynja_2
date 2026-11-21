@@ -23,37 +23,13 @@ private slots:
     void afvisning_giver_outcome_cancelled();
     void ingen_dobbelt_svar();
 private:
-    QByteArray readFixture(const QString& name);
 };
 
 REGISTER_TEST(TestTilladelsesdialog)
 
-static QJsonObject jsonObj(const QByteArray& json)
-{
-    return QJsonDocument::fromJson(json).object();
-}
-
 void TestTilladelsesdialog::initTestCase()
 {
-    QStandardPaths::setTestModeEnabled(true);
-    QString path = QDir::tempPath() + "/skrynja-tst-settings-tilladelse";
-    QDir().mkpath(path);
-    QSettings::setDefaultFormat(QSettings::IniFormat);
-    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, path);
-    QSettings s;
-    s.clear();
-    s.sync();
-}
-
-QByteArray TestTilladelsesdialog::readFixture(const QString& name)
-{
-    QString path = QFINDTESTDATA("fixtures/" + name);
-    if (path.isEmpty())
-        path = "fixtures/" + name;
-    QFile f(path);
-    if (!f.open(QIODevice::ReadOnly))
-        return QByteArray();
-    return f.readAll();
+    opretTestSettingsSti("/skrynja-tst-settings-tilladelse");
 }
 
 void TestTilladelsesdialog::anmodning_parses_til_pendingPermission()
@@ -62,7 +38,7 @@ void TestTilladelsesdialog::anmodning_parses_til_pendingPermission()
     injectTestModels(&client, this);
     client.setTestMode(true);
     QSignalSpy requested(&client, SIGNAL(permissionRequested()));
-    client.feedBytesForTest(readFixture("fixture_tilladelse.ndjson"));
+    client.feedBytesForTest(testReadFixture("fixture_tilladelse.ndjson"));
     QCOMPARE(requested.count(), 1);
     PermissionModel* model = client.permissionModel();
     QVERIFY(model->isPending());
@@ -75,7 +51,7 @@ void TestTilladelsesdialog::options_liste_med_optionId()
     AcpClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
-    client.feedBytesForTest(readFixture("fixture_tilladelse.ndjson"));
+    client.feedBytesForTest(testReadFixture("fixture_tilladelse.ndjson"));
     QVariantMap pending = client.permissionModel()->pendingPermission();
     QVariantList options = pending.value("options").toList();
     QCOMPARE(options.size(), 2);
@@ -89,9 +65,9 @@ void TestTilladelsesdialog::svar_payload_selected_optionId()
     AcpClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
-    client.feedBytesForTest(readFixture("fixture_tilladelse.ndjson"));
+    client.feedBytesForTest(testReadFixture("fixture_tilladelse.ndjson"));
     QVERIFY(client.answerPermission("allow"));
-    QJsonObject o = jsonObj(client.lastSentForTest());
+    QJsonObject o = testJsonObj(client.lastSentForTest());
     QCOMPARE(o.value("id").toVariant().toLongLong(), 100);
     QJsonObject outcome = o.value("result").toObject().value("outcome").toObject();
     QCOMPARE(outcome.value("outcome").toString(), QString("selected"));
@@ -103,9 +79,9 @@ void TestTilladelsesdialog::afvisning_giver_outcome_cancelled()
     AcpClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
-    client.feedBytesForTest(readFixture("fixture_tilladelse.ndjson"));
+    client.feedBytesForTest(testReadFixture("fixture_tilladelse.ndjson"));
     QVERIFY(client.declinePermission());
-    QJsonObject o = jsonObj(client.lastSentForTest());
+    QJsonObject o = testJsonObj(client.lastSentForTest());
     QJsonObject outcome = o.value("result").toObject().value("outcome").toObject();
     QCOMPARE(outcome.value("outcome").toString(), QString("cancelled"));
 }
@@ -115,7 +91,7 @@ void TestTilladelsesdialog::ingen_dobbelt_svar()
     AcpClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
-    client.feedBytesForTest(readFixture("fixture_tilladelse.ndjson"));
+    client.feedBytesForTest(testReadFixture("fixture_tilladelse.ndjson"));
     QCOMPARE(client.permissionModel()->requests(), 1);
     QVERIFY(client.answerPermission("allow"));
     QVERIFY(!client.answerPermission("deny"));
@@ -123,7 +99,7 @@ void TestTilladelsesdialog::ingen_dobbelt_svar()
     int responseCount = 0;
     QList<QByteArray> sent = client.sentForTest();
     for (int i = 0; i < sent.size(); ++i) {
-        QJsonObject o = jsonObj(sent.at(i));
+        QJsonObject o = testJsonObj(sent.at(i));
         if (o.contains("id") && o.value("id").toVariant().toLongLong() == 100 && o.contains("result"))
             ++responseCount;
     }

@@ -25,14 +25,7 @@ REGISTER_TEST(TestAgentprocesOgInitialisering)
 
 void TestAgentprocesOgInitialisering::initTestCase()
 {
-    QStandardPaths::setTestModeEnabled(true);
-    QString path = QDir::tempPath() + "/skrynja-tst-settings-agent";
-    QDir().mkpath(path);
-    QSettings::setDefaultFormat(QSettings::IniFormat);
-    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, path);
-    QSettings s;
-    s.clear();
-    s.sync();
+    opretTestSettingsSti("/skrynja-tst-settings-agent");
 }
 
 void TestAgentprocesOgInitialisering::standard_agentsti_er_vibe_acp()

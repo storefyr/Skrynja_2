@@ -18,24 +18,15 @@ private slots:
     void suite_omfatter_alle_13_testklasser();
     void faelles_hjaelpere_i_testregistrering_h();
 private:
-    QString repoRoot();
     QJsonObject readManifest();
     QString readTestsPro();
 };
 
 REGISTER_TEST(TestProevesuiteITests)
 
-QString TestProevesuiteITests::repoRoot()
-{
-    QString root = QCoreApplication::applicationDirPath() + "/..";
-    if (!QFileInfo::exists(root + "/realiseringsmanifest_for_funktioner_og_parrede_tests.json"))
-        root = "..";
-    return root;
-}
-
 QJsonObject TestProevesuiteITests::readManifest()
 {
-    QFile f(repoRoot() + "/realiseringsmanifest_for_funktioner_og_parrede_tests.json");
+    QFile f(testRepoRoot() + "/realiseringsmanifest_for_funktioner_og_parrede_tests.json");
     if (!f.open(QIODevice::ReadOnly))
         return QJsonObject();
     return QJsonDocument::fromJson(f.readAll()).object();
@@ -80,7 +71,7 @@ void TestProevesuiteITests::alle_manifest_testfiler_er_i_tests_pro()
             continue;
         QJsonObject pt = fn.value("parret_test").toObject();
         QString testfil = pt.value("testfil").toString();
-        QVERIFY2(QFileInfo::exists(repoRoot() + "/" + testfil), qPrintable(testfil));
+        QVERIFY2(QFileInfo::exists(testRepoRoot() + "/" + testfil), qPrintable(testfil));
         QVERIFY2(testsProContent.contains(QFileInfo(testfil).fileName()),
                  qPrintable("ikke i tests.pro: " + testfil));
     }
@@ -105,7 +96,7 @@ void TestProevesuiteITests::suite_omfatter_alle_13_testklasser()
     for (int i = 0; i < funktioner.size(); ++i) {
         QJsonObject fn = funktioner.at(i).toObject();
         QString testfil = fn.value("parret_test").toObject().value("testfil").toString();
-        if (QFileInfo::exists(repoRoot() + "/" + testfil)) {
+        if (QFileInfo::exists(testRepoRoot() + "/" + testfil)) {
             ++forventet;
             QString klasse = fn.value("parret_test").toObject().value("testklasse").toString();
             QVERIFY2(registrerede.contains(klasse), qPrintable(klasse));
@@ -116,7 +107,7 @@ void TestProevesuiteITests::suite_omfatter_alle_13_testklasser()
 
 void TestProevesuiteITests::faelles_hjaelpere_i_testregistrering_h()
 {
-    QFile f(repoRoot() + "/tests/testregistrering.h");
+    QFile f(testRepoRoot() + "/tests/testregistrering.h");
     QVERIFY(f.open(QIODevice::ReadOnly));
     QString h = QString::fromUtf8(f.readAll());
     QVERIFY(h.contains("opretTestSettingsSti"));
