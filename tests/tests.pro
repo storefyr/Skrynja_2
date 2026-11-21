@@ -24,6 +24,7 @@ SOURCES += \
     tst_oprydning_af_trae.cpp \
     tst_arkitektur_opdeling_protokol.cpp \
     tst_arkitektur_opdeling_session.cpp \
+    tst_arkitektur_opdeling_ui_modeller.cpp \
     ../src/logfil.cpp \
     ../src/acpframereader.cpp \
     ../src/acpbesked.cpp \
