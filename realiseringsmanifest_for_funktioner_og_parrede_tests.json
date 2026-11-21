@@ -117,7 +117,7 @@
       {"id": "ark-6", "type": "arkitektur", "mål_funktion": "værktøjskald_visning", "ordre": "Enten fjern de ubrugte QAbstractListModel-roller fra ConversationModel/ToolCallModel/DiffModel, eller skift QML til at bruge model-rollerne — ikke begge dele.", "parret_test": "tests/tst_vaerktoejskald_visning.cpp + ny slot: qml_bruger_en_eneste_model_mekanisme", "gennemfoert": true}
     ]
   },
-  "succeskriterium": "prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0, samtidig med at alle 22 funktioner (13 oprindelige + 3 ark-1-opdelinger fra PR #10 + 5 ark-2..6-trin fra PR #18 + 1 distributionsartefakt-trin) har passerer: sand og alle parrede tests i tests/ er grønne.",
+  "succeskriterium": "prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0, samtidig med at alle 23 funktioner (13 oprindelige + 3 ark-1-opdelinger fra PR #10 + 5 ark-2..6-trin fra PR #18 + 2 distributionsartefakt-trin) har passerer: sand og alle parrede tests i tests/ er grønne; distributionsartefaktet (.rpm) er desuden bygget som aarch64 mål-byg i Sailfish SDK, installeret på Jolla Phone 2026, og succeskriteriet er målt on-device med exit 0.",
   "strategisk_rækkefølge": [
     "byggesti_og_logfil",
     "acp_rygrad",
@@ -140,7 +140,8 @@
     "arkitektur_diffmodel_uden_transport",
     "arkitektur_en_config_ejer",
     "arkitektur_fjern_ubrugte_roller",
-    "distributionsartefakt_ikoner"
+    "distributionsartefakt_ikoner",
+    "distributionsartefakt_rpm"
   ],
   "funktioner": [
     {
@@ -1098,6 +1099,60 @@
         }
       ],
       "passerer": true
+    },
+    {
+      "id": "distributionsartefakt_rpm",
+      "navn": "Distributionsartefakt: mål-byg, .rpm og on-device succeskriterium",
+      "beskrivelse": "Byg distributionsartefaktet som mål-byg: aarch64/Qt 5.6 i Sailfish SDK (sfdk/mb2 med harbour-skrynja-2.yaml, eller rpmbuild med rpm/harbour-skrynja-2.spec + Source0-tarball) → harbour-skrynja-2-<version>.aarch64.rpm; installér på Jolla Phone 2026; kør succeskriteriet on-device (prompt sendt → tilladelse spurgt → besvaret → fil skrevet → end_turn → exit 0). Resultatet er det målbare grundlag for Slutbrugeranvendelighedssonderingsstokastikerens vurderings-JSON'er. Kan ikke bygges i sandbox (ingen sfdk/rpmbuild/qmake, host x86_64) — mål-byg hører til SDK mål-miljøet. Strategisk begrundelse: anbefalet af Strategistokastikeren 2026-11-21 (plan-revision af projektbeskrivelse.adoc ligger hos Strategistokastikeren).",
+      "filer": [
+        "rpm/harbour-skrynja-2.spec",
+        "harbour-skrynja-2.yaml",
+        "harbour-skrynja-2.pro",
+        "tests/tst_byggesti_og_logfil.cpp"
+      ],
+      "parret_test": {
+        "testfil": "tests/tst_byggesti_og_logfil.cpp",
+        "testklasse": "TestByggestiOgLogfil",
+        "testslots": [
+          "spec_og_yaml_er_konsistente_med_pro",
+          "ingen_rpm_eller_log_i_depotet"
+        ],
+        "fixtures": [],
+        "bemærkning": "Nye host-slots i den eksisterende parrede testfil (prøve før kilde); mål-byg/on-device trin dækkes af verifikations_trin i SDK-miljøet"
+      },
+      "verifikations_trin": [
+        {
+          "trin": "Host: packaging-konsistens via nye parrede slots",
+          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "forventet_uddata": "ALL TESTS PASSED (inkl. TestByggestiOgLogfil::spec_og_yaml_er_konsistente_med_pro og ::ingen_rpm_eller_log_i_depotet)"
+        },
+        {
+          "trin": "Manifest-tjek grøn",
+          "kommando": "python3 tjek_manifest_parrede_tests.py",
+          "forventet_uddata": "rækkefølge ok; exit 0"
+        },
+        {
+          "trin": "Mål-byg i Sailfish SDK producerer aarch64-RPM (mål-miljø)",
+          "kommando": "sfdk build (mb2, harbour-skrynja-2.yaml) — eller rpmbuild -ba rpm/harbour-skrynja-2.spec",
+          "forventet_uddata": "rc=0; harbour-skrynja-2-1.0.0-1.aarch64.rpm bygget; indhold er ELF AArch64"
+        },
+        {
+          "trin": "RPM-indhold dækker binær, desktop, qml og 4 ikoner",
+          "kommando": "rpm -qpl harbour-skrynja-2-1.0.0-1.aarch64.rpm",
+          "forventet_uddata": "/usr/bin/harbour-skrynja-2, /usr/share/applications/harbour-skrynja-2.desktop, /usr/share/harbour-skrynja-2/qml/..., 4 ikoner under /usr/share/icons/hicolor/*/apps/"
+        },
+        {
+          "trin": "Install på Jolla Phone 2026 og app vises med ikon (mål-miljø)",
+          "kommando": "pkcon install-local harbour-skrynja-2-1.0.0-1.aarch64.rpm (på enheden)",
+          "forventet_uddata": "installation ok; Skrynja 2 i launcher med ikon"
+        },
+        {
+          "trin": "Succeskriterium målt on-device",
+          "kommando": "kør appen på enheden med --selvtest (prompt → tilladelse spurgt → besvaret → fil skrevet → end_turn); echo $?",
+          "forventet_uddata": "exit=0; verdict {\"resultat\":\"pass\"}; ingen hemmeligheder eller transskripter i rpm eller logfil"
+        }
+      ],
+      "passerer": false
     }
   ]
 }
