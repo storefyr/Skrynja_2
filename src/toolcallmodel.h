@@ -1,13 +1,13 @@
 #ifndef TOOLCALLMODEL_H
 #define TOOLCALLMODEL_H
 
-#include <QAbstractListModel>
+#include <QObject>
 #include <QList>
 #include <QString>
 #include <QVariantList>
 #include <QVariantMap>
 
-class ToolCallModel : public QAbstractListModel
+class ToolCallModel : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QVariantList toolCalls READ toolCalls NOTIFY changed)
@@ -21,9 +21,6 @@ public:
     QVariantList toolCalls() const;
     QVariantMap find(const QString& toolCallId) const;
     int count() const;
-
-    int rowCount(const QModelIndex& parent = QModelIndex()) const;
-    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
 signals:
     void changed();

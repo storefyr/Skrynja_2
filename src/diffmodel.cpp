@@ -3,7 +3,7 @@
 #include "acpprotokol.h"
 
 DiffModel::DiffModel(QObject* parent)
-    : QAbstractListModel(parent)
+    : QObject(parent)
 {
 }
 
@@ -18,9 +18,7 @@ void DiffModel::addDiff(const QString& path, const QString& diffText)
             lines[i] = lines.at(i).left(cap);
     }
     d.lines = lines;
-    beginInsertRows(QModelIndex(), m_diffs.size(), m_diffs.size());
     m_diffs.append(d);
-    endInsertRows();
     emit changed();
 }
 
@@ -59,22 +57,4 @@ int DiffModel::diffCount() const
 int DiffModel::outputCount() const
 {
     return m_outputs.size();
-}
-
-int DiffModel::rowCount(const QModelIndex& parent) const
-{
-    if (parent.isValid())
-        return 0;
-    return m_diffs.size();
-}
-
-QVariant DiffModel::data(const QModelIndex& index, int role) const
-{
-    if (!index.isValid() || index.row() < 0 || index.row() >= m_diffs.size())
-        return QVariant();
-    if (role == Qt::DisplayRole)
-        return m_diffs.at(index.row()).path;
-    if (role == Qt::UserRole + 1)
-        return m_diffs.at(index.row()).lines.join("\n");
-    return QVariant();
 }

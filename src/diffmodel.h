@@ -1,14 +1,14 @@
 #ifndef DIFFMODEL_H
 #define DIFFMODEL_H
 
-#include <QAbstractListModel>
+#include <QObject>
 #include <QList>
 #include <QString>
 #include <QStringList>
 #include <QVariantList>
 #include <QVariantMap>
 
-class DiffModel : public QAbstractListModel
+class DiffModel : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QVariantList diffs READ diffs NOTIFY changed)
@@ -23,9 +23,6 @@ public:
     QVariantList outputs() const;
     int diffCount() const;
     int outputCount() const;
-
-    int rowCount(const QModelIndex& parent = QModelIndex()) const;
-    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
 signals:
     void changed();

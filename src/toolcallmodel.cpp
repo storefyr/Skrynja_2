@@ -1,7 +1,7 @@
 #include "toolcallmodel.h"
 
 ToolCallModel::ToolCallModel(QObject* parent)
-    : QAbstractListModel(parent)
+    : QObject(parent)
 {
 }
 
@@ -12,9 +12,7 @@ void ToolCallModel::addToolCall(const QString& toolCallId, const QString& title,
     k.title = title;
     k.status = status.isEmpty() ? QString("pending") : status;
     k.set = false;
-    beginInsertRows(QModelIndex(), m_calls.size(), m_calls.size());
     m_calls.append(k);
-    endInsertRows();
     emit changed();
 }
 
@@ -26,8 +24,6 @@ void ToolCallModel::updateToolCall(const QString& toolCallId, const QString& sta
                 m_calls[i].status = status;
             if (!title.isEmpty())
                 m_calls[i].title = title;
-            QModelIndex idx = index(i);
-            emit dataChanged(idx, idx);
             emit changed();
             return;
         }
@@ -41,8 +37,6 @@ bool ToolCallModel::acknowledge(const QString& toolCallId)
             if (m_calls.at(i).set)
                 return false;
             m_calls[i].set = true;
-            QModelIndex idx = index(i);
-            emit dataChanged(idx, idx);
             emit changed();
             return true;
         }
@@ -80,25 +74,4 @@ QVariantMap ToolCallModel::find(const QString& toolCallId) const
 int ToolCallModel::count() const
 {
     return m_calls.size();
-}
-
-int ToolCallModel::rowCount(const QModelIndex& parent) const
-{
-    if (parent.isValid())
-        return 0;
-    return m_calls.size();
-}
-
-QVariant ToolCallModel::data(const QModelIndex& index, int role) const
-{
-    if (!index.isValid() || index.row() < 0 || index.row() >= m_calls.size())
-        return QVariant();
-    const Call& k = m_calls.at(index.row());
-    if (role == Qt::DisplayRole)
-        return k.title + " (" + k.status + ")";
-    if (role == Qt::UserRole + 1)
-        return k.toolCallId;
-    if (role == Qt::UserRole + 2)
-        return k.status;
-    return QVariant();
 }

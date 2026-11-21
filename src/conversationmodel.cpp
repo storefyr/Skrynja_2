@@ -1,7 +1,7 @@
 #include "conversationmodel.h"
 
 ConversationModel::ConversationModel(QObject* parent)
-    : QAbstractListModel(parent)
+    : QObject(parent)
     , m_round(0)
     , m_status("klar")
 {
@@ -9,9 +9,6 @@ ConversationModel::ConversationModel(QObject* parent)
 
 void ConversationModel::addChunk(const QString& text)
 {
-    beginInsertRows(QModelIndex(), m_lines.size(), m_lines.size());
-    m_lines.append(text);
-    endInsertRows();
     m_lastText += text;
     emit changed();
 }
@@ -43,20 +40,4 @@ int ConversationModel::round() const
 QString ConversationModel::status() const
 {
     return m_status;
-}
-
-int ConversationModel::rowCount(const QModelIndex& parent) const
-{
-    if (parent.isValid())
-        return 0;
-    return m_lines.size();
-}
-
-QVariant ConversationModel::data(const QModelIndex& index, int role) const
-{
-    if (!index.isValid() || index.row() < 0 || index.row() >= m_lines.size())
-        return QVariant();
-    if (role == TextRole || role == Qt::DisplayRole)
-        return m_lines.at(index.row());
-    return QVariant();
 }
