@@ -106,7 +106,7 @@ void TestSelvtestMedVerdict::verdict_pass_ved_end_turn_og_exit_0()
     QCOMPARE(finished.count(), 1);
     QCOMPARE(finished.at(0).at(0).toInt(), 0);
     QVERIFY(selfTest.verdictWritten());
-    QCOMPARE(selfTest.verdict().value("result").toString(), QString("pass"));
+    QCOMPARE(selfTest.verdict().value("resultat").toString(), QString("pass"));
 }
 
 void TestSelvtestMedVerdict::verdict_fail_uden_toolcall()
@@ -121,7 +121,7 @@ void TestSelvtestMedVerdict::verdict_fail_uden_toolcall()
     client.feedBytesForTest(readFixture("fixture_end_turn.ndjson"));
     QCOMPARE(finished.count(), 1);
     QCOMPARE(finished.at(0).at(0).toInt(), 1);
-    QCOMPARE(selfTest.verdict().value("result").toString(), QString("fail"));
+    QCOMPARE(selfTest.verdict().value("resultat").toString(), QString("fail"));
 }
 
 void TestSelvtestMedVerdict::ingen_dobbelt_verdict()
@@ -159,7 +159,7 @@ void TestSelvtestMedVerdict::verdict_ved_agentdoed()
     client.simulateAgentDeathForTest(1);
     QCOMPARE(finished.count(), 1);
     QCOMPARE(finished.at(0).at(0).toInt(), 1);
-    QCOMPARE(selfTest.verdict().value("result").toString(), QString("fail"));
+    QCOMPARE(selfTest.verdict().value("resultat").toString(), QString("fail"));
     QVERIFY(selfTest.verdict().value("årsag").toString().contains("agentdød"));
 }
 
@@ -177,7 +177,7 @@ void TestSelvtestMedVerdict::verdict_ved_startfejl()
     QCOMPARE(finished.count(), 1);
     QCOMPARE(finished.at(0).at(0).toInt(), 1);
     QVERIFY(selfTest.verdictWritten());
-    QCOMPARE(selfTest.verdict().value("result").toString(), QString("fail"));
+    QCOMPARE(selfTest.verdict().value("resultat").toString(), QString("fail"));
     s.remove("agent/sti");
     s.sync();
 }
@@ -199,10 +199,10 @@ void TestSelvtestMedVerdict::verdict_fil_skrives_og_laeses_tilbage()
     QVERIFY(f.open(QIODevice::ReadOnly));
     QJsonObject fromFile = QJsonDocument::fromJson(f.readAll()).object();
     f.close();
-    QCOMPARE(fromFile.value("result").toString(), QString("pass"));
+    QCOMPARE(fromFile.value("resultat").toString(), QString("pass"));
     QVERIFY(fromFile.contains("årsag"));
     QVERIFY(fromFile.contains("tidsstempel"));
-    QCOMPARE(selfTest.verdict().value("result").toString(), fromFile.value("result").toString());
+    QCOMPARE(selfTest.verdict().value("resultat").toString(), fromFile.value("resultat").toString());
 }
 
 #include "tst_selvtest_med_verdict.moc"

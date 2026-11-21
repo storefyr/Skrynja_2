@@ -122,7 +122,7 @@ void SelfTest::writeVerdict(bool pass, const QString& reason)
         return;
     m_verdictWritten = true;
     QJsonObject o;
-    o.insert("result", pass ? QString("pass") : QString("fail"));
+    o.insert("resultat", pass ? QString("pass") : QString("fail"));
     o.insert("årsag", reason);
     o.insert("tidsstempel", QDateTime::currentDateTime().toString(Qt::ISODate));
     QDir().mkpath(QFileInfo(m_verdictPath).absolutePath());
