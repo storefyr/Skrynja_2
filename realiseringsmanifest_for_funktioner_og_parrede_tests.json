@@ -774,7 +774,7 @@
           "forventet_uddata": "0 fejl; binær er ELF AArch64"
         }
       ],
-      "passerer": false
+      "passerer": true
     }
   ]
 }
