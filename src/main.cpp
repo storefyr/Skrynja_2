@@ -79,14 +79,21 @@ int main(int argc, char *argv[])
     if (!QFileInfo::exists(qmlPath))
         qmlPath = "qml/harbour-skrynja-2.qml";
 
-    if (!QFileInfo::exists(qmlPath))
-        return 0;
+    if (!QFileInfo::exists(qmlPath)) {
+        qWarning("QML-fil ikke fundet: %s", qPrintable(qmlPath));
+        LogFile::instance()->writeLine("fejl: QML-fil mangler: " + qmlPath);
+        return 2;
+    }
 
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("acp", &client);
     engine.load(QUrl::fromLocalFile(qmlPath));
     if (engine.rootObjects().isEmpty())
         return 1;
-    client.startAgent();
+    if (!client.startAgent()) {
+        qWarning("agent kunne ikke startes: %s", qPrintable(client.lastError()));
+        LogFile::instance()->writeLine("fejl: startAgent fejlede: " + client.lastError());
+        return 3;
+    }
     return app.exec();
 }
