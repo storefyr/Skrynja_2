@@ -23,6 +23,7 @@ SOURCES += \
     tst_proevesuite_i_tests.cpp \
     tst_oprydning_af_trae.cpp \
     tst_arkitektur_opdeling_protokol.cpp \
+    tst_arkitektur_opdeling_session.cpp \
     ../src/logfil.cpp \
     ../src/acpframereader.cpp \
     ../src/acpbesked.cpp \
