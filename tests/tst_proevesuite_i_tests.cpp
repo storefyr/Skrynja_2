@@ -21,6 +21,7 @@ private slots:
     void faelles_hjaelpere_i_testregistrering_h();
     void ingen_dublerede_slots_paa_tvaers();
     void ingen_global_settings_mutation_i_tests();
+    void meta_test_afledt_af_manifest_ikke_hardkodet();
 private:
     QJsonObject readManifest();
     QString readTestsPro();
@@ -193,9 +194,12 @@ void TestProevesuiteITests::meta_test_afledt_af_manifest_ikke_hardkodet()
 {
     QString kilde = testReadSource("tests/tst_proevesuite_i_tests.cpp");
     QVERIFY(!kilde.isEmpty());
-    QVERIFY2(!kilde.contains("size(), 13)"), "hårdkodet 13 i meta-test");
-    QVERIFY2(!kilde.contains("size(), 16)"), "hårdkodet 16 i meta-test");
-    QVERIFY2(kilde.contains("strategisk_r"), "meta-test aflæser ikke manifestets rækkefølge");
+    int pos = kilde.indexOf("meta_test_afledt_af_manifest_ikke_hardkodet()\n{");
+    QVERIFY(pos >= 0);
+    QString udenEgenSlot = kilde.left(pos);
+    QVERIFY2(!udenEgenSlot.contains("size(), 13)"), "haardkodet funktionsantal 13 i meta-test");
+    QVERIFY2(!udenEgenSlot.contains("size(), 16)"), "haardkodet funktionsantal 16 i meta-test");
+    QVERIFY2(kilde.contains("strategisk_r"), "meta-test aflaeser ikke manifestets raekkefoelge");
 }
 
 #include "tst_proevesuite_i_tests.moc"

@@ -29,6 +29,7 @@ private slots:
     void lineDropped_logges_i_produktion();
     void haleReady_logges_i_produktion();
     void afskaaren_hale_logges();
+    void besked_id_korrelation_mod_fixture_wireformat();
 private:
     QString logFil(const QString& navn);
 };
@@ -234,6 +235,30 @@ void TestAcpRygrad::afskaaren_hale_logges()
     client.feedBytesForTest("{\"foo\":1}\n");
     QString log = readAll(path);
     QVERIFY2(log.contains("kasseret hale"), qPrintable(log));
+}
+
+void TestAcpRygrad::besked_id_korrelation_mod_fixture_wireformat()
+{
+    QByteArray data = testReadFixture("fixture_rygrad.ndjson");
+    QVERIFY(!data.isEmpty());
+    QList<QByteArray> linjer = data.split('\n');
+    int talt = 0;
+    for (int i = 0; i < linjer.size(); ++i) {
+        if (linjer.at(i).trimmed().isEmpty())
+            continue;
+        QJsonObject wire = QJsonDocument::fromJson(linjer.at(i)).object();
+        bool ok = false;
+        AcpMessage besked = AcpMessage::fraJson(linjer.at(i), &ok);
+        QVERIFY(ok);
+        if (wire.contains("id")) {
+            QVERIFY(besked.hasId());
+            QCOMPARE(besked.id(), wire.value("id").toVariant().toLongLong());
+        }
+        if (wire.contains("method"))
+            QCOMPARE(besked.method(), wire.value("method").toString());
+        ++talt;
+    }
+    QCOMPARE(talt, 5);
 }
 
 #include "tst_acp_rygrad.moc"

@@ -91,8 +91,10 @@ void TestDiffOgUddata::diff_test_paastaaer_kun_diff()
     QString kilde = testReadSource("tests/tst_diff_og_uddata.cpp");
     int pos = kilde.indexOf("TestDiffOgUddata::diff_vises_mens_det_sker");
     QVERIFY(pos >= 0);
-    QString kroppen = kilde.mid(pos, kilde.indexOf("\n}\n", pos));
-    QVERIFY2(!kroppen.contains("conversationStatus"), "diff-test påstår stadig conversationStatus");
+    int slut = kilde.indexOf("TestDiffOgUddata::diff_test_paastaaer_kun_diff", pos);
+    QVERIFY(slut > pos);
+    QString kroppen = kilde.mid(pos, slut - pos);
+    QVERIFY2(!kroppen.contains("conversationModel"), "diff-test paastaaer stadig samtale-status");
 }
 
 #include "tst_diff_og_uddata.moc"
