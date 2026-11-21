@@ -264,7 +264,7 @@ Denne plan fastlægger 23 funktioner i følgende rækkefølge (svarende til mani
 
 *Verifikation af ark-2..6-trinnene:* hvert trin uden ny funktionalitet; `python3 tjek_manifest_parrede_tests.py` grøn før og efter (senest på `main` @ `45e339e`: exit 0, 23/23 parrede tests), host-test grøn, aarch64/Qt 5.6 mål-byg med 0 fejl. Trinnene er registreret i manifestet som funktion 17–21 — eksisterende verifikations_trin blev ikke fjernet jf. redigeringsreglen.
 
-== Distributionsartefakt — mål-byg, .rpm og on-device succeskriterium (funktion 22–23)
+== Distributionsartefakt — mål-byg, .rpm og succeskriterium på enheden (funktion 22–23)
 
 Strategisk begrundelse (spørgsmål fra orkestratoren, besvaret 2026-11-21): Ja, der skal være et bygget .rpm. Distributionsartefaktet (RPM) er en del af visionen — det er Realiseringsstokastikerens artefakt — og Slutbrugeranvendelighedssonderingsstokastikeren kan kun vurdere overskuelighed, intuitivitet, kohærens og ansvarlighed på den kørende app på mål-enheden, ikke på host-tests eller ved kodelæsning. Projektstokastikeren har registreret det som funktion 22–23 i manifestet (PR #28).
 
@@ -272,29 +272,29 @@ Strategisk begrundelse (spørgsmål fra orkestratoren, besvaret 2026-11-21): Ja,
 * `distributionsartefakt_rpm` (funktion 23, `passerer: false` indtil mål-byg køres) — leveringskæden i den virkelige verden (verdensbillede fra orkestratoren 2026-11-21: mål-enheden er din eneste enhed, Jolla Phone 2026; du skriver via Vibe-appen; stokastikerne kører i hver deres sandkasse):
   . Mål-byg i en stokastiker-sandkasse med Sailfish SDK: aarch64/Qt 5.6 via `sfdk`/mb2 (`harbour-skrynja-2.yaml`) eller `rpmbuild` med `rpm/harbour-skrynja-2.spec` → `harbour-skrynja-2-1.0.0-1.aarch64.rpm`.
   . Udgiv .rpm som **GitHub Release**-asset på `storefyr/Skrynja_2` — som i tidligere Skrynja-forsøg anskaffes .rpm fra kildekodelageret på github.com. Release-assets ligger uden for git-træet, så reglen `ingen_rpm_eller_log_i_depotet` (ingen `*.rpm`/`*.log` i depotet) stadig overholdes.
-  . Download .rpm på Jolla Phone 2026 fra github.com → `rpm -qpl`-tjek (binær, `.desktop`, QML, 4 ikoner) → `pkcon install-local` på telefonen.
-  . On-device succeskriterium efter install: prompt → tilladelse → besvaret → fil skrevet → end_turn → exit 0. Resultatet er det målbare grundlag for slutbruger-vurderings-JSON'erne.
+  . Hent .rpm på Jolla Phone 2026 fra github.com → `rpm -qpl`-tjek (binær, `.desktop`, QML, 4 ikoner) → `pkcon install-local` på telefonen.
+  . Succeskriterium på enheden efter install: prompt → tilladelse → besvaret → fil skrevet → end_turn → exit 0. Resultatet er det målbare grundlag for slutbruger-vurderings-JSON'erne.
 
 *Begrænsning:* denne sandkasse kan ikke bygge RPM (ingen sfdk/rpmbuild/qmake, host x86_64) — mål-bygget kører i en sandkasse med Sailfish SDK, ikke hos dig og ikke i dette miljø; host-suiten (QtTest) dækker fortsat kodekvalitet her.
 
 *Parret test:* nye host-slots `spec_og_yaml_er_konsistente_med_pro` og `ingen_rpm_eller_log_i_depotet` i `tests/tst_byggesti_og_logfil.cpp` (prøve før kilde; ingen .rpm eller logfil må nogensinde ligge i depotet).
 
-*Verifikation:* `python3 tjek_manifest_parrede_tests.py` exit 0; host `ALL TESTS PASSED`; mål-byg rc=0 med 0 fejl; `rpm -qpl` viser forventet indhold; on-device exit 0.
+*Verifikation:* `python3 tjek_manifest_parrede_tests.py` exit 0; vært `ALL TESTS PASSED`; mål-byg rc=0 med 0 fejl; `rpm -qpl` viser forventet indhold; exit 0 på enheden.
 
-== Udviklingsloop og hastighed (host-loop vs. device-loop)
+== Udviklingsløkke og hastighed (værtsløkke vs. enhedsløkke)
 
-Verdensbillede (orkestratoren 2026-11-21): mål-enheden er Jolla Phone 2026 (Sailfish OS), brugeren skriver via Vibe-appen, og hver stokastiker arbejder i sin egen sandkasse. Udviklingshastigheden højnes ved at køre to adskilte loops i stedet for én lang kæde pr. ændring:
+Verdensbillede (orkestratoren 2026-11-21): mål-enheden er Jolla Phone 2026 (Sailfish OS), brugeren skriver via Vibe-appen, og hver stokastiker arbejder i sin egen sandkasse. Udviklingshastigheden højnes ved at køre to adskilte løkker i stedet for én lang kæde pr. ændring:
 
-*Host-loop (hurtigt, pr. ændring, i sandkassen med værktøjskæden):* rediger kildekode → host-byg (`qmake && make`) → QtTest i `tests/` → qemu-aarch64 kørsel af tests (vist virker, jf. commit `b163e78`) → `python3 tjek_manifest_parrede_tests.py` → Projektstokastikeren flipper `passerer` efter måling. Hele loopet tager minutter og fanger de fleste fejl, før telefonen ser koden.
+*Værtsløkke (hurtig, pr. ændring, i sandkassen med værktøjskæden):* rediger kildekode → værtsbyg (`qmake && make`) → QtTest i `tests/` → qemu-aarch64 kørsel af tests (vist virker, jf. commit `b163e78`) → `python3 tjek_manifest_parrede_tests.py` → Projektstokastikeren flipper `passerer` efter måling. Hele løkken tager minutter og fanger de fleste fejl, før telefonen ser koden.
 
-*Device-loop (langsomt, kun som release-gate ved milepæle):* mål-byg aarch64/Qt 5.6 i sandkasse med Sailfish SDK → `.rpm` → GitHub Release på `storefyr/Skrynja_2` → download på Jolla Phone 2026 → `rpm -qpl`-tjek → `pkcon install-local` → on-device verifikation. Funktionen 23's on-device-del er dette gate, ikke en del af hver udviklingscyklus.
+*Enhedsløkke (langsom, kun som udgivelsesport ved milepæle):* mål-byg aarch64/Qt 5.6 i sandkasse med Sailfish SDK → `.rpm` → GitHub Release på `storefyr/Skrynja_2` → hentning på Jolla Phone 2026 → `rpm -qpl`-tjek → `pkcon install-local` → verifikation på enheden. Funktionen 23's enheds-del er denne udgivelsesport, ikke en del af hver udviklingscyklus.
 
-*Automatisering af device-loop:* on-device køres succeskriteriet via appens eget `--selvtest` (funktion 11, verdict-JSON + exit-kode) i stedet for manuel gennemkørsel; mål-byg og `gh release create`/upload køres i samme automatiserede kørsel, så intet manuelt trin står mellem byg og download.
+*Automatisering af enhedsløkken:* på enheden køres succeskriteriet via appens eget `--selvtest` (funktion 11, resultats-JSON + exit-kode) i stedet for manuel gennemkørsel; mål-byg og `gh release create` (som også lægger .rpm op) køres i samme automatiserede kørsel, så intet manuelt trin står mellem byg og hentning.
 
 *Process:* batch relaterede triage-ordrer (støj/fragilitet) i én PR med flere parrede test-slots; kildesondrings-audit kører pr. milepæl, ikke pr. PR; dokumentationsændringer samles i batched PRs.
 
-*Begrænsning:* denne sandkasse har ingen Qt/Sailfish-værktøjskæde (ingen qmake/sfdk/rpmbuild, x86_64) — host-loop kræver sandkassen med værktøjskæden; her kan kun dokumentation, manifest-checks og audit køres.
+*Begrænsning:* denne sandkasse har ingen Qt/Sailfish-værktøjskæde (ingen qmake/sfdk/rpmbuild, x86_64) — værtsløkken kræver sandkassen med værktøjskæden; her kan kun dokumentation, manifest-checks og audit køres.
 
 == Succeskriterium for økosystemet
 
-Økosystemet betragtes som realiseret, når kæden kører end-to-end på mål-enheden: prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0, samtidig med at alle stokastiker-artefakter (denne beskrivelse, manifestet med alle 23 funktioner `passerer: sand`, de parrede tests og vurderings-JSON'erne) ligger sporbare i kildekodelageret, og distributionsartefaktet (.rpm) desuden er bygget som aarch64 mål-byg i en sandkasse med Sailfish SDK, udgivet som GitHub Release på kildekodelageret, downloadet og installeret på Jolla Phone 2026 og kørt igennem on-device med exit 0.
+Økosystemet betragtes som realiseret, når kæden kører end-to-end på mål-enheden: prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0, samtidig med at alle stokastiker-artefakter (denne beskrivelse, manifestet med alle 23 funktioner `passerer: sand`, de parrede tests og vurderings-JSON'erne) ligger sporbare i kildekodelageret, og distributionsartefaktet (.rpm) desuden er bygget som aarch64 mål-byg i en sandkasse med Sailfish SDK, udgivet som GitHub Release på kildekodelageret, hentet og installeret på Jolla Phone 2026 og kørt igennem på enheden med exit 0.
