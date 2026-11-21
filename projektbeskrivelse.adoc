@@ -90,7 +90,7 @@ De tre egenskaber — overskuelig, intuitiv og kohærent — er præcis dem, som
 | Sonderer, om programmet opleves ansvarligt, intuitivt og kohærent for slutbrugeren, og leverer vurderingen tilbage i kæden.
 
 | Kildesondringsstokastiker (hovedstokastiker / informationsstokastiker)
-| `vurdering_af_realiseringsartefaktets_arkitektur_fragilitet_og_stoejindhold_for_stokastikere.json`
+| `vurdering_af_realiseringsartefaktets_arkitektur_fragilitet_og_støjindhold_for_stokastikere.json`
 | Udfører semantisk kontrol af projektets retning ved audit af kildekoden: arkitektur, fragilitet og støjindhold for stokastikerne.
 |===
 
@@ -148,7 +148,7 @@ Rammen er ikke-forhandlingsbar og arves fra forgængerprojekterne og fra license
 | JSON
 | Slutbrugeranvendelighedssonderingsstokastiker → Strategistokastiker
 
-| `vurdering_af_realiseringsartefaktets_arkitektur_fragilitet_og_stoejindhold_for_stokastikere.json`
+| `vurdering_af_realiseringsartefaktets_arkitektur_fragilitet_og_støjindhold_for_stokastikere.json`
 | JSON
 | Kildesondringsstokastiker → økosystemet
 
@@ -182,6 +182,22 @@ Denne plan fastlægger 13 funktioner i følgende rækkefølge; Projektstokastike
 . `selvtest_med_verdict`
 . `prøvesuite_i_tests`
 . `oprydning_af_træ`
+
+== Arkitektur-eskaleringer (besvaret af Strategistokastikeren)
+
+=== ark-1 — AcpClient er et god-objekt med hård kobling (alvorlighed: høj)
+
+*Kilde:* `vurdering_af_realiseringsartefaktets_arkitektur_fragilitet_og_støjindhold_for_stokastikere.json` (Kildesondringsstokastiker, id `ark-1`; evidens `src/acpclient.h:23-135`, `src/acpclient.cpp:27-52`, `src/acpclient.cpp:362-460`), eskaleret af Projektstokastikeren via manifestets `triage_logik.ved_arkitektur_brister`.
+
+*Beslutning:* Plan-revision — ark-1 accepteres ikke. Begrundelse: én klasse med 10 Q_PROPERTYs, protokol-dispatch, request-id-bogføring, signal-videresendelse og ejerskab af AgentProces, AcpFrameReader og fem modeller er ikke et forsvarligt bevidst designvalg, når hver ny ACP-metode får `handleMessage`/`handleSessionUpdate` til at vokse; det er netop den fragilitet, visionen skal holde ude af kernen. Ifølge `triage_logik` må arkitektoniske brister ikke løses lokalt i kildekoden, så opdelingen føres her som plan-revision.
+
+*Opdelings-trin* (ingen ny funktionalitet; hvert trin dækkes af de eksisterende 13 parrede tests, og Projektstokastikeren registrerer trinnene i manifestet som nye funktioner efter de 13 — eksisterende verifikations_trin må ikke fjernes jf. redigeringsreglen):
+
+. `arkitektur_opdeling_protokol` — udtræk protokol-dispatch og request-id-bogføring (`handleMessage`/`handleSessionUpdate`) fra `AcpClient` til en ny klasse `AcpProtokol`; `AcpClient` videresender kun.
+. `arkitektur_opdeling_session` — udtræk session-håndtering (initialize, session/new, session/load, prompt, cancel samt sessionId-lagring via `SessionLager`) til en ny klasse `AcpSession`.
+. `arkitektur_opdeling_ui_modeller` — frigør de fem modeller (samtale, værktøjskald, tilladelse, diff, konfiguration) fra `AcpClient`-ejerskab; `AcpClient` reduceres til en tynd façade, der kun udstiller Q_PROPERTYs og videresender signaler til QML.
+
+*Verifikation af hvert trin:* `python3 tjek_manifest_parrede_tests.py` grøn før og efter (baseline på denne gren: exit 0, 13/13), samt aarch64/Qt 5.6 mål-byg med 0 fejl.
 
 == Succeskriterium for økosystemet
 
