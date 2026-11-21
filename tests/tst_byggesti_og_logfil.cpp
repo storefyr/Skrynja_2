@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QStandardPaths>
+#include <QDirIterator>
 
 #include "logfile.h"
 #include "testregistrering.h"
@@ -22,6 +23,8 @@ private slots:
     void startAgent_fejl_signaleres();
     void ikoner_findes_i_fire_stoerrelser_og_er_png();
     void ikoner_wired_i_pro_spec_og_yaml();
+    void spec_og_yaml_er_konsistente_med_pro();
+    void ingen_rpm_eller_log_i_depotet();
 private:
     QString readLines(int& count);
     QString m_path;
@@ -196,6 +199,61 @@ void TestByggestiOgLogfil::ikoner_wired_i_pro_spec_og_yaml()
 
     QString desktop = testReadSource("harbour-skrynja-2.desktop");
     QVERIFY2(desktop.contains("Icon=harbour-skrynja-2"), "desktop skal beholde Icon=harbour-skrynja-2");
+}
+
+void TestByggestiOgLogfil::spec_og_yaml_er_konsistente_med_pro()
+{
+    QString pro = testReadSource("harbour-skrynja-2.pro");
+    QString spec = testReadSource("rpm/harbour-skrynja-2.spec");
+    QString yaml = testReadSource("harbour-skrynja-2.yaml");
+    QString desktop = testReadSource("harbour-skrynja-2.desktop");
+    QVERIFY2(!pro.isEmpty() && !spec.isEmpty() && !yaml.isEmpty() && !desktop.isEmpty(), "packaging-fil mangler");
+
+    QRegExp targetRe("TARGET\\s*=\\s*(\\w[\\w-]*)");
+    QVERIFY(targetRe.indexIn(pro) != -1);
+    QString target = targetRe.cap(1);
+
+    QVERIFY2(spec.contains("Name: " + target), "spec Name matcher ikke pro TARGET");
+    QVERIFY2(spec.contains("Source0: %{name}-%{version}.tar.gz"), "spec Source0 følger ikke name-version");
+    QVERIFY2(spec.contains("/usr/bin/" + target), "spec %files mangler binær");
+    QVERIFY2(spec.contains("/usr/share/applications/" + target + ".desktop"), "spec %files mangler desktop");
+    QVERIFY2(spec.contains("/usr/share/" + target + "/qml"), "spec %files mangler qml");
+    QVERIFY2(spec.contains("%{_datadir}/icons/hicolor"), "spec %files mangler ikoner");
+    QVERIFY2(spec.contains("%{name}.png"), "spec %files mangler ikon-glob");
+    QVERIFY2(spec.contains("BuildRequires: qt5-qmake"), "spec mangler qt5-qmake BuildRequires");
+    QVERIFY2(spec.contains("qmake " + target + ".pro"), "spec %build kører ikke qmake på pro-filen");
+
+    QVERIFY2(yaml.contains("Builder: qmake"), "yaml Builder skal være qmake");
+    QVERIFY2(yaml.contains("- " + target + ".desktop"), "yaml Files mangler desktop");
+    QVERIFY2(yaml.contains("- qml"), "yaml Files mangler qml");
+    QVERIFY2(yaml.contains("- icons"), "yaml Files mangler icons");
+
+    QVERIFY2(desktop.contains("Exec=" + target), "desktop Exec matcher ikke target");
+    QVERIFY2(desktop.contains("Icon=" + target), "desktop Icon matcher ikke target");
+
+    const char* stoerrelser[] = {"86x86", "108x108", "128x128", "172x172"};
+    for (int i = 0; i < 4; ++i) {
+        QString s = stoerrelser[i];
+        QVERIFY2(pro.contains("/usr/share/icons/hicolor/" + s + "/apps"),
+                 qPrintable("pro mangler hicolor-path for " + s));
+    }
+}
+
+void TestByggestiOgLogfil::ingen_rpm_eller_log_i_depotet()
+{
+    QString gitignore = testReadSource(".gitignore");
+    QVERIFY2(gitignore.contains("*.rpm"), ".gitignore skal ignorere *.rpm");
+    QVERIFY2(gitignore.contains("*.log"), ".gitignore skal ignorere *.log");
+
+    QStringList forbudte;
+    QDirIterator it(testRepoRoot(), QStringList() << "*.rpm" << "*.log", QDir::Files, QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        QString path = it.next();
+        if (path.contains("/.git/"))
+            continue;
+        forbudte.append(path);
+    }
+    QVERIFY2(forbudte.isEmpty(), qPrintable("build-artefakter i depotet: " + forbudte.join(", ")));
 }
 
 #include "tst_byggesti_og_logfil.moc"
