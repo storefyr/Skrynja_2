@@ -16,6 +16,7 @@ private slots:
     void alle_manifest_testfiler_er_i_tests_pro();
     void ingen_silica_afhaengighed_i_tests_pro();
     void suite_omfatter_alle_13_testklasser();
+    void faelles_hjaelpere_i_testregistrering_h();
 private:
     QString repoRoot();
     QJsonObject readManifest();
@@ -111,6 +112,25 @@ void TestProevesuiteITests::suite_omfatter_alle_13_testklasser()
         }
     }
     QCOMPARE(registrerede.size(), forventet);
+}
+
+void TestProevesuiteITests::faelles_hjaelpere_i_testregistrering_h()
+{
+    QFile f(repoRoot() + "/tests/testregistrering.h");
+    QVERIFY(f.open(QIODevice::ReadOnly));
+    QString h = QString::fromUtf8(f.readAll());
+    QVERIFY(h.contains("opretTestSettingsSti"));
+    QVERIFY(h.contains("testJsonObj"));
+    QVERIFY(h.contains("testIdOf"));
+    QVERIFY(h.contains("testResponseJson"));
+    QVERIFY(h.contains("testErrorResponseJson"));
+    QVERIFY(h.contains("testReadFixture"));
+
+    QJsonObject r = testJsonObj(testResponseJson(7, QJsonObject()));
+    QCOMPARE(testIdOf(testResponseJson(7, QJsonObject())), qint64(7));
+    QCOMPARE(r.value("id").toVariant().toLongLong(), qint64(7));
+    QVERIFY(testErrorResponseJson(8, -1, "x").contains("error"));
+    QVERIFY(!testReadFixture("fixture_rygrad.ndjson").isEmpty());
 }
 
 #include "tst_proevesuite_i_tests.moc"
