@@ -27,16 +27,6 @@ void AgentProcess::setAgentPath(const QString& path)
     settings.sync();
 }
 
-QString AgentProcess::workingDirectory() const
-{
-    return m_workingDirectory;
-}
-
-void AgentProcess::setWorkingDirectory(const QString& folder)
-{
-    m_workingDirectory = folder;
-}
-
 bool AgentProcess::start()
 {
     m_lastError.clear();
@@ -50,8 +40,6 @@ bool AgentProcess::start()
         return true;
     m_process->setProgram(program);
     m_process->setArguments(m_argsForTest);
-    if (!m_workingDirectory.isEmpty())
-        m_process->setWorkingDirectory(m_workingDirectory);
     m_process->start();
     if (!m_process->waitForStarted(3000)) {
         m_lastError = "agent kunne ikke startes: " + program;

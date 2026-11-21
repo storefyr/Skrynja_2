@@ -29,7 +29,6 @@ public:
 
 signals:
     void changed();
-    void roundFinished();
 
 private:
     QStringList m_lines;

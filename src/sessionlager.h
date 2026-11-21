@@ -12,7 +12,6 @@ public:
     void saveSessionId(const QString& id);
     QString sessionId() const;
     bool hasSessionId() const;
-    void clear();
 
 private:
     QSettings m_settings;

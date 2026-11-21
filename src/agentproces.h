@@ -14,8 +14,6 @@ public:
 
     QString agentPath() const;
     void setAgentPath(const QString& path);
-    QString workingDirectory() const;
-    void setWorkingDirectory(const QString& folder);
 
     bool start();
     void stopAgent();
@@ -36,7 +34,6 @@ private slots:
 private:
     QProcess* m_process;
     QString m_lastError;
-    QString m_workingDirectory;
     QString m_programForTest;
     QStringList m_argsForTest;
 };

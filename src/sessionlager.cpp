@@ -20,9 +20,3 @@ bool SessionStore::hasSessionId() const
 {
     return m_settings.contains("session/id");
 }
-
-void SessionStore::clear()
-{
-    m_settings.remove("session/id");
-    m_settings.sync();
-}

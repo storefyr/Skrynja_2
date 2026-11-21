@@ -36,14 +36,6 @@ void PermissionModel::setAnswered()
     emit changed();
 }
 
-void PermissionModel::clear()
-{
-    m_pending.clear();
-    m_isPending = false;
-    m_requestId = 0;
-    emit changed();
-}
-
 QVariantMap PermissionModel::pendingPermission() const
 {
     return m_pending;
@@ -57,11 +49,6 @@ qint64 PermissionModel::requestId() const
 bool PermissionModel::isPending() const
 {
     return m_isPending && !m_answered;
-}
-
-bool PermissionModel::isAnswered() const
-{
-    return m_answered;
 }
 
 int PermissionModel::requests() const

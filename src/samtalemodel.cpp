@@ -28,7 +28,6 @@ void ConversationModel::endRound()
 {
     m_status = "klar";
     emit changed();
-    emit roundFinished();
 }
 
 QString ConversationModel::lastText() const

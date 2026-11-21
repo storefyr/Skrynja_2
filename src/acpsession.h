@@ -27,8 +27,6 @@ public:
     void sendSessionPrompt(const QString& prompt);
     void sessionCancel();
 
-    void resetForTest();
-
 signals:
     void messageOut(const AcpMessage& message);
     void sessionCreated(const QString& sessionId);

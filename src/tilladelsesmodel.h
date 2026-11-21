@@ -14,12 +14,10 @@ public:
 
     void setRequest(qint64 requestId, const QJsonObject& params);
     void setAnswered();
-    void clear();
 
     QVariantMap pendingPermission() const;
     qint64 requestId() const;
     bool isPending() const;
-    bool isAnswered() const;
     int requests() const;
 
 signals:

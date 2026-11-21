@@ -316,15 +316,6 @@ QByteArray AcpClient::lastSentForTest() const
     return m_sendte.last();
 }
 
-void AcpClient::resetForTest()
-{
-    m_sendte.clear();
-    m_protokol->clearPendingRequests();
-    m_session->resetForTest();
-    m_configOptions.clear();
-    m_lastError.clear();
-}
-
 qint64 AcpClient::sendRequest(const QString& method, const QJsonObject& params)
 {
     qint64 id = m_protokol->registerRequest(method);

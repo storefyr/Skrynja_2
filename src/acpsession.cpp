@@ -35,12 +35,6 @@ QString AcpSession::stopReason() const
     return m_stopReason;
 }
 
-void AcpSession::resetForTest()
-{
-    m_sessionId.clear();
-    m_stopReason.clear();
-}
-
 void AcpSession::initialize()
 {
     QJsonObject params;

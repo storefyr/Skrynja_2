@@ -82,7 +82,6 @@ public:
     void simulateAgentDeathForTest(int kode);
     QList<QByteArray> sentForTest() const;
     QByteArray lastSentForTest() const;
-    void resetForTest();
 
 signals:
     void messageSent(const QByteArray& line);
