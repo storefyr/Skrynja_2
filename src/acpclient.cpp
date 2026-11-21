@@ -342,8 +342,8 @@ void AcpClient::write(const QByteArray& line)
         m_sendte.append(line);
     } else if (m_process->process()->isOpen()) {
         m_process->process()->write(line);
+        emit messageSent(line);
     }
-    emit messageSent(line);
 }
 
 void AcpClient::receiveLine(const QByteArray& line)

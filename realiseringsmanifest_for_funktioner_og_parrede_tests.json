@@ -247,13 +247,7 @@
       "parret_test": {
         "testfil": "tests/tst_prompt_og_svar.cpp",
         "testklasse": "TestPromptOgSvar",
-        "testslots": [
-          "session_new_payload_cwd",
-          "prompt_payload_content_blokke",
-          "chunk_akkumuleres_til_lastText",
-          "svar_korreleres_paa_request_id",
-          "end_turn_afslutter_runde"
-        ],
+        "testslots": ["session_new_payload_cwd", "prompt_payload_content_blokke", "chunk_akkumuleres_til_lastText", "svar_korreleres_paa_request_id", "end_turn_afslutter_runde", "messageSent_kun_ved_faktisk_skrevet"],
         "fixtures": [
           "tests/fixtures/fixture_prompt_svar.ndjson"
         ],

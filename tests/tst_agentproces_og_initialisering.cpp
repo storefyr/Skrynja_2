@@ -38,10 +38,8 @@ void TestAgentprocesOgInitialisering::initialize_payload_protocolversion_1()
     AcpClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
-    QSignalSpy sendt(&client, SIGNAL(messageSent(QByteArray)));
     client.sendInitialize();
-    QCOMPARE(sendt.count(), 1);
-    QJsonObject obj = QJsonDocument::fromJson(sendt.at(0).at(0).toByteArray()).object();
+    QJsonObject obj = QJsonDocument::fromJson(client.lastSentForTest()).object();
     QCOMPARE(obj.value("method").toString(), QString("initialize"));
     QCOMPARE(obj.value("params").toObject().value("protocolVersion").toInt(), 1);
 }
@@ -60,10 +58,9 @@ void TestAgentprocesOgInitialisering::initialize_svar_parses_og_giver_config_opt
     AcpClient client;
     injectTestModels(&client, this);
     client.setTestMode(true);
-    QSignalSpy sendt(&client, SIGNAL(messageSent(QByteArray)));
     QSignalSpy klar(&client, SIGNAL(agentReady()));
     client.sendInitialize();
-    qint64 id = QJsonDocument::fromJson(sendt.at(0).at(0).toByteArray()).object().value("id").toVariant().toLongLong();
+    qint64 id = testIdOf(client.lastSentForTest());
     QJsonObject result;
     result.insert("protocolVersion", 1);
     QJsonArray options;

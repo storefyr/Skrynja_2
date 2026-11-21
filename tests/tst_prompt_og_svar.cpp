@@ -19,6 +19,7 @@ private slots:
     void chunk_akkumuleres_til_lastText();
     void svar_korreleres_paa_request_id();
     void end_turn_afslutter_runde();
+    void messageSent_kun_ved_faktisk_skrevet();
 private:
 };
 
@@ -116,6 +117,23 @@ void TestPromptOgSvar::end_turn_afslutter_runde()
     client.feedBytesForTest("{\"jsonrpc\":\"2.0\",\"method\":\"end_turn\",\"params\":{\"sessionId\":\"s1\"}}\n");
     QCOMPARE(afsluttet.count(), 1);
     QCOMPARE(client.conversationModel()->status(), QString("klar"));
+}
+
+void TestPromptOgSvar::messageSent_kun_ved_faktisk_skrevet()
+{
+    AcpClient client;
+    injectTestModels(&client, this);
+    client.setTestMode(true);
+    QSignalSpy sendtSpy(&client, SIGNAL(messageSent(QByteArray)));
+    client.sendSessionNew("/tmp");
+    QCOMPARE(sendtSpy.count(), 0);
+    QVERIFY(!client.lastSentForTest().isEmpty());
+
+    AcpClient lukket;
+    injectTestModels(&lukket, this);
+    QSignalSpy sendtSpy2(&lukket, SIGNAL(messageSent(QByteArray)));
+    lukket.sendSessionNew("/tmp");
+    QCOMPARE(sendtSpy2.count(), 0);
 }
 
 #include "tst_prompt_og_svar.moc"
