@@ -197,7 +197,51 @@ Denne plan fastlægger 13 funktioner i følgende rækkefølge; Projektstokastike
 . `arkitektur_opdeling_session` — udtræk session-håndtering (initialize, session/new, session/load, prompt, cancel samt sessionId-lagring via `SessionLager`) til en ny klasse `AcpSession`.
 . `arkitektur_opdeling_ui_modeller` — frigør de fem modeller (samtale, værktøjskald, tilladelse, diff, konfiguration) fra `AcpClient`-ejerskab; `AcpClient` reduceres til en tynd façade, der kun udstiller Q_PROPERTYs og videresender signaler til QML.
 
-*Verifikation af hvert trin:* `python3 tjek_manifest_parrede_tests.py` grøn før og efter (baseline på denne gren: exit 0, 13/13), samt aarch64/Qt 5.6 mål-byg med 0 fejl.
+*Verifikation af hvert trin:* `python3 tjek_manifest_parrede_tests.py` grøn før og efter, samt aarch64/Qt 5.6 mål-byg med 0 fejl.
+
+*Status:* LUKKET — besvaret via PR #10; opdelings-trinnene gennemført som funktion 14–16 via PR #12–14. På `main` @ `64b3d8e` er manifestet 16/16 `passerer: sand`, host-test kører 136 PASS / 0 FAIL, og `tjek_manifest_parrede_tests.py` giver exit 0.
+
+=== ark-2 — Test-kroge indlejret i produktionsklasserne (alvorlighed: middel)
+
+*Kilde:* vurderings-JSON id `ark-2`, eskaleret i manifestets `triage_af_kildesonderingsvurdering.eskalering_til_strategistokastiker`. Evidens verificeret på `main`: `src/acpclient.h:80-85`, `src/acpframereader.h:20-21`, `src/agentprocess.h:24,37-38`, `src/logfile.cpp:32`.
+
+*Beslutning:* Plan-revision — ark-2 accepteres ikke. Produktionsklasser må ikke koble til test-infrastruktur; adfærd under test må ikke kunne afvige fra drift.
+
+*Trin:* `arkitektur_fjern_testkroge` (funktion 17, mål_funktion `prøvesuite_i_tests`) — flyt alle `*ForTest`-metoder og `m_testMode`-grenen i `write()` ud af `acpclient`, `acpframereader`, `agentprocess` og `logfile` og ind i en separat test-harness under `tests/`. Parret test: ny slot `ingen_testkroge_i_produktionsklasser` i `tests/tst_proevesuite_i_tests.cpp`.
+
+=== ark-3 — Magiske metode-strenge ved svar-korrelation (alvorlighed: middel)
+
+*Kilde:* vurderings-JSON id `ark-3`, eskaleret i manifestet. Audit på `main`: efter ark-1-trin 1 ligger metoderne som navngivne konstanter i `AcpProtokol` (`src/acpprotokol.h:14-20`), men `src/acpsession.cpp:10` har stadig et lokalt `kSessionCancel`-literal.
+
+*Beslutning:* Plan-revision — ark-3 accepteres ikke, før alle metode-strenge ligger ét sted.
+
+*Trin:* `arkitektur_alle_metoder_konstanter` (funktion 18, mål_funktion `acp_rygrad`) — flyt resterende lokale metode-literaler (f.eks. `kSessionCancel` i `acpsession.cpp`) ind i `AcpProtokol`'s konstantsæt, så en omdøbning ét sted ikke kan give stille korrelationsfejl. Parret test: ny slot `alle_metoder_er_konstanter` i `tests/tst_acp_rygrad.cpp`.
+
+=== ark-4 — UI-model afhænger af transport-laget (alvorlighed: middel)
+
+*Kilde:* vurderings-JSON id `ark-4`, eskaleret i manifestet. Evidens verificeret på `main`: `src/diffmodel.cpp:3` inkluderer `acpframereader.h` kun for `standardCap()`.
+
+*Beslutning:* Plan-revision — ark-4 accepteres ikke; afhængighedsretningen skal vendes.
+
+*Trin:* `arkitektur_diffmodel_uden_transport` (funktion 19, mål_funktion `diff_og_uddata`) — fjern `#include "acpframereader.h"` fra `diffmodel`; flyt cap-konstanten til det fælles konstant-header (eller giv den som parameter), så UI-laget ikke kender transport-laget. Parret test: ny slot `diffmodel_uden_acpframereader_include` i `tests/tst_diff_og_uddata.cpp`.
+
+=== ark-5 — QSettings som skjult global tilstand læst i gettere (alvorlighed: lav)
+
+*Kilde:* vurderings-JSON id `ark-5`, eskaleret i manifestet. Evidens verificeret på `main`: `src/agentprocess.cpp:19,25` læser QSettings pr. kald; `src/sessionstore.h:17` har eget QSettings-medlem.
+
+*Beslutning:* Plan-revision — ark-5 accepteres ikke; konfiguration skal have én ejer med change-signaler.
+
+*Trin:* `arkitektur_en_config_ejer` (funktion 20, mål_funktion `konfiguration_af_agent`) — centralisér agentsti og session-id i én konfigurationsklasse med change-signaler; fjern QSettings-læsninger fra spredte gettere. Parret test: ny slot `en_config_ejer_med_signaler` i `tests/tst_konfiguration_af_agent.cpp`.
+
+=== ark-6 — Dobbelt model-lag uden konsument (alvorlighed: lav)
+
+*Kilde:* vurderings-JSON id `ark-6`, eskaleret i manifestet. Audit på `main`: `conversationmodel`, `toolcallmodel` og `diffmodel` arver QAbstractListModel, men hverken QML (kun `modelData` over QVariantList-properties — se `qml/pages/StartSide.qml`, `qml/pages/DiffVisning.qml`) eller `tests/` bruger `data()`/rollerne.
+
+*Beslutning:* Plan-revision — ark-6 accepteres ikke; ét model-lag, ikke to.
+
+*Trin:* `arkitektur_fjern_ubrugte_roller` (funktion 21, mål_funktion `værktøjskald_visning`) — fjern det ubrugte QAbstractListModel-lag fra de tre modeller (rene data-holdere); QML fortsætter uændret med QVariantList-properties. Parret test: ny slot `qml_bruger_en_eneste_model_mekanisme` i `tests/tst_vaerktoejskald_visning.cpp`.
+
+*Verifikation af ark-2..6-trinnene:* hvert trin uden ny funktionalitet; `python3 tjek_manifest_parrede_tests.py` grøn før og efter (baseline på `main` @ `64b3d8e`: exit 0, 16/16), host-test 136 PASS / 0 FAIL bevares, aarch64/Qt 5.6 mål-byg med 0 fejl. Projektstokastikeren registrerer trinnene i manifestet som funktion 17–21 — eksisterende verifikations_trin må ikke fjernes jf. redigeringsreglen.
 
 == Succeskriterium for økosystemet
 
