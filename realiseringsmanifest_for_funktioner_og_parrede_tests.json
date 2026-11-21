@@ -551,7 +551,8 @@
           "verdict_ved_agentdoed",
           "verdict_ved_startfejl",
           "verdict_fil_skrives_og_laeses_tilbage"
-        ],
+        ,
+          "watchdog_udloeser_verdict_fail_ved_haeng"],
         "fixtures": [
           "tests/fixtures/fixture_end_turn.ndjson",
           "tests/fixtures/fixture_tilladelse_og_svar.ndjson"
