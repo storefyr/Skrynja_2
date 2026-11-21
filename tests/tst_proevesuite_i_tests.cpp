@@ -22,6 +22,7 @@ private slots:
     void ingen_dublerede_slots_paa_tvaers();
     void ingen_global_settings_mutation_i_tests();
     void meta_test_afledt_af_manifest_ikke_hardkodet();
+    void ingen_testkroge_i_produktionsklasser();
 private:
     QJsonObject readManifest();
     QString readTestsPro();
@@ -200,6 +201,18 @@ void TestProevesuiteITests::meta_test_afledt_af_manifest_ikke_hardkodet()
     QVERIFY2(!udenEgenSlot.contains("size(), 13)"), "haardkodet funktionsantal 13 i meta-test");
     QVERIFY2(!udenEgenSlot.contains("size(), 16)"), "haardkodet funktionsantal 16 i meta-test");
     QVERIFY2(kilde.contains("strategisk_r"), "meta-test aflaeser ikke manifestets raekkefoelge");
+}
+
+void TestProevesuiteITests::ingen_testkroge_i_produktionsklasser()
+{
+    QDir dir(testRepoRoot() + "/src");
+    QStringList filer = dir.entryList(QStringList() << "*.h" << "*.cpp", QDir::Files);
+    QVERIFY(filer.size() >= 15);
+    for (int i = 0; i < filer.size(); ++i) {
+        QString src = testReadSource("src/" + filer.at(i));
+        QVERIFY2(!src.contains("ForTest"), qPrintable("ForTest-krog i " + filer.at(i)));
+        QVERIFY2(!src.contains("m_testMode"), qPrintable("m_testMode i " + filer.at(i)));
+    }
 }
 
 #include "tst_proevesuite_i_tests.moc"
