@@ -123,12 +123,7 @@
       "parret_test": {
         "testfil": "tests/tst_byggesti_og_logfil.cpp",
         "testklasse": "TestByggestiOgLogfil",
-        "testslots": [
-          "logfil_oprettes_ved_foerste_linje",
-          "logfil_linje_har_iso_tidsstempel",
-          "logfil_appender_uden_at_overskrive",
-          "logfil_roerer_ikke_transskripter"
-        ],
+        "testslots": ["logfil_oprettes_ved_foerste_linje", "logfil_linje_har_iso_tidsstempel", "logfil_appender_uden_at_overskrive", "logfil_roerer_ikke_transskripter", "manglende_qml_giver_ikke_exit_0", "startAgent_fejl_signaleres"],
         "fixtures": [],
         "bemærkning": "QtTest uden Silica (QT += core testlib); prøven indskrives før src/logfil.cpp og registreres i tests/tests.pro"
       },
