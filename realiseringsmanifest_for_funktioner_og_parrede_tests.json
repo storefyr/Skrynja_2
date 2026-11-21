@@ -54,37 +54,38 @@
         "alvorlighed": "høj",
         "titel": "AcpClient er et god-objekt med hård kobling (ejer AgentProcess, AcpFrameReader og fem modeller; 10 Q_PROPERTYs; protokol-dispatch + id-bogføring + signal-videresendelse i én klasse)",
         "beslutning": "Eskaleret til Strategistokastikeren jf. triage_logik: enten accepteres ark-1 med sporbar begrundelse i projektbeskrivelse.adoc, eller planen tilføjer et arkitektur-opdelings-trin (protokol-dispatch, session-håndtering og UI-modeller i hver sin klasse).",
-        "besvarelse": "Besvaret af Strategistokastikeren via PR #10 (draft, commit bac0603, branch vibe/ark-1-opdeling-df693a): plan-revision — ark-1 accepteres ikke. Tre opdelings-trin er registreret i dette manifest som funktion 14-16 (arkitektur_opdeling_protokol, arkitektur_opdeling_session, arkitektur_opdeling_ui_modeller). ark-1 lukkes, når PR #10 er merged, og de tre funktioner har passerer: sand."
+        "besvarelse": "Besvaret af Strategistokastikeren via PR #10 (draft, commit bac0603, branch vibe/ark-1-opdeling-df693a): plan-revision — ark-1 accepteres ikke. Tre opdelings-trin er registreret i dette manifest som funktion 14-16 (arkitektur_opdeling_protokol, arkitektur_opdeling_session, arkitektur_opdeling_ui_modeller). ark-1 lukkes, når PR #10 er merged, og de tre funktioner har passerer: sand.",
+        "status": "LUKKET — gennemført som funktion 14-16 via PR #12-14; på main @ 64b3d8e er alle 16 funktioner passerer: sand (PR #18 markerer ark-1 LUKKET i projektbeskrivelse.adoc)"
       },
       {
         "id": "ark-2",
         "alvorlighed": "medium",
         "titel": "Test-kroge i produktionsklasser (setTestMode/feedBytesForTest/simulateAgentDeathForTest og m_testMode-grenen i AcpClient::write); test-injektion bør ligge i en separat test-harness",
-        "status": "eskaleret til Strategistokastikeren jf. triage_logik.ved_arkitektur_brister — må ikke løses lokalt i kildekoden; afventer plan-revision eller accepteret begrundelse i projektbeskrivelse.adoc"
+        "status": "besvaret af Strategistokastikeren via PR #18 (draft, commit 82100be): plan-revision — accepteres ikke; registreret i dette manifest som ny funktion i 17-21 (se strategisk_rækkefølge); lukkes når PR #18 er merged og den tilhørende funktion har passerer: sand"
       },
       {
         "id": "ark-3",
         "alvorlighed": "medium",
         "titel": "Inline metode-literaler ('initialize', 'session/load', 'session/new', 'end_turn') i stedet for navngivne konstanter",
-        "status": "eskaleret til Strategistokastikeren jf. triage_logik.ved_arkitektur_brister — må ikke løses lokalt i kildekoden; afventer plan-revision eller accepteret begrundelse i projektbeskrivelse.adoc"
+        "status": "besvaret af Strategistokastikeren via PR #18 (draft, commit 82100be): plan-revision — accepteres ikke; registreret i dette manifest som ny funktion i 17-21 (se strategisk_rækkefølge); lukkes når PR #18 er merged og den tilhørende funktion har passerer: sand"
       },
       {
         "id": "ark-4",
         "alvorlighed": "medium",
         "titel": "DiffModel afhænger af transport-laget (AcpFrameReader::standardCap)",
-        "status": "eskaleret til Strategistokastikeren jf. triage_logik.ved_arkitektur_brister — må ikke løses lokalt i kildekoden; afventer plan-revision eller accepteret begrundelse i projektbeskrivelse.adoc"
+        "status": "besvaret af Strategistokastikeren via PR #18 (draft, commit 82100be): plan-revision — accepteres ikke; registreret i dette manifest som ny funktion i 17-21 (se strategisk_rækkefølge); lukkes når PR #18 er merged og den tilhørende funktion har passerer: sand"
       },
       {
         "id": "ark-5",
         "alvorlighed": "medium",
         "titel": "QSettings-læsning spredt over gettere (agentsti, session-id) i stedet for én konfigurationsklasse med change-signaler",
-        "status": "eskaleret til Strategistokastikeren jf. triage_logik.ved_arkitektur_brister — må ikke løses lokalt i kildekoden; afventer plan-revision eller accepteret begrundelse i projektbeskrivelse.adoc"
+        "status": "besvaret af Strategistokastikeren via PR #18 (draft, commit 82100be): plan-revision — accepteres ikke; registreret i dette manifest som ny funktion i 17-21 (se strategisk_rækkefølge); lukkes når PR #18 er merged og den tilhørende funktion har passerer: sand"
       },
       {
         "id": "ark-6",
         "alvorlighed": "medium",
         "titel": "Ubrugte QAbstractListModel-roller i ConversationModel/ToolCallModel/DiffModel samtidig med QML-brug af list-properties",
-        "status": "eskaleret til Strategistokastikeren jf. triage_logik.ved_arkitektur_brister — må ikke løses lokalt i kildekoden; afventer plan-revision eller accepteret begrundelse i projektbeskrivelse.adoc"
+        "status": "besvaret af Strategistokastikeren via PR #18 (draft, commit 82100be): plan-revision — accepteres ikke; registreret i dette manifest som ny funktion i 17-21 (se strategisk_rækkefølge); lukkes når PR #18 er merged og den tilhørende funktion har passerer: sand"
       }
     ],
     "ordrer_til_realiseringsstokastikeren": [
@@ -116,7 +117,7 @@
       {"id": "ark-6", "type": "arkitektur", "mål_funktion": "værktøjskald_visning", "ordre": "Enten fjern de ubrugte QAbstractListModel-roller fra ConversationModel/ToolCallModel/DiffModel, eller skift QML til at bruge model-rollerne — ikke begge dele.", "parret_test": "tests/tst_vaerktoejskald_visning.cpp + ny slot: qml_bruger_en_eneste_model_mekanisme"}
     ]
   },
-  "succeskriterium": "prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0, samtidig med at alle 16 funktioner (13 oprindelige + 3 arkitektur-opdelings-trin fra PR #10) har passerer: sand og alle parrede tests i tests/ er grønne.",
+  "succeskriterium": "prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0, samtidig med at alle 21 funktioner (13 oprindelige + 3 ark-1-opdelinger fra PR #10 + 5 ark-2..6-trin fra PR #18) har passerer: sand og alle parrede tests i tests/ er grønne.",
   "strategisk_rækkefølge": [
     "byggesti_og_logfil",
     "acp_rygrad",
@@ -133,7 +134,12 @@
     "oprydning_af_træ",
     "arkitektur_opdeling_protokol",
     "arkitektur_opdeling_session",
-    "arkitektur_opdeling_ui_modeller"
+    "arkitektur_opdeling_ui_modeller",
+    "arkitektur_fjern_testkroge",
+    "arkitektur_alle_metoder_konstanter",
+    "arkitektur_diffmodel_uden_transport",
+    "arkitektur_en_config_ejer",
+    "arkitektur_fjern_ubrugte_roller"
   ],
   "funktioner": [
     {
@@ -827,6 +833,216 @@
         }
       ],
       "passerer": true
+    },
+    {
+      "id": "arkitektur_fjern_testkroge",
+      "navn": "Arkitektur: fjern test-kroge fra produktion",
+      "beskrivelse": "Flyt alle *ForTest-metoder og m_testMode-grenen i write() ud af acpclient, acpframereader, agentprocess og logfile og ind i en separat test-harness under tests/. Ingen ny funktionalitet — trin fra PR #18 (svar på ark-2).",
+      "filer": [
+        "src/acpclient.h",
+        "src/acpclient.cpp",
+        "src/acpframereader.h",
+        "src/acpframereader.cpp",
+        "src/agentproces.h",
+        "src/agentproces.cpp",
+        "src/logfil.h",
+        "src/logfil.cpp",
+        "tests/testregistrering.h",
+        "tests/tst_proevesuite_i_tests.cpp"
+      ],
+      "parret_test": {
+        "testfil": "tests/tst_proevesuite_i_tests.cpp",
+        "testklasse": "TestProevesuiteITests",
+        "testslots": [
+          "ingen_testkroge_i_produktionsklasser"
+        ],
+        "fixtures": [],
+        "bemærkning": "Ny slot i den eksisterende parrede testfil; prøven opdateres før produktionskoden ændres"
+      },
+      "verifikations_trin": [
+        {
+          "trin": "Host-suite grøn med ny slot; baseline 136 PASS / 0 FAIL bevaret",
+          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "forventet_uddata": "ALL TESTS PASSED (inkl. TestProevesuiteITests::ingen_testkroge_i_produktionsklasser); 136 PASS / 0 FAIL"
+        },
+        {
+          "trin": "Manifest-tjek grøn før og efter",
+          "kommando": "python3 tjek_manifest_parrede_tests.py",
+          "forventet_uddata": "rækkefølge ok; exit 0"
+        },
+        {
+          "trin": "Mål-byg uden fejl",
+          "kommando": "aarch64/Qt 5.6 mål-byg: qmake harbour-skrynja-2.pro && make",
+          "forventet_uddata": "0 fejl; binær er ELF AArch64"
+        }
+      ],
+      "passerer": false
+    },
+    {
+      "id": "arkitektur_alle_metoder_konstanter",
+      "navn": "Arkitektur: alle ACP-metoder som konstanter",
+      "beskrivelse": "Flyt resterende lokale metode-literaler (f.eks. kSessionCancel i acpsession.cpp:10) ind i AcpProtokol's konstantsæt, så en omdøbning ét sted ikke kan give stille korrelationsfejl. Ingen ny funktionalitet — trin fra PR #18 (svar på ark-3).",
+      "filer": [
+        "src/acpprotokol.h",
+        "src/acpprotokol.cpp",
+        "src/acpsession.cpp",
+        "tests/tst_acp_rygrad.cpp"
+      ],
+      "parret_test": {
+        "testfil": "tests/tst_acp_rygrad.cpp",
+        "testklasse": "TestAcpRygrad",
+        "testslots": [
+          "alle_metoder_er_konstanter"
+        ],
+        "fixtures": [
+          "tests/fixtures/fixture_rygrad.ndjson"
+        ],
+        "bemærkning": "Ny slot i den eksisterende parrede testfil"
+      },
+      "verifikations_trin": [
+        {
+          "trin": "Host-suite grøn med ny slot; baseline 136 PASS / 0 FAIL bevaret",
+          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "forventet_uddata": "ALL TESTS PASSED (inkl. TestAcpRygrad::alle_metoder_er_konstanter); 136 PASS / 0 FAIL"
+        },
+        {
+          "trin": "Manifest-tjek grøn før og efter",
+          "kommando": "python3 tjek_manifest_parrede_tests.py",
+          "forventet_uddata": "rækkefølge ok; exit 0"
+        },
+        {
+          "trin": "Mål-byg uden fejl",
+          "kommando": "aarch64/Qt 5.6 mål-byg: qmake harbour-skrynja-2.pro && make",
+          "forventet_uddata": "0 fejl; binær er ELF AArch64"
+        }
+      ],
+      "passerer": false
+    },
+    {
+      "id": "arkitektur_diffmodel_uden_transport",
+      "navn": "Arkitektur: DiffModel uden transport-afhængighed",
+      "beskrivelse": "Fjern #include \"acpframereader.h\" fra diffmodel.cpp:3; flyt cap-konstanten til et fælles konstant-header (eller giv den som parameter), så UI-laget ikke kender transport-laget. Ingen ny funktionalitet — trin fra PR #18 (svar på ark-4).",
+      "filer": [
+        "src/diffmodel.h",
+        "src/diffmodel.cpp",
+        "src/acpprotokol.h",
+        "tests/tst_diff_og_uddata.cpp"
+      ],
+      "parret_test": {
+        "testfil": "tests/tst_diff_og_uddata.cpp",
+        "testklasse": "TestDiffOgUddata",
+        "testslots": [
+          "diffmodel_uden_acpframereader_include"
+        ],
+        "fixtures": [
+          "tests/fixtures/fixture_diff.ndjson"
+        ],
+        "bemærkning": "Ny slot i den eksisterende parrede testfil"
+      },
+      "verifikations_trin": [
+        {
+          "trin": "Host-suite grøn med ny slot; baseline 136 PASS / 0 FAIL bevaret",
+          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "forventet_uddata": "ALL TESTS PASSED (inkl. TestDiffOgUddata::diffmodel_uden_acpframereader_include); 136 PASS / 0 FAIL"
+        },
+        {
+          "trin": "Manifest-tjek grøn før og efter",
+          "kommando": "python3 tjek_manifest_parrede_tests.py",
+          "forventet_uddata": "rækkefølge ok; exit 0"
+        },
+        {
+          "trin": "Mål-byg uden fejl",
+          "kommando": "aarch64/Qt 5.6 mål-byg: qmake harbour-skrynja-2.pro && make",
+          "forventet_uddata": "0 fejl; binær er ELF AArch64"
+        }
+      ],
+      "passerer": false
+    },
+    {
+      "id": "arkitektur_en_config_ejer",
+      "navn": "Arkitektur: én config-ejer med change-signaler",
+      "beskrivelse": "Centralisér agentsti og session-id i én konfigurationsklasse med change-signaler; fjern QSettings-læsninger fra spredte gettere (agentproces.cpp, sessionlager). Ingen ny funktionalitet — trin fra PR #18 (svar på ark-5).",
+      "filer": [
+        "src/konfiguration.h",
+        "src/konfiguration.cpp",
+        "src/agentproces.h",
+        "src/agentproces.cpp",
+        "src/sessionlager.h",
+        "src/sessionlager.cpp",
+        "tests/tst_konfiguration_af_agent.cpp"
+      ],
+      "parret_test": {
+        "testfil": "tests/tst_konfiguration_af_agent.cpp",
+        "testklasse": "TestKonfigurationAfAgent",
+        "testslots": [
+          "en_config_ejer_med_signaler"
+        ],
+        "fixtures": [
+          "tests/fixtures/fixture_initialize_config.ndjson"
+        ],
+        "bemærkning": "Ny slot i den eksisterende parrede testfil; prøven opdateres før produktionskoden ændres"
+      },
+      "verifikations_trin": [
+        {
+          "trin": "Host-suite grøn med ny slot; baseline 136 PASS / 0 FAIL bevaret",
+          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "forventet_uddata": "ALL TESTS PASSED (inkl. TestKonfigurationAfAgent::en_config_ejer_med_signaler); 136 PASS / 0 FAIL"
+        },
+        {
+          "trin": "Manifest-tjek grøn før og efter",
+          "kommando": "python3 tjek_manifest_parrede_tests.py",
+          "forventet_uddata": "rækkefølge ok; exit 0"
+        },
+        {
+          "trin": "Mål-byg uden fejl",
+          "kommando": "aarch64/Qt 5.6 mål-byg: qmake harbour-skrynja-2.pro && make",
+          "forventet_uddata": "0 fejl; binær er ELF AArch64"
+        }
+      ],
+      "passerer": false
+    },
+    {
+      "id": "arkitektur_fjern_ubrugte_roller",
+      "navn": "Arkitektur: fjern ubrugte model-roller",
+      "beskrivelse": "Fjern det ubrugte QAbstractListModel-lag fra samtalemodel, vaerktoejskaldsmodel og diffmodel (rene data-holdere); QML fortsætter uændret med QVariantList-properties. Ingen ny funktionalitet — trin fra PR #18 (svar på ark-6).",
+      "filer": [
+        "src/samtalemodel.h",
+        "src/samtalemodel.cpp",
+        "src/vaerktoejskaldsmodel.h",
+        "src/vaerktoejskaldsmodel.cpp",
+        "src/diffmodel.h",
+        "src/diffmodel.cpp",
+        "tests/tst_vaerktoejskald_visning.cpp"
+      ],
+      "parret_test": {
+        "testfil": "tests/tst_vaerktoejskald_visning.cpp",
+        "testklasse": "TestVaerktoejskaldVisning",
+        "testslots": [
+          "qml_bruger_en_eneste_model_mekanisme"
+        ],
+        "fixtures": [
+          "tests/fixtures/fixture_værktøjskald.ndjson"
+        ],
+        "bemærkning": "Ny slot i den eksisterende parrede testfil"
+      },
+      "verifikations_trin": [
+        {
+          "trin": "Host-suite grøn med ny slot; baseline 136 PASS / 0 FAIL bevaret",
+          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "forventet_uddata": "ALL TESTS PASSED (inkl. TestVaerktoejskaldVisning::qml_bruger_en_eneste_model_mekanisme); 136 PASS / 0 FAIL"
+        },
+        {
+          "trin": "Manifest-tjek grøn før og efter",
+          "kommando": "python3 tjek_manifest_parrede_tests.py",
+          "forventet_uddata": "rækkefølge ok; exit 0"
+        },
+        {
+          "trin": "Mål-byg uden fejl",
+          "kommando": "aarch64/Qt 5.6 mål-byg: qmake harbour-skrynja-2.pro && make",
+          "forventet_uddata": "0 fejl; binær er ELF AArch64"
+        }
+      ],
+      "passerer": false
     }
   ]
 }
