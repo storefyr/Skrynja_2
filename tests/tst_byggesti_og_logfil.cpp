@@ -17,6 +17,7 @@ private slots:
     void logfil_linje_har_iso_tidsstempel();
     void logfil_appender_uden_at_overskrive();
     void logfil_roerer_ikke_transskripter();
+    void src_filnavne_matcher_klassenavne();
 private:
     QString readLines(int& count);
     QString m_path;
@@ -107,6 +108,26 @@ int main(int argc, char** argv)
     else
         qDebug("TESTS FEJLEDE: %d fejlede i %s", failed, qPrintable(navne.join(", ")));
     return failed;
+}
+
+void TestByggestiOgLogfil::src_filnavne_matcher_klassenavne()
+{
+    QDir srcDir(testRepoRoot() + "/src");
+    QStringList filer = srcDir.entryList(QStringList() << "*.h" << "*.cpp", QDir::Files);
+    for (int i = 0; i < filer.size(); ++i)
+        QVERIFY2(filer.at(i) == QString::fromUtf8(filer.at(i).toUtf8()),
+                 qPrintable("ikke-ascii filnavn: " + filer.at(i)));
+
+    const char* forventede[] = {
+        "logfile", "acpframereader", "acpmessage", "agentprocess", "acpprotokol",
+        "acpsession", "acpclient", "conversationmodel", "sessionstore", "toolcallmodel",
+        "permissionmodel", "diffmodel", "configurationmodel", "selftest", "main"
+    };
+    for (int i = 0; i < 15; ++i) {
+        QString base = QString::fromLatin1(forventede[i]);
+        QVERIFY2(QFileInfo::exists(srcDir.filePath(base + ".h")), qPrintable(base + ".h mangler"));
+        QVERIFY2(QFileInfo::exists(srcDir.filePath(base + ".cpp")), qPrintable(base + ".cpp mangler"));
+    }
 }
 
 #include "tst_byggesti_og_logfil.moc"
