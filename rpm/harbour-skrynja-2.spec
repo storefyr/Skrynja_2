@@ -30,3 +30,4 @@ make install INSTALL_ROOT=%{buildroot}
 /usr/bin/harbour-skrynja-2
 /usr/share/applications/harbour-skrynja-2.desktop
 /usr/share/harbour-skrynja-2/qml/
+%{_datadir}/icons/hicolor/*/apps/%{name}.png
