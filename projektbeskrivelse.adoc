@@ -268,9 +268,13 @@ Denne plan fastlægger 23 funktioner i følgende rækkefølge (svarende til mani
 Strategisk begrundelse (spørgsmål fra orkestratoren, besvaret 2026-11-21): Ja, der skal være et bygget .rpm. Distributionsartefaktet (RPM) er en del af visionen — det er Realiseringsstokastikerens artefakt — og Slutbrugeranvendelighedssonderingsstokastikeren kan kun vurdere overskuelighed, intuitivitet, kohærens og ansvarlighed på den kørende app på mål-enheden, ikke på host-tests eller ved kodelæsning. Projektstokastikeren har registreret det som funktion 22–23 i manifestet (PR #28).
 
 * `distributionsartefakt_ikoner` (funktion 22) — app-ikoner i hicolor-stier, wired i `.pro`, spec, yaml og `.desktop`.
-* `distributionsartefakt_rpm` (funktion 23, `passerer: false` indtil mål-byg køres) — aarch64/Qt 5.6 mål-byg i Sailfish SDK (`sfdk`/mb2 med `harbour-skrynja-2.yaml`, eller `rpmbuild` med `rpm/harbour-skrynja-2.spec`) → `harbour-skrynja-2-1.0.0-1.aarch64.rpm` → `rpm -qpl`-tjek (binær, `.desktop`, QML, 4 ikoner) → install på Jolla Phone 2026 → succeskriterium on-device (prompt → tilladelse → besvaret → fil skrevet → end_turn → exit 0). Resultatet er det målbare grundlag for slutbruger-vurderings-JSON'erne.
+* `distributionsartefakt_rpm` (funktion 23, `passerer: false` indtil mål-byg køres) — leveringskæden i den virkelige verden (verdensbillede fra orkestratoren 2026-11-21: mål-enheden er din eneste enhed, Jolla Phone 2026; du skriver via Vibe-appen; stokastikerne kører i hver deres sandkasse):
+  . Mål-byg i en stokastiker-sandkasse med Sailfish SDK: aarch64/Qt 5.6 via `sfdk`/mb2 (`harbour-skrynja-2.yaml`) eller `rpmbuild` med `rpm/harbour-skrynja-2.spec` → `harbour-skrynja-2-1.0.0-1.aarch64.rpm`.
+  . Udgiv .rpm som **GitHub Release**-asset på `storefyr/Skrynja_2` — som i tidligere Skrynja-forsøg anskaffes .rpm fra kildekodelageret på github.com. Release-assets ligger uden for git-træet, så reglen `ingen_rpm_eller_log_i_depotet` (ingen `*.rpm`/`*.log` i depotet) stadig overholdes.
+  . Download .rpm på Jolla Phone 2026 fra github.com → `rpm -qpl`-tjek (binær, `.desktop`, QML, 4 ikoner) → `pkcon install-local` på telefonen.
+  . On-device succeskriterium efter install: prompt → tilladelse → besvaret → fil skrevet → end_turn → exit 0. Resultatet er det målbare grundlag for slutbruger-vurderings-JSON'erne.
 
-*Begrænsning:* sandbox kan ikke bygge RPM (ingen sfdk/rpmbuild/qmake, host x86_64) — mål-byg og on-device-kørsel ligger hos Realiseringsstokastikeren i SDK mål-miljøet; host-suiten (QtTest) dækker fortsat kodekvalitet.
+*Begrænsning:* denne sandkasse kan ikke bygge RPM (ingen sfdk/rpmbuild/qmake, host x86_64) — mål-bygget kører i en sandkasse med Sailfish SDK, ikke hos dig og ikke i dette miljø; host-suiten (QtTest) dækker fortsat kodekvalitet her.
 
 *Parret test:* nye host-slots `spec_og_yaml_er_konsistente_med_pro` og `ingen_rpm_eller_log_i_depotet` i `tests/tst_byggesti_og_logfil.cpp` (prøve før kilde; ingen .rpm eller logfil må nogensinde ligge i depotet).
 
@@ -278,4 +282,4 @@ Strategisk begrundelse (spørgsmål fra orkestratoren, besvaret 2026-11-21): Ja,
 
 == Succeskriterium for økosystemet
 
-Økosystemet betragtes som realiseret, når kæden kører end-to-end på mål-enheden: prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0, samtidig med at alle stokastiker-artefakter (denne beskrivelse, manifestet med alle 23 funktioner `passerer: sand`, de parrede tests og vurderings-JSON'erne) ligger sporbare i kildekodelageret, og distributionsartefaktet (.rpm) desuden er bygget som aarch64 mål-byg i Sailfish SDK og kørt igennem on-device med exit 0.
+Økosystemet betragtes som realiseret, når kæden kører end-to-end på mål-enheden: prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0, samtidig med at alle stokastiker-artefakter (denne beskrivelse, manifestet med alle 23 funktioner `passerer: sand`, de parrede tests og vurderings-JSON'erne) ligger sporbare i kildekodelageret, og distributionsartefaktet (.rpm) desuden er bygget som aarch64 mål-byg i en sandkasse med Sailfish SDK, udgivet som GitHub Release på kildekodelageret, downloadet og installeret på Jolla Phone 2026 og kørt igennem on-device med exit 0.
