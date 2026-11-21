@@ -50,31 +50,29 @@ bool ToolCallModel::acknowledge(const QString& toolCallId)
     return false;
 }
 
+QVariantMap ToolCallModel::projektion(const Call& k) const
+{
+    QVariantMap m;
+    m.insert("toolCallId", k.toolCallId);
+    m.insert("title", k.title);
+    m.insert("status", k.status);
+    m.insert("set", k.set);
+    return m;
+}
+
 QVariantList ToolCallModel::toolCalls() const
 {
     QVariantList list;
-    for (int i = 0; i < m_calls.size(); ++i) {
-        QVariantMap m;
-        m.insert("toolCallId", m_calls.at(i).toolCallId);
-        m.insert("title", m_calls.at(i).title);
-        m.insert("status", m_calls.at(i).status);
-        m.insert("set", m_calls.at(i).set);
-        list.append(m);
-    }
+    for (int i = 0; i < m_calls.size(); ++i)
+        list.append(projektion(m_calls.at(i)));
     return list;
 }
 
 QVariantMap ToolCallModel::find(const QString& toolCallId) const
 {
     for (int i = 0; i < m_calls.size(); ++i) {
-        if (m_calls.at(i).toolCallId == toolCallId) {
-            QVariantMap m;
-            m.insert("toolCallId", m_calls.at(i).toolCallId);
-            m.insert("title", m_calls.at(i).title);
-            m.insert("status", m_calls.at(i).status);
-            m.insert("set", m_calls.at(i).set);
-            return m;
-        }
+        if (m_calls.at(i).toolCallId == toolCallId)
+            return projektion(m_calls.at(i));
     }
     return QVariantMap();
 }

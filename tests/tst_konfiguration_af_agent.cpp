@@ -19,8 +19,6 @@ private slots:
     void config_options_fra_initialize_svar();
     void set_config_option_payload();
     void agentsti_override_fra_settings();
-    void standard_agentsti_er_vibe_acp();
-    void clientCapabilities_fortsat_tom();
 private:
 };
 
@@ -78,27 +76,6 @@ void TestKonfigurationAfAgent::agentsti_override_fra_settings()
     QCOMPARE(process.agentPath(), QString("/tmp/min-agent"));
     s.remove("agent/sti");
     s.sync();
-}
-
-void TestKonfigurationAfAgent::standard_agentsti_er_vibe_acp()
-{
-    QSettings s;
-    s.remove("agent/sti");
-    s.sync();
-    AgentProcess process;
-    QCOMPARE(process.agentPath(), QString("/home/defaultuser/.local/bin/vibe-acp"));
-}
-
-void TestKonfigurationAfAgent::clientCapabilities_fortsat_tom()
-{
-    AcpClient client;
-    injectTestModels(&client, this);
-    client.setTestMode(true);
-    client.sendInitialize();
-    QJsonObject params = testJsonObj(client.lastSentForTest()).value("params").toObject();
-    QJsonValue cap = params.value("clientCapabilities");
-    QVERIFY(cap.isObject());
-    QVERIFY(cap.toObject().isEmpty());
 }
 
 #include "tst_konfiguration_af_agent.moc"

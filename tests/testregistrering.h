@@ -59,7 +59,7 @@ inline void injectTestModels(AcpClient* client, QObject* ejer)
 inline void opretTestSettingsSti(const QString& navn)
 {
     QStandardPaths::setTestModeEnabled(true);
-    QString path = QDir::tempPath() + "/" + navn;
+    QString path = QDir::tempPath() + (navn.startsWith('/') ? navn : "/" + navn);
     QDir().mkpath(path);
     QSettings::setDefaultFormat(QSettings::IniFormat);
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, path);

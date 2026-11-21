@@ -35,6 +35,7 @@ private:
         QString status;
         bool set;
     };
+    QVariantMap projektion(const Call& k) const;
     QList<Call> m_calls;
 };
 
