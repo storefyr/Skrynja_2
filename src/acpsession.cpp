@@ -7,8 +7,6 @@
 #include "acpprotokol.h"
 #include "sessionstore.h"
 
-static const QString kSessionCancel = QLatin1String("session/cancel");
-
 AcpSession::AcpSession(AcpProtokol* protokol, QObject* parent)
     : QObject(parent)
     , m_protokol(protokol)
@@ -87,7 +85,7 @@ void AcpSession::sessionCancel()
 {
     QJsonObject params;
     params.insert("sessionId", m_sessionId);
-    sendNotification(kSessionCancel, params);
+    sendNotification(AcpProtokol::kSessionCancel, params);
 }
 
 qint64 AcpSession::sendRequest(const QString& method, const QJsonObject& params)

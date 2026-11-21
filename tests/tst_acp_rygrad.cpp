@@ -31,6 +31,7 @@ private slots:
     void haleReady_logges_i_produktion();
     void afskaaren_hale_logges();
     void besked_id_korrelation_mod_fixture_wireformat();
+    void alle_metoder_er_konstanter();
 private:
     QString logFil(const QString& navn);
 };
@@ -260,6 +261,45 @@ void TestAcpRygrad::besked_id_korrelation_mod_fixture_wireformat()
         ++talt;
     }
     QCOMPARE(talt, 5);
+}
+
+void TestAcpRygrad::alle_metoder_er_konstanter()
+{
+    QStringList metoder;
+    metoder << "initialize" << "session/new" << "session/load" << "session/prompt"
+            << "session/cancel" << "session/update" << "session/set_config_option"
+            << "session/request_permission" << "end_turn";
+    QString protokol = testReadSource("src/acpprotokol.cpp");
+    QVERIFY(!protokol.isEmpty());
+    QDir srcDir(testRepoRoot() + "/src");
+    QStringList filer = srcDir.entryList(QStringList() << "*.cpp" << "*.h", QDir::Files);
+    for (int m = 0; m < metoder.size(); ++m) {
+        QCOMPARE(protokol.count("\"" + metoder.at(m) + "\""), 1);
+        for (int i = 0; i < filer.size(); ++i) {
+            if (filer.at(i) == "acpprotokol.cpp" || filer.at(i) == "acpprotokol.h")
+                continue;
+            QString src = testReadSource("src/" + filer.at(i));
+            QVERIFY2(!src.contains("\"" + metoder.at(m) + "\""),
+                     qPrintable("metode-literal uden for AcpProtokol i " + filer.at(i) + ": " + metoder.at(m)));
+        }
+    }
+
+    QStringList kendte;
+    kendte << AcpProtokol::kInitialize << AcpProtokol::kSessionNew << AcpProtokol::kSessionLoad
+           << AcpProtokol::kSessionPrompt << AcpProtokol::kSessionCancel << AcpProtokol::kSessionUpdate
+           << AcpProtokol::kSetConfigOption << AcpProtokol::kRequestPermission << AcpProtokol::kEndTurn;
+    TestFrameReader reader;
+    QSignalSpy klar(&reader, SIGNAL(messageReady(QByteArray)));
+    reader.feedBytesForTest(testReadFixture("fixture_rygrad.ndjson"));
+    QVERIFY(klar.count() > 0);
+    for (int i = 0; i < klar.count(); ++i) {
+        bool ok = false;
+        AcpMessage besked = AcpMessage::fraJson(klar.at(i).at(0).toByteArray(), &ok);
+        QVERIFY(ok);
+        if (besked.type() == AcpMessage::Request || besked.type() == AcpMessage::Notification)
+            QVERIFY2(kendte.contains(besked.method()),
+                     qPrintable("ukendt metode i fixture: " + besked.method()));
+    }
 }
 
 #include "tst_acp_rygrad.moc"

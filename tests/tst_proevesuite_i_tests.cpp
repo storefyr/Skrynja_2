@@ -97,6 +97,7 @@ void TestProevesuiteITests::suite_omfatter_alle_13_testklasser()
     QStringList registrerede;
     for (int i = 0; i < testRegistrations().size(); ++i)
         registrerede.append(testRegistrations().at(i).name);
+    QStringList klaser;
     int forventet = 0;
     for (int i = 0; i < funktioner.size(); ++i) {
         QJsonObject fn = funktioner.at(i).toObject();
@@ -104,9 +105,12 @@ void TestProevesuiteITests::suite_omfatter_alle_13_testklasser()
             continue;
         QString testfil = fn.value("parret_test").toObject().value("testfil").toString();
         if (QFileInfo::exists(testRepoRoot() + "/" + testfil)) {
-            ++forventet;
             QString klasse = fn.value("parret_test").toObject().value("testklasse").toString();
             QVERIFY2(registrerede.contains(klasse), qPrintable(klasse));
+            if (!klaser.contains(klasse)) {
+                klaser.append(klasse);
+                ++forventet;
+            }
         }
     }
     QCOMPARE(registrerede.size(), forventet);

@@ -166,8 +166,10 @@ void TestArkitekturOpdelingProtokol::acpclient_har_ingen_dispatch()
     QCOMPARE(kilde.count("session/prompt"), 0);
     QCOMPARE(kilde.count("session/cancel"), 0);
     QCOMPARE(protokolKilde.count("session/prompt"), 1);
-    QCOMPARE(sessionKilde.count("session/cancel"), 1);
-    QCOMPARE(kilde.count("set_config_option"), 1);
+    QCOMPARE(protokolKilde.count("session/cancel"), 1);
+    QCOMPARE(sessionKilde.count("session/cancel"), 0);
+    QCOMPARE(kilde.count("set_config_option"), 0);
+    QCOMPARE(protokolKilde.count("set_config_option"), 1);
 
     TestClient client;
     injectTestModels(&client, this);

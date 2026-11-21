@@ -16,8 +16,6 @@
 #include "permissionmodel.h"
 #include "toolcallmodel.h"
 
-static const QString kSetConfigOption = QLatin1String("session/set_config_option");
-
 AcpClient::AcpClient(QObject* parent)
     : AcpClient(0, 0, parent)
 {
@@ -245,7 +243,7 @@ void AcpClient::setConfigOption(const QString& configId, const QVariant& value)
     params.insert("sessionId", m_session->sessionId());
     params.insert("configId", configId);
     params.insert("value", QJsonValue::fromVariant(value));
-    sendRequest(kSetConfigOption, params);
+    sendRequest(AcpProtokol::kSetConfigOption, params);
 }
 
 QString AcpClient::agentPath() const

@@ -15,6 +15,8 @@ public:
     static const QString kSessionLoad;
     static const QString kSessionNew;
     static const QString kSessionPrompt;
+    static const QString kSessionCancel;
+    static const QString kSetConfigOption;
     static const QString kSessionUpdate;
     static const QString kEndTurn;
     static const QString kRequestPermission;
