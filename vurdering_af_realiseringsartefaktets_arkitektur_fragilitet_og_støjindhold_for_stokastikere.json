@@ -1,0 +1,235 @@
+{
+  "artefakt": "vurdering_af_realiseringsartefaktets_arkitektur_fragilitet_og_støjindhold_for_stokastikere.json",
+  "version": "1.0.0",
+  "producent": "Kildesondringsstokastiker",
+  "konsument": "Projektstokastiker",
+  "input": "Realiseringsartefaktet: src/ (13 cpp + 13 h), qml/ (4 filer), harbour-skrynja-2.pro, harbour-skrynja-2.desktop, tests/ (13 tst_*.cpp, tests.pro, 11 fixtures), tjek_manifest_parrede_tests.py",
+  "metode": [
+    "Fuld gennemlæsning af alle kildefiler, QML-filer, build-filer og parrede tests",
+    "Krydstjek af signaler, funktionskald og QML-referencer via grep (uforbundne signaler, ubrugte funktioner, utilgængelige sider)",
+    "Kørsel af python3 tjek_manifest_parrede_tests.py (resultat: rækkefølge ok, 13/13 parrede tests registreret)",
+    "git grep efter hemmelighedsmønstre i træet (ingen hits uden for dokumentation)"
+  ],
+  "begrænsning": "qmake/Qt 5.6 er ikke tilgængelig i dette revisionsmiljø, så QtTest-suiten kunne ikke køres lokalt; kun python-checkeren og statisk analyse er kørt.",
+  "samlet_vurdering": "Realiseringsartefaktet er funktionelt dækket af 13 parrede tests og manifest-parringen er grøn, men arkitekturen bærer risiko i AcpClient som god-objekt med indlejrede test-kroge, flere produktionsområder er uovervågede (droppede linjer, agentfejl, tilladelsesanmodninger når aldrig UI), tre af fire QML-sider er utilgængelige, og der findes død kode samt kopieret test-boilerplate. Ingen hemmeligheder i træet.",
+  "arkitektur": {
+    "observationer": [
+      {
+        "id": "ark-1",
+        "titel": "AcpClient er et god-objekt med hård kobling",
+        "risiko": "Én klasse ejer AgentProcess, AcpFrameReader og fem modeller, udstiller 10 Q_PROPERTYs og indeholder både protokol-dispatch, request-id-bogføring og signal-videresendelse; ændring ét sted berører mange ansvarsområder, og kompleksiteten i handleMessage/handleSessionUpdate vokser ved hver ny metode.",
+        "evidens": ["src/acpclient.h:23-135", "src/acpclient.cpp:27-52", "src/acpclient.cpp:362-460"],
+        "alvorlighed": "høj"
+      },
+      {
+        "id": "ark-2",
+        "titel": "Test-kroge indlejret i produktionsklasserne",
+        "risiko": "setTestMode/feedBytesForTest/simulateAgentDeathForTest/resetForTest/sentForTest og m_testMode-grenen i write() koble produktionslogik direkte til test-infrastruktur; samme mønster i AcpFrameReader (feedBytesForTest/eofForTest). Produktionskode bærer risiko for at opføre sig anderledes under test end i drift.",
+        "evidens": ["src/acpclient.h:73-81", "src/acpclient.cpp:344-352", "src/acpframereader.h:20-21", "src/acpframereader.cpp:44-55"],
+        "alvorlighed": "middel"
+      },
+      {
+        "id": "ark-3",
+        "titel": "String-baseret dispatch med magiske metode-strenge",
+        "risiko": "m_pendingRequests QHash<qint64,QString> korrelerer svar via rå strenge; kun session/prompt, session/cancel og session/set_config_option er konstanter, resten er inline-literaler ('initialize', 'session/load', 'session/new', 'end_turn'), så en omdøbning ét sted giver stille fejl i korrelationen.",
+        "evidens": ["src/acpclient.cpp:19-21", "src/acpclient.cpp:68-160", "src/acpclient.cpp:365-411"],
+        "alvorlighed": "middel"
+      },
+      {
+        "id": "ark-4",
+        "titel": "Forkert afhængighedsretning: DiffModel -> AcpFrameReader",
+        "risiko": "DiffModel inkluderer acpframereader.h udelukkende for standardCap(); en UI-model afhænger dermed af transport-laget, og de to lag har hver sin cap-semantik (hel linje 64 KB i rygraden vs. pr. diff-linje 64 KB i modellen) med samme kilde.",
+        "evidens": ["src/diffmodel.cpp:3", "src/diffmodel.cpp:15", "src/acpframereader.cpp:7-9"],
+        "alvorlighed": "middel"
+      },
+      {
+        "id": "ark-5",
+        "titel": "QSettings som skjult global tilstand læst i getter",
+        "risiko": "AgentProcess::agentPath() læser QSettings ved hvert kald; agentsti (agent/sti) og session-id (session/id) håndteres af to forskellige klasser uden fælles ejer, og værdierne kan ændres under agenten uden at nogen signalerer det videre ud over ét agentPathChanged.",
+        "evidens": ["src/agentproces.cpp:24-35", "src/sessionlager.cpp:10-26", "src/acpclient.cpp:296-301"],
+        "alvorlighed": "lav"
+      },
+      {
+        "id": "ark-6",
+        "titel": "Dobbelt model-lag: QAbstractListModel-roller bruges ikke af QML",
+        "risiko": "ConversationModel, ToolCallModel og DiffModel implementerer rowCount/data/roller, men QML læser kun QVariantList/Q_PROPERTY-værdierne; model-rollerne er overflødige for appen og øger overfladen uden konsument.",
+        "evidens": ["src/samtalemodel.cpp:49-63", "src/vaerktoejskaldsmodel.cpp:92-106", "src/diffmodel.cpp:65-80", "qml/pages/StartSide.qml:43-72", "qml/pages/DiffVisning.qml:22-46"],
+        "alvorlighed": "lav"
+      }
+    ]
+  },
+  "fragilitet": {
+    "observationer": [
+      {
+        "id": "fra-1",
+        "titel": "Droppede og ugyldige linjer er uovervågede i produktion",
+        "risiko": "lineDropped (cap, ugyldig json, ugyldig utf-8) og haleReady forbindes kun i tests, aldrig i produktionskode; LogFile skrives kun fra main.cpp ('start'/'selfTest'). Store eller malformerede beskeder fra agenten tabes stille uden log eller UI.",
+        "evidens": ["src/acpframereader.cpp:82-99", "src/acpclient.cpp:45", "src/main.cpp:26", "src/main.cpp:44", "grep: ingen connect til lineDropped/haleReady i src/ uden for acpframereader"],
+        "alvorlighed": "høj"
+      },
+      {
+        "id": "fra-2",
+        "titel": "Asymmetrisk fejlhåndtering af svar; kun initialize-fejl signaleres",
+        "risiko": "Ved fejl på session/load falder der tilbage til session/new, men fejl på f.eks. session/prompt sætter kun m_lastError uden signal; svar med ukendt id ignoreres stille (take() giver tom streng). Desuden er agentError og permissionRequested ikke forbundet i QML eller main, så hverken agentfejl eller tilladelsesanmodninger når nogensinde brugerfladen.",
+        "evidens": ["src/acpclient.cpp:365-378", "src/acpclient.cpp:460-466", "grep: ingen connect til agentError/permissionRequested i qml/ eller src/main.cpp"],
+        "alvorlighed": "høj"
+      },
+      {
+        "id": "fra-3",
+        "titel": "write() emitter messageSent også når intet blev skrevet",
+        "risiko": "I ikke-test-tilstand skrives kun hvis processen er åben, men messageSent emitteres uanset; selvtesten detekterer 'prompt sendt' via dette signal, så en besked der aldrig nåede agenten stadig tæller som sendt.",
+        "evidens": ["src/acpclient.cpp:344-352", "src/selvtest.cpp:56-60"],
+        "alvorlighed": "høj"
+      },
+      {
+        "id": "fra-4",
+        "titel": "Fail-open i main: manglende QML giver exit 0; startAgent-fejl ignoreres",
+        "risiko": "Hvis QML-filen ikke findes efter tre sti-gæt, returneres 0 (succes) uden besked; resultatet af client.startAgent() tjekkes ikke, så appen kører videre uden agent og uden advarsel i UI.",
+        "evidens": ["src/main.cpp:48-64"],
+        "alvorlighed": "høj"
+      },
+      {
+        "id": "fra-5",
+        "titel": "Selvtest har ingen watchdog",
+        "risiko": "Hvis agenten starter, men hverken svarer på initialize eller dør, hænger app.exec() for evigt; der er ingen timeout omkring selvtest-kæden, så 'afslutter med kode 0' kan ikke garanteres ved hæng.",
+        "evidens": ["src/main.cpp:31-37", "src/selvtest.cpp:30-48", "src/agentproces.cpp:56-61"],
+        "alvorlighed": "middel"
+      },
+      {
+        "id": "fra-6",
+        "titel": "Tre af fire QML-sider er utilgængelige; stop/afvis findes ikke i UI",
+        "risiko": "Kun StartSide instanseres (initialPage); TilladelsesDialog, DiffVisning og KonfigurationsSide refereres ingen steder, og sessionCancel/stopAgent kaldes ikke fra QML — stop og afvis er kun dækket af selvtest og destruktøren, så brugeren kan ikke afbryde en runde eller se tilladelser/diffs i GUI.",
+        "evidens": ["qml/harbour-skrynja-2.qml:7", "grep: ingen referencer til TilladelsesDialog/DiffVisning/KonfigurationsSide i qml/", "grep: sessionCancel/stopAgent ikke kaldt i qml/"],
+        "alvorlighed": "høj"
+      },
+      {
+        "id": "fra-7",
+        "titel": "KonfigurationsSide sender set_config_option pr. tastetryk",
+        "risiko": "onTextChanged kalder acp.setConfigOption umiddelbart for hvert tegn; uden debounce kan hver indtastning udløse en ACP-request, og agentens svar kan ankomme efter næste ændring.",
+        "evidens": ["qml/pages/KonfigurationsSide.qml:40-48", "src/acpclient.cpp:274-284"],
+        "alvorlighed": "middel"
+      },
+      {
+        "id": "fra-8",
+        "titel": "TilladelsesDialog accepterer også ved mislykket svar",
+        "risiko": "canAccept er false og hver knap kalder dialog.accept() efter acp.answerPermission/declinePermission uden at tjekke returværdien; dobbeltsvar forhindres kun i modellen, ikke i dialogen.",
+        "evidens": ["qml/pages/TilladelsesDialog.qml:8", "qml/pages/TilladelsesDialog.qml:33-49", "src/acpclient.cpp:170-194"],
+        "alvorlighed": "lav"
+      },
+      {
+        "id": "fra-9",
+        "titel": "Miljøafhængige tests i oprydning_af_træ",
+        "risiko": "git_status_porcelain_tom_efter_indskrivning fejler ved enhver ikke-indskrevet ændring i træet, og agentproces_ikke_haengende kører pgrep -f vibe-acp mod værtsmiljøet; suiten er dermed ikke reproducerbar uden for en ren, indskrevet, agent-fri maskine.",
+        "evidens": ["tests/tst_oprydning_af_trae.cpp:46-52", "tests/tst_oprydning_af_trae.cpp:75-84"],
+        "alvorlighed": "middel"
+      },
+      {
+        "id": "fra-10",
+        "titel": "Delte singletoner og global QSettings-mutation i tests giver rækkefølgeafhængighed",
+        "risiko": "LogFile::instance() med setLogPathForTest deles på tværs af testklasser, og hver initTestCase kalder QSettings::setPath globalt med egen temp-mappe; hvilken sti der gælder, afhænger af hvilken testklasse der kørte sidst.",
+        "evidens": ["tests/tst_byggesti_og_logfil.cpp:31", "tests/tst_oprydning_af_trae.cpp:88-90", "tests/tst_agentproces_og_initialisering.cpp:30-38", "tests/tst_prompt_og_svar.cpp:38-46"],
+        "alvorlighed": "middel"
+      },
+      {
+        "id": "fra-11",
+        "titel": "stopAgent() tjekker ikke returværdierne på waitForFinished",
+        "risiko": "terminate() + waitForFinished(2000) + kill() + waitForFinished(1000) ignorerer om processen faktisk stoppede; en agent der overlever kill() opdages ikke.",
+        "evidens": ["src/agentproces.cpp:66-73"],
+        "alvorlighed": "lav"
+      },
+      {
+        "id": "fra-12",
+        "titel": "Ikke-tom hale ved EOF falder stille fra i klienten",
+        "risiko": "haleReady leverer bufferen råt ved EOF, men AcpClient::receiveLine kasserer den stille hvis fraJson fejler; en afskåret besked fra agenten bliver usynlig.",
+        "evidens": ["src/acpframereader.cpp:35-42", "src/acpframereader.cpp:50-57", "src/acpclient.cpp:354-360"],
+        "alvorlighed": "lav"
+      }
+    ]
+  },
+  "støj": {
+    "observationer": [
+      {
+        "id": "støj-1",
+        "titel": "Død kode: ubrugte offentlige funktioner og signaler",
+        "risiko": "PermissionModel::clear(), SessionStore::clear(), PermissionModel::isAnswered(), AcpClient::resetForTest(), AgentProcess::setWorkingDirectory/workingDirectory (m_workingDirectory sættes aldrig) og ConversationModel::roundFinished (emitteres, forbindes aldrig) har ingen kaldere; de vedligeholdes som død vægt.",
+        "evidens": ["src/tilladelsesmodel.h:17", "src/tilladelsesmodel.cpp:40-46", "src/tilladelsesmodel.h:22", "src/sessionlager.h:15", "src/acpclient.h:79", "src/agentproces.h:17-18", "src/samtalemodel.h:32", "src/samtalemodel.cpp:31", "grep: ingen kaldere i src/ qml/ tests/"],
+        "alvorlighed": "middel"
+      },
+      {
+        "id": "støj-2",
+        "titel": "Kopieret test-boilerplate på tværs af seks testfiler",
+        "risiko": "initTestCase med QStandardPaths::setTestModeEnabled + QSettings::setDefaultFormat/setPath/clear samt hjælperne jsonObj/idOf/responseJson/readFixture er kopieret næsten 1:1 i tst_agentproces_og_initialisering, tst_prompt_og_svar, tst_genoptagelse_af_samtale, tst_tilladelsesdialog, tst_stop_og_afvis, tst_diff_og_uddata, tst_konfiguration_af_agent og tst_selvtest_med_verdict; rettelser skal gentages otte steder.",
+        "evidens": ["tests/tst_agentproces_og_initialisering.cpp:30-38", "tests/tst_prompt_og_svar.cpp:38-46", "tests/tst_genoptagelse_af_samtale.cpp:43-51", "tests/tst_tilladelsesdialog.cpp:42-50", "tests/tst_stop_og_afvis.cpp:42-50", "tests/tst_diff_og_uddata.cpp:37-45", "tests/tst_konfiguration_af_agent.cpp:38-46", "tests/tst_selvtest_med_verdict.cpp:39-50"],
+        "alvorlighed": "middel"
+      },
+      {
+        "id": "støj-3",
+        "titel": "Duplikeret map-bygning i ToolCallModel",
+        "risiko": "toolCalls() og find() bygger hver deres QVariantMap med identiske fire felter; to kopier af samme projektion skal holdes synkron.",
+        "evidens": ["src/vaerktoejskaldsmodel.cpp:70-98"],
+        "alvorlighed": "lav"
+      },
+      {
+        "id": "støj-4",
+        "titel": "Duplikerede testslots på tværs af parrede tests",
+        "risiko": "standard_agentsti_er_vibe_acp og clientCapabilities-tom testes både i tst_agentproces_og_initialisering og i tst_konfiguration_af_agent; samme påstand vedligeholdes to steder.",
+        "evidens": ["tests/tst_agentproces_og_initialisering.cpp:41-44", "tests/tst_konfiguration_af_agent.cpp:109-121", "tests/tst_konfiguration_af_agent.cpp:131-140"],
+        "alvorlighed": "lav"
+      },
+      {
+        "id": "støj-5",
+        "titel": "Tre navngivningssprog i samme kodebase",
+        "risiko": "Filnavne er danske ascii (acpbesked.h, samtalemodel.h), klassenavne engelske (AcpMessage, ConversationModel), metode- og signalnavne danske ascii (fraJson, haleReady, setAgentsti), include guards engelske — læsning kræver konstant sprogskift, og filnavn og klassenavn svarer ikke til hinanden.",
+        "evidens": ["src/acpbesked.h:5", "src/samtalemodel.h:5", "src/acpbesked.cpp:19-22", "src/acpframereader.h:16-21"],
+        "alvorlighed": "lav"
+      }
+    ]
+  },
+  "overfladiske_tests": [
+    {
+      "id": "test-1",
+      "titel": "resumeregel_laeser_manifest_og_finder_foerste_false verificerer manifestets interne konsistens, ikke genoptagelsesreglen",
+      "risiko": "Testen beregner første passerer:false både fra strategisk_rækkefølge og fra funktioner i samme manifestfil og sammenligner de to; den rører ikke app-kode, og genoptagelsesreglen (pwd/git status/git log) er en procesregel, så påstanden 'resumeregel' dækkes ikke.",
+      "evidens": ["tests/tst_genoptagelse_af_samtale.cpp:142-176"]
+    },
+    {
+      "id": "test-2",
+      "titel": "Meta-tests tæller registreringer og hårdkodede 13-taller",
+      "risiko": "manifest_har_13_parrede_tests og suite_omfatter_alle_13_testklasser QCOMPARE'er mod det hårdkodede 13 og antallet af REGISTER_TEST-makroer; de passerer ved konstruktion og siger intet om hvad testene faktisk påstår.",
+      "evidens": ["tests/tst_proevesuite_i_tests.cpp:57-66", "tests/tst_proevesuite_i_tests.cpp:93-108"]
+    },
+    {
+      "id": "test-3",
+      "titel": "besked_id_korrelation er ren round-trip af samme klasse",
+      "risiko": "Testen serialiserer med tilJson og parser med fraJson i samme klasse; id-korrelationen valideres kun for beskeder der selv blev produceret, ikke for agentens faktiske wire-format (som rygrad-fixtures dækker, men besked-klassen gør ikke).",
+      "evidens": ["tests/tst_acp_rygrad.cpp:148-187"]
+    },
+    {
+      "id": "test-4",
+      "titel": "Irrelevant påstand blandet ind i diff_vises_mens_det_sker",
+      "risiko": "Ud over diff-signalet påstår testen også conversationStatus == 'klar', som intet har med diff-visning at gøre; fejler samtalen, fejler diff-testen af en årsag uden for området.",
+      "evidens": ["tests/tst_diff_og_uddata.cpp:92-105"]
+    }
+  ],
+  "uovervågede_områder": [
+    "Droppede/ugyldige indgående linjer (lineDropped: cap, ugyldig json, ugyldig utf-8) — ingen log, ingen signal videre, ingen UI (fra-1)",
+    "Agentfejl og tilladelsesanmodninger (agentError, permissionRequested) — ikke forbundet i QML/main (fra-2)",
+    "Fejl på alle svar end initialize — kun m_lastError, ingen signal (fra-2)",
+    "Beskeder der aldrig når processen, men stadig emitter messageSent (fra-3)",
+    "Manglende QML-fil og fejlet agent-start i GUI-tilstand — stille exit 0 / app uden agent (fra-4)",
+    "Selvtest-hæng uden timeout (fra-5)",
+    "TilladelsesDialog, DiffVisning, KonfigurationsSide — kompileres og installeres, men instanseres aldrig (fra-6)",
+    "Afskåren hale ved EOF — leveres råt og kasseres stille (fra-12)"
+  ],
+  "verificeret_positivt": [
+    "python3 tjek_manifest_parrede_tests.py: 'rækkefølge ok; stop_og_afvis ikke sprunget over' og '13/13 funktioner har parret testfil registreret i tests/tests.pro' (exit 0)",
+    "Alle src-filer registreret i harbour-skrynja-2.pro; alle QML-filer registreret til installation",
+    "Sandboxing=Disabled i harbour-skrynja-2.desktop; agentsti /home/defaultuser/.local/bin/vibe-acp præcis én forekomst; clientCapabilities tom i initialize-payload",
+    "tests.pro uden Silica (QT += core testlib); ingen hemmelighedsmønstre i git-træet uden for dokumentationen",
+    "LogFile afviser flerlinjede events (transskript-beskyttelse) og testen logfil_roerer_ikke_transskripter dækker det"
+  ],
+  "bemærkninger": [
+    "Denne leverance følger ordren og hedder derfor 'støjindhold' med ø; projektbeskrivelse.adoc og manifestet refererer til artefaktet med ascii-navnet 'stoejindhold' — en navne-inkonsistens i de normative dokumenter, som Projektstokastikeren kan triagere.",
+    "Ifølge kommandokæden leveres observationer af risiko uden løsningsforslag; triage (støj -> rengøringsordre, fragilitet -> nye parrede tests, arkitektur -> eskalering) ligger hos Projektstokastikeren."
+  ]
+}
