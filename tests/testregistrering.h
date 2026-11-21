@@ -14,6 +14,7 @@
 #include <QString>
 
 #include "acpclient.h"
+#include "agentproces.h"
 #include "konfigurationsmodel.h"
 #include "diffmodel.h"
 #include "samtalemodel.h"
@@ -124,6 +125,22 @@ inline QByteArray testErrorResponseJson(qint64 id, int kode, const QString& mess
     o.insert("id", QJsonValue(id));
     o.insert("error", error);
     return QJsonDocument(o).toJson(QJsonDocument::Compact);
+}
+
+inline QString testStandardAgentsti()
+{
+    QSettings s;
+    s.remove("agent/sti");
+    s.sync();
+    AgentProcess process;
+    return process.agentPath();
+}
+
+inline QJsonObject testInitializeParams(AcpClient& client)
+{
+    client.setTestMode(true);
+    client.sendInitialize();
+    return testJsonObj(client.lastSentForTest()).value("params").toObject();
 }
 
 #endif

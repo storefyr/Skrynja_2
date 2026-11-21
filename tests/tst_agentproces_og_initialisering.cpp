@@ -30,11 +30,7 @@ void TestAgentprocesOgInitialisering::initTestCase()
 
 void TestAgentprocesOgInitialisering::standard_agentsti_er_vibe_acp()
 {
-    QSettings s;
-    s.remove("agent/sti");
-    s.sync();
-    AgentProcess process;
-    QCOMPARE(process.agentPath(), QString("/home/defaultuser/.local/bin/vibe-acp"));
+    QCOMPARE(testStandardAgentsti(), QString("/home/defaultuser/.local/bin/vibe-acp"));
 }
 
 void TestAgentprocesOgInitialisering::initialize_payload_protocolversion_1()
@@ -54,12 +50,7 @@ void TestAgentprocesOgInitialisering::initialize_payload_tom_clientCapabilities(
 {
     AcpClient client;
     injectTestModels(&client, this);
-    client.setTestMode(true);
-    QSignalSpy sendt(&client, SIGNAL(messageSent(QByteArray)));
-    client.sendInitialize();
-    QJsonObject params = QJsonDocument::fromJson(sendt.at(0).at(0).toByteArray()).object()
-                             .value("params").toObject();
-    QJsonValue cap = params.value("clientCapabilities");
+    QJsonValue cap = testInitializeParams(client).value("clientCapabilities");
     QVERIFY(cap.isObject());
     QVERIFY(cap.toObject().isEmpty());
 }
