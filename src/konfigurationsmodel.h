@@ -1,16 +1,16 @@
-#ifndef KONFIGURATIONSMODEL_H
-#define KONFIGURATIONSMODEL_H
+#ifndef CONFIGURATIONMODEL_H
+#define CONFIGURATIONMODEL_H
 
 #include <QObject>
 #include <QVariantList>
 #include <QVariantMap>
 
-class Konfigurationsmodel : public QObject
+class ConfigurationModel : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QVariantList configOptions READ configOptions NOTIFY changed)
 public:
-    explicit Konfigurationsmodel(QObject* parent = 0);
+    explicit ConfigurationModel(QObject* parent = 0);
 
     void setConfigOptions(const QVariantList& options);
     QVariantList configOptions() const;

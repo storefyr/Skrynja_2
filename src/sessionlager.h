@@ -1,21 +1,21 @@
-#ifndef SESSIONLAGER_H
-#define SESSIONLAGER_H
+#ifndef SESSIONSTORE_H
+#define SESSIONSTORE_H
 
 #include <QString>
 #include <QSettings>
 
-class SessionLager
+class SessionStore
 {
 public:
-    SessionLager();
+    SessionStore();
 
-    void gemSessionId(const QString& id);
+    void saveSessionId(const QString& id);
     QString sessionId() const;
-    bool harSessionId() const;
-    void ryd();
+    bool hasSessionId() const;
+    void clear();
 
 private:
-    QSettings m_indstillinger;
+    QSettings m_settings;
 };
 
 #endif

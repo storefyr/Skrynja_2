@@ -1,26 +1,26 @@
-#ifndef TILLADELSESMODEL_H
-#define TILLADELSESMODEL_H
+#ifndef PERMISSIONMODEL_H
+#define PERMISSIONMODEL_H
 
 #include <QObject>
 #include <QVariantMap>
 
-class Tilladelsesmodel : public QObject
+class PermissionModel : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QVariantMap pendingPermission READ pendingPermission NOTIFY changed)
-    Q_PROPERTY(int anmodninger READ anmodninger NOTIFY changed)
+    Q_PROPERTY(int requests READ requests NOTIFY changed)
 public:
-    explicit Tilladelsesmodel(QObject* parent = 0);
+    explicit PermissionModel(QObject* parent = 0);
 
-    void setAnmodning(qint64 requestId, const QJsonObject& params);
-    void setSvaret();
+    void setRequest(qint64 requestId, const QJsonObject& params);
+    void setAnswered();
     void clear();
 
     QVariantMap pendingPermission() const;
-    qint64 anmodningsId() const;
-    bool afventende() const;
-    bool svaret() const;
-    int anmodninger() const;
+    qint64 requestId() const;
+    bool isPending() const;
+    bool isAnswered() const;
+    int requests() const;
 
 signals:
     void changed();
@@ -28,9 +28,9 @@ signals:
 private:
     qint64 m_requestId;
     QVariantMap m_pending;
-    bool m_afventende;
-    bool m_svaret;
-    int m_antal;
+    bool m_isPending;
+    bool m_answered;
+    int m_count;
 };
 
 #endif

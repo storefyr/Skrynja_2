@@ -21,7 +21,7 @@ Page {
                 id: stiFelt
                 width: parent.width
                 label: "Agentsti"
-                text: acp.agentsti
+                text: acp.agentPath
                 placeholderText: "/home/defaultuser/.local/bin/vibe-acp"
             }
 

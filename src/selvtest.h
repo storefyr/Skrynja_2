@@ -1,5 +1,5 @@
-#ifndef SELVTEST_H
-#define SELVTEST_H
+#ifndef SELFTEST_H
+#define SELFTEST_H
 
 #include <QJsonObject>
 #include <QObject>
@@ -7,41 +7,41 @@
 
 class AcpClient;
 
-class Selvtest : public QObject
+class SelfTest : public QObject
 {
     Q_OBJECT
 public:
-    explicit Selvtest(AcpClient* klient, QObject* parent = 0);
+    explicit SelfTest(AcpClient* client, QObject* parent = 0);
 
-    void start(const QString& prompt, const QString& verdictSti);
-    bool verdictSkrevet() const;
+    void start(const QString& prompt, const QString& verdictPath);
+    bool verdictWritten() const;
     QJsonObject verdict() const;
-    QString verdictSti() const;
+    QString verdictPath() const;
 
 signals:
-    void faerdig(int exitKode);
+    void finished(int exitKode);
 
 private slots:
-    void onAgentKlar();
-    void onSessionOprettet(const QString& sessionId);
-    void onPermissionAnmodet();
-    void onRundeAfsluttet();
-    void onAgentFejl(const QString& fejl);
-    void onAgentDoed(int kode);
-    void onBeskedSendt(const QByteArray& linje);
-    void onDiffsAendret();
+    void onAgentReady();
+    void onSessionCreated(const QString& sessionId);
+    void onPermissionRequested();
+    void onRoundFinished();
+    void onAgentError(const QString& error);
+    void onAgentDied(int kode);
+    void onMessageSent(const QByteArray& line);
+    void onDiffsChanged();
 
 private:
-    void skrivVerdict(bool pass, const QString& årsag);
-    void afslut(bool pass, const QString& årsag);
+    void writeVerdict(bool pass, const QString& reason);
+    void finish(bool pass, const QString& reason);
 
-    AcpClient* m_klient;
+    AcpClient* m_client;
     QString m_prompt;
-    QString m_verdictSti;
-    bool m_verdictSkrevet;
-    bool m_promptSendt;
-    bool m_tilladelseBesvaret;
-    bool m_filSkrevet;
+    QString m_verdictPath;
+    bool m_verdictWritten;
+    bool m_promptSent;
+    bool m_permissionAnswered;
+    bool m_fileWritten;
 };
 
 #endif

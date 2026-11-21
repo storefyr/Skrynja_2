@@ -1,22 +1,22 @@
 #include "samtalemodel.h"
 
-SamtaleModel::SamtaleModel(QObject* parent)
+ConversationModel::ConversationModel(QObject* parent)
     : QAbstractListModel(parent)
     , m_round(0)
     , m_status("klar")
 {
 }
 
-void SamtaleModel::addChunk(const QString& tekst)
+void ConversationModel::addChunk(const QString& text)
 {
-    beginInsertRows(QModelIndex(), m_linjer.size(), m_linjer.size());
-    m_linjer.append(tekst);
+    beginInsertRows(QModelIndex(), m_lines.size(), m_lines.size());
+    m_lines.append(text);
     endInsertRows();
-    m_lastText += tekst;
+    m_lastText += text;
     emit changed();
 }
 
-void SamtaleModel::startRunde()
+void ConversationModel::startRound()
 {
     ++m_round;
     m_lastText.clear();
@@ -24,40 +24,40 @@ void SamtaleModel::startRunde()
     emit changed();
 }
 
-void SamtaleModel::endRunde()
+void ConversationModel::endRound()
 {
     m_status = "klar";
     emit changed();
-    emit rundeAfsluttet();
+    emit roundFinished();
 }
 
-QString SamtaleModel::lastText() const
+QString ConversationModel::lastText() const
 {
     return m_lastText;
 }
 
-int SamtaleModel::round() const
+int ConversationModel::round() const
 {
     return m_round;
 }
 
-QString SamtaleModel::status() const
+QString ConversationModel::status() const
 {
     return m_status;
 }
 
-int SamtaleModel::rowCount(const QModelIndex& parent) const
+int ConversationModel::rowCount(const QModelIndex& parent) const
 {
     if (parent.isValid())
         return 0;
-    return m_linjer.size();
+    return m_lines.size();
 }
 
-QVariant SamtaleModel::data(const QModelIndex& index, int role) const
+QVariant ConversationModel::data(const QModelIndex& index, int role) const
 {
-    if (!index.isValid() || index.row() < 0 || index.row() >= m_linjer.size())
+    if (!index.isValid() || index.row() < 0 || index.row() >= m_lines.size())
         return QVariant();
-    if (role == TekstRolle || role == Qt::DisplayRole)
-        return m_linjer.at(index.row());
+    if (role == TextRole || role == Qt::DisplayRole)
+        return m_lines.at(index.row());
     return QVariant();
 }

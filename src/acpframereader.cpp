@@ -11,14 +11,14 @@ int AcpFrameReader::standardCap()
 
 AcpFrameReader::AcpFrameReader(QIODevice* enhed, QObject* parent)
     : QObject(parent)
-    , m_enhed(enhed)
+    , m_device(enhed)
     , m_cap(standardCap())
 {
-    if (m_enhed)
-        connect(m_enhed, SIGNAL(readyRead()), this, SLOT(læsFraEnhed()));
+    if (m_device)
+        connect(m_device, SIGNAL(readyRead()), this, SLOT(readFromDevice()));
 }
 
-void AcpFrameReader::sætCap(int maksBytes)
+void AcpFrameReader::setCap(int maksBytes)
 {
     m_cap = maksBytes;
 }
@@ -28,12 +28,12 @@ int AcpFrameReader::cap() const
     return m_cap;
 }
 
-void AcpFrameReader::læsFraEnhed()
+void AcpFrameReader::readFromDevice()
 {
-    if (!m_enhed)
+    if (!m_device)
         return;
-    bearbejd(m_enhed->readAll());
-    if (m_enhed->atEnd() && !m_buffer.isEmpty()) {
+    processBuffer(m_device->readAll());
+    if (m_device->atEnd() && !m_buffer.isEmpty()) {
         emit haleReady(m_buffer);
         m_buffer.clear();
     }
@@ -41,7 +41,7 @@ void AcpFrameReader::læsFraEnhed()
 
 void AcpFrameReader::feedBytesForTest(const QByteArray& data)
 {
-    bearbejd(data);
+    processBuffer(data);
 }
 
 void AcpFrameReader::eofForTest()
@@ -52,53 +52,53 @@ void AcpFrameReader::eofForTest()
     }
 }
 
-void AcpFrameReader::bearbejd(const QByteArray& data)
+void AcpFrameReader::processBuffer(const QByteArray& data)
 {
     m_buffer.append(data);
     int pos;
     while ((pos = m_buffer.indexOf('\n')) >= 0) {
-        QByteArray linje = m_buffer.left(pos);
+        QByteArray line = m_buffer.left(pos);
         m_buffer.remove(0, pos + 1);
-        if (linje.endsWith('\r'))
-            linje.chop(1);
-        håndterLinje(linje);
+        if (line.endsWith('\r'))
+            line.chop(1);
+        handleLine(line);
     }
 }
 
-void AcpFrameReader::håndterLinje(const QByteArray& linje)
+void AcpFrameReader::handleLine(const QByteArray& line)
 {
-    if (linje.isEmpty())
+    if (line.isEmpty())
         return;
-    if (linje.size() > m_cap) {
-        emit linjeDroppet(linje, "cap");
+    if (line.size() > m_cap) {
+        emit lineDropped(line, "cap");
         return;
     }
-    if (!gyldigUtf8(linje)) {
-        emit linjeDroppet(linje, "ugyldig utf-8");
+    if (!isValidUtf8(line)) {
+        emit lineDropped(line, "ugyldig utf-8");
         return;
     }
     QJsonParseError err;
-    QJsonDocument doc = QJsonDocument::fromJson(linje, &err);
+    QJsonDocument doc = QJsonDocument::fromJson(line, &err);
     if (err.error == QJsonParseError::NoError && doc.isObject()) {
-        emit beskedKlar(linje);
+        emit messageReady(line);
         return;
     }
-    QList<QByteArray> dele = splitTopLevel(linje);
-    if (dele.size() > 1) {
-        for (int i = 0; i < dele.size(); ++i) {
+    QList<QByteArray> parts = splitTopLevel(line);
+    if (parts.size() > 1) {
+        for (int i = 0; i < parts.size(); ++i) {
             QJsonParseError delErr;
-            QJsonDocument delDoc = QJsonDocument::fromJson(dele.at(i), &delErr);
+            QJsonDocument delDoc = QJsonDocument::fromJson(parts.at(i), &delErr);
             if (delErr.error == QJsonParseError::NoError && delDoc.isObject())
-                emit beskedKlar(dele.at(i));
+                emit messageReady(parts.at(i));
             else
-                emit linjeDroppet(dele.at(i), "ugyldig json");
+                emit lineDropped(parts.at(i), "ugyldig json");
         }
         return;
     }
-    emit linjeDroppet(linje, "ugyldig json");
+    emit lineDropped(line, "ugyldig json");
 }
 
-bool AcpFrameReader::gyldigUtf8(const QByteArray& bytes)
+bool AcpFrameReader::isValidUtf8(const QByteArray& bytes)
 {
     int i = 0;
     const int n = bytes.size();
@@ -138,37 +138,37 @@ bool AcpFrameReader::gyldigUtf8(const QByteArray& bytes)
     return true;
 }
 
-QList<QByteArray> AcpFrameReader::splitTopLevel(const QByteArray& linje)
+QList<QByteArray> AcpFrameReader::splitTopLevel(const QByteArray& line)
 {
-    QList<QByteArray> dele;
+    QList<QByteArray> parts;
     int i = 0;
-    const int n = linje.size();
+    const int n = line.size();
     while (i < n) {
-        while (i < n && (linje.at(i) == ' ' || linje.at(i) == '\t'))
+        while (i < n && (line.at(i) == ' ' || line.at(i) == '\t'))
             ++i;
         if (i >= n)
             break;
         int start = i;
-        if (linje.at(i) == '{' || linje.at(i) == '[') {
-            char luk = (linje.at(i) == '{') ? '}' : ']';
+        if (line.at(i) == '{' || line.at(i) == '[') {
+            char closeBrace = (line.at(i) == '{') ? '}' : ']';
             int depth = 0;
-            bool iStreng = false;
+            bool inString = false;
             bool esc = false;
             for (; i < n; ++i) {
-                char c = linje.at(i);
-                if (iStreng) {
+                char c = line.at(i);
+                if (inString) {
                     if (esc)
                         esc = false;
                     else if (c == '\\')
                         esc = true;
                     else if (c == '"')
-                        iStreng = false;
+                        inString = false;
                 } else {
                     if (c == '"')
-                        iStreng = true;
-                    else if (c == linje.at(start))
+                        inString = true;
+                    else if (c == line.at(start))
                         ++depth;
-                    else if (c == luk) {
+                    else if (c == closeBrace) {
                         --depth;
                         if (depth == 0) {
                             ++i;
@@ -177,11 +177,11 @@ QList<QByteArray> AcpFrameReader::splitTopLevel(const QByteArray& linje)
                     }
                 }
             }
-            dele.append(linje.mid(start, i - start));
+            parts.append(line.mid(start, i - start));
         } else {
-            dele.append(linje.mid(start));
+            parts.append(line.mid(start));
             i = n;
         }
     }
-    return dele;
+    return parts;
 }

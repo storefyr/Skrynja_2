@@ -1,44 +1,44 @@
-#ifndef ACPBESKED_H
-#define ACPBESKED_H
+#ifndef ACPMESSAGE_H
+#define ACPMESSAGE_H
 
 #include <QByteArray>
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QString>
 
-class AcpBesked
+class AcpMessage
 {
 public:
-    enum Type { Ugyldig = 0, Anmodning, Svar, Notifikation };
+    enum Type { Invalid = 0, Request, Response, Notification };
 
-    AcpBesked();
+    AcpMessage();
 
-    static AcpBesked fraJson(const QByteArray& json, bool* ok = 0);
+    static AcpMessage fraJson(const QByteArray& json, bool* ok = 0);
     QByteArray tilJson() const;
 
     Type type() const;
-    bool harId() const;
+    bool hasId() const;
     qint64 id() const;
-    QString metode() const;
+    QString method() const;
     QJsonObject params() const;
-    QJsonValue resultat() const;
-    bool erFejl() const;
-    QJsonObject fejl() const;
+    QJsonValue result() const;
+    bool isError() const;
+    QJsonObject error() const;
 
-    static AcpBesked anmodning(qint64 id, const QString& metode, const QJsonObject& params);
-    static AcpBesked svar(qint64 id, const QJsonValue& resultat);
-    static AcpBesked fejlSvar(qint64 id, int kode, const QString& besked);
-    static AcpBesked notifikation(const QString& metode, const QJsonObject& params);
+    static AcpMessage request(qint64 id, const QString& method, const QJsonObject& params);
+    static AcpMessage response(qint64 id, const QJsonValue& result);
+    static AcpMessage errorResponse(qint64 id, int kode, const QString& message);
+    static AcpMessage notification(const QString& method, const QJsonObject& params);
 
 private:
     Type m_type;
     qint64 m_id;
-    bool m_harId;
-    QString m_metode;
+    bool m_hasId;
+    QString m_method;
     QJsonObject m_params;
-    QJsonValue m_resultat;
-    bool m_erFejl;
-    QJsonObject m_fejl;
+    QJsonValue m_result;
+    bool m_isError;
+    QJsonObject m_error;
 };
 
 #endif

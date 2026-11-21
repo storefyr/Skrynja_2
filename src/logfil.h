@@ -1,24 +1,24 @@
-#ifndef LOGFIL_H
-#define LOGFIL_H
+#ifndef LOGFILE_H
+#define LOGFILE_H
 
 #include <QObject>
 #include <QString>
 
-class Logfil : public QObject
+class LogFile : public QObject
 {
     Q_OBJECT
 public:
-    static Logfil* instans();
+    static LogFile* instance();
 
-    QString logsti() const;
-    bool skrivLinje(const QString& hændelse);
-    void sætLogstiForTest(const QString& sti);
+    QString logPath() const;
+    bool writeLine(const QString& event);
+    void setLogPathForTest(const QString& path);
 
 private:
-    explicit Logfil(QObject* parent = 0);
+    explicit LogFile(QObject* parent = 0);
 
-    QString m_logsti;
-    bool m_teststi;
+    QString m_logPath;
+    bool m_testPath;
 };
 
 #endif

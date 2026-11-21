@@ -20,12 +20,12 @@ private slots:
     void svar_korreleres_paa_request_id();
     void end_turn_afslutter_runde();
 private:
-    QByteArray læsFixture(const QString& navn);
-    qint64 idAf(const QByteArray& json);
-    QByteArray svarJson(qint64 id, const QJsonObject& resultat);
+    QByteArray readFixture(const QString& name);
+    qint64 idOf(const QByteArray& json);
+    QByteArray responseJson(qint64 id, const QJsonObject& result);
 };
 
-REGISTRER_TEST(TestPromptOgSvar)
+REGISTER_TEST(TestPromptOgSvar)
 
 static QJsonObject jsonObj(const QByteArray& json)
 {
@@ -35,63 +35,63 @@ static QJsonObject jsonObj(const QByteArray& json)
 void TestPromptOgSvar::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    QString sti = QDir::tempPath() + "/skrynja-tst-settings-prompt";
-    QDir().mkpath(sti);
+    QString path = QDir::tempPath() + "/skrynja-tst-settings-prompt";
+    QDir().mkpath(path);
     QSettings::setDefaultFormat(QSettings::IniFormat);
-    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, sti);
+    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, path);
     QSettings s;
     s.clear();
     s.sync();
 }
 
-QByteArray TestPromptOgSvar::læsFixture(const QString& navn)
+QByteArray TestPromptOgSvar::readFixture(const QString& name)
 {
-    QString sti = QFINDTESTDATA("fixtures/" + navn);
-    if (sti.isEmpty())
-        sti = "fixtures/" + navn;
-    QFile f(sti);
+    QString path = QFINDTESTDATA("fixtures/" + name);
+    if (path.isEmpty())
+        path = "fixtures/" + name;
+    QFile f(path);
     if (!f.open(QIODevice::ReadOnly))
         return QByteArray();
     return f.readAll();
 }
 
-qint64 TestPromptOgSvar::idAf(const QByteArray& json)
+qint64 TestPromptOgSvar::idOf(const QByteArray& json)
 {
     return jsonObj(json).value("id").toVariant().toLongLong();
 }
 
-QByteArray TestPromptOgSvar::svarJson(qint64 id, const QJsonObject& resultat)
+QByteArray TestPromptOgSvar::responseJson(qint64 id, const QJsonObject& result)
 {
     QJsonObject o;
     o.insert("jsonrpc", "2.0");
     o.insert("id", QJsonValue(id));
-    o.insert("result", resultat);
+    o.insert("result", result);
     return QJsonDocument(o).toJson(QJsonDocument::Compact);
 }
 
 void TestPromptOgSvar::session_new_payload_cwd()
 {
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    klient.sendSessionNew("/tmp/arbejde");
-    QJsonObject o = jsonObj(klient.sidsteSendtForTest());
+    AcpClient client;
+    client.setTestMode(true);
+    client.sendSessionNew("/tmp/arbejde");
+    QJsonObject o = jsonObj(client.lastSentForTest());
     QCOMPARE(o.value("method").toString(), QString("session/new"));
     QCOMPARE(o.value("params").toObject().value("cwd").toString(), QString("/tmp/arbejde"));
 }
 
 void TestPromptOgSvar::prompt_payload_content_blokke()
 {
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    klient.sendSessionNew("/tmp");
-    qint64 id = idAf(klient.sidsteSendtForTest());
-    QJsonObject resultat;
-    resultat.insert("sessionId", "sess-42");
-    klient.feedBytesForTest(svarJson(id, resultat) + "\n");
-    QCOMPARE(klient.sessionId(), QString("sess-42"));
+    AcpClient client;
+    client.setTestMode(true);
+    client.sendSessionNew("/tmp");
+    qint64 id = idOf(client.lastSentForTest());
+    QJsonObject result;
+    result.insert("sessionId", "sess-42");
+    client.feedBytesForTest(responseJson(id, result) + "\n");
+    QCOMPARE(client.sessionId(), QString("sess-42"));
 
-    klient.sendSessionPrompt("Hej agent");
-    QJsonObject o = jsonObj(klient.sidsteSendtForTest());
+    client.sendSessionPrompt("Hej agent");
+    QJsonObject o = jsonObj(client.lastSentForTest());
     QCOMPARE(o.value("method").toString(), QString("session/prompt"));
     QJsonObject params = o.value("params").toObject();
     QCOMPARE(params.value("sessionId").toString(), QString("sess-42"));
@@ -103,54 +103,54 @@ void TestPromptOgSvar::prompt_payload_content_blokke()
 
 void TestPromptOgSvar::chunk_akkumuleres_til_lastText()
 {
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    klient.feedBytesForTest(læsFixture("fixture_prompt_svar.ndjson"));
-    QCOMPARE(klient.samtaleModel()->lastText(), QString("Hej verden"));
+    AcpClient client;
+    client.setTestMode(true);
+    client.feedBytesForTest(readFixture("fixture_prompt_svar.ndjson"));
+    QCOMPARE(client.conversationModel()->lastText(), QString("Hej verden"));
 }
 
 void TestPromptOgSvar::svar_korreleres_paa_request_id()
 {
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    klient.sendSessionNew("/tmp");
-    qint64 id = idAf(klient.sidsteSendtForTest());
-    QJsonObject resultat;
-    resultat.insert("sessionId", "s1");
-    klient.feedBytesForTest(svarJson(id, resultat) + "\n");
+    AcpClient client;
+    client.setTestMode(true);
+    client.sendSessionNew("/tmp");
+    qint64 id = idOf(client.lastSentForTest());
+    QJsonObject result;
+    result.insert("sessionId", "s1");
+    client.feedBytesForTest(responseJson(id, result) + "\n");
 
-    klient.sendSessionPrompt("test");
-    qint64 pid = idAf(klient.sidsteSendtForTest());
-    QVERIFY(klient.stopReason().isEmpty());
+    client.sendSessionPrompt("test");
+    qint64 pid = idOf(client.lastSentForTest());
+    QVERIFY(client.stopReason().isEmpty());
     QJsonObject stop;
     stop.insert("stopReason", "end_turn");
-    klient.feedBytesForTest(svarJson(pid, stop) + "\n");
-    QCOMPARE(klient.stopReason(), QString("end_turn"));
+    client.feedBytesForTest(responseJson(pid, stop) + "\n");
+    QCOMPARE(client.stopReason(), QString("end_turn"));
 
     QJsonObject ukendt;
     ukendt.insert("stopReason", "cancelled");
-    klient.feedBytesForTest(svarJson(9999, ukendt) + "\n");
-    QCOMPARE(klient.stopReason(), QString("end_turn"));
+    client.feedBytesForTest(responseJson(9999, ukendt) + "\n");
+    QCOMPARE(client.stopReason(), QString("end_turn"));
 }
 
 void TestPromptOgSvar::end_turn_afslutter_runde()
 {
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    QSignalSpy afsluttet(&klient, SIGNAL(rundeAfsluttet()));
-    klient.sendSessionNew("/tmp");
-    qint64 id = idAf(klient.sidsteSendtForTest());
-    QJsonObject resultat;
-    resultat.insert("sessionId", "s1");
-    klient.feedBytesForTest(svarJson(id, resultat) + "\n");
+    AcpClient client;
+    client.setTestMode(true);
+    QSignalSpy afsluttet(&client, SIGNAL(roundFinished()));
+    client.sendSessionNew("/tmp");
+    qint64 id = idOf(client.lastSentForTest());
+    QJsonObject result;
+    result.insert("sessionId", "s1");
+    client.feedBytesForTest(responseJson(id, result) + "\n");
 
-    klient.sendSessionPrompt("hej");
-    QCOMPARE(klient.samtaleModel()->round(), 1);
-    QCOMPARE(klient.samtaleModel()->status(), QString("kører"));
+    client.sendSessionPrompt("hej");
+    QCOMPARE(client.conversationModel()->round(), 1);
+    QCOMPARE(client.conversationModel()->status(), QString("kører"));
 
-    klient.feedBytesForTest("{\"jsonrpc\":\"2.0\",\"method\":\"end_turn\",\"params\":{\"sessionId\":\"s1\"}}\n");
+    client.feedBytesForTest("{\"jsonrpc\":\"2.0\",\"method\":\"end_turn\",\"params\":{\"sessionId\":\"s1\"}}\n");
     QCOMPARE(afsluttet.count(), 1);
-    QCOMPARE(klient.samtaleModel()->status(), QString("klar"));
+    QCOMPARE(client.conversationModel()->status(), QString("klar"));
 }
 
 #include "tst_prompt_og_svar.moc"

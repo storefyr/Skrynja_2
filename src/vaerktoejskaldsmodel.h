@@ -1,5 +1,5 @@
-#ifndef VAERKTOEJSKALDSMODEL_H
-#define VAERKTOEJSKALDSMODEL_H
+#ifndef TOOLCALLMODEL_H
+#define TOOLCALLMODEL_H
 
 #include <QAbstractListModel>
 #include <QList>
@@ -7,15 +7,15 @@
 #include <QVariantList>
 #include <QVariantMap>
 
-class VaerktoejskaldsModel : public QAbstractListModel
+class ToolCallModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(QVariantList toolCalls READ toolCalls NOTIFY changed)
 public:
-    explicit VaerktoejskaldsModel(QObject* parent = 0);
+    explicit ToolCallModel(QObject* parent = 0);
 
-    void addToolCall(const QString& toolCallId, const QString& titel, const QString& status);
-    void updateToolCall(const QString& toolCallId, const QString& status, const QString& titel = QString());
+    void addToolCall(const QString& toolCallId, const QString& title, const QString& status);
+    void updateToolCall(const QString& toolCallId, const QString& status, const QString& title = QString());
     bool acknowledge(const QString& toolCallId);
 
     QVariantList toolCalls() const;
@@ -29,13 +29,13 @@ signals:
     void changed();
 
 private:
-    struct Kald {
+    struct Call {
         QString toolCallId;
-        QString titel;
+        QString title;
         QString status;
         bool set;
     };
-    QList<Kald> m_kald;
+    QList<Call> m_calls;
 };
 
 #endif

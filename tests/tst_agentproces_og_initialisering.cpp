@@ -21,15 +21,15 @@ private slots:
     void startfejl_giver_lastError_uden_haeng();
 };
 
-REGISTRER_TEST(TestAgentprocesOgInitialisering)
+REGISTER_TEST(TestAgentprocesOgInitialisering)
 
 void TestAgentprocesOgInitialisering::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    QString sti = QDir::tempPath() + "/skrynja-tst-settings-agent";
-    QDir().mkpath(sti);
+    QString path = QDir::tempPath() + "/skrynja-tst-settings-agent";
+    QDir().mkpath(path);
     QSettings::setDefaultFormat(QSettings::IniFormat);
-    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, sti);
+    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, path);
     QSettings s;
     s.clear();
     s.sync();
@@ -40,16 +40,16 @@ void TestAgentprocesOgInitialisering::standard_agentsti_er_vibe_acp()
     QSettings s;
     s.remove("agent/sti");
     s.sync();
-    AgentProces proces;
-    QCOMPARE(proces.agentsti(), QString("/home/defaultuser/.local/bin/vibe-acp"));
+    AgentProcess process;
+    QCOMPARE(process.agentPath(), QString("/home/defaultuser/.local/bin/vibe-acp"));
 }
 
 void TestAgentprocesOgInitialisering::initialize_payload_protocolversion_1()
 {
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    QSignalSpy sendt(&klient, SIGNAL(beskedSendt(QByteArray)));
-    klient.sendInitialize();
+    AcpClient client;
+    client.setTestMode(true);
+    QSignalSpy sendt(&client, SIGNAL(messageSent(QByteArray)));
+    client.sendInitialize();
     QCOMPARE(sendt.count(), 1);
     QJsonObject obj = QJsonDocument::fromJson(sendt.at(0).at(0).toByteArray()).object();
     QCOMPARE(obj.value("method").toString(), QString("initialize"));
@@ -58,10 +58,10 @@ void TestAgentprocesOgInitialisering::initialize_payload_protocolversion_1()
 
 void TestAgentprocesOgInitialisering::initialize_payload_tom_clientCapabilities()
 {
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    QSignalSpy sendt(&klient, SIGNAL(beskedSendt(QByteArray)));
-    klient.sendInitialize();
+    AcpClient client;
+    client.setTestMode(true);
+    QSignalSpy sendt(&client, SIGNAL(messageSent(QByteArray)));
+    client.sendInitialize();
     QJsonObject params = QJsonDocument::fromJson(sendt.at(0).at(0).toByteArray()).object()
                              .value("params").toObject();
     QJsonValue cap = params.value("clientCapabilities");
@@ -71,46 +71,46 @@ void TestAgentprocesOgInitialisering::initialize_payload_tom_clientCapabilities(
 
 void TestAgentprocesOgInitialisering::initialize_svar_parses_og_giver_config_options()
 {
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    QSignalSpy sendt(&klient, SIGNAL(beskedSendt(QByteArray)));
-    QSignalSpy klar(&klient, SIGNAL(agentKlar()));
-    klient.sendInitialize();
+    AcpClient client;
+    client.setTestMode(true);
+    QSignalSpy sendt(&client, SIGNAL(messageSent(QByteArray)));
+    QSignalSpy klar(&client, SIGNAL(agentReady()));
+    client.sendInitialize();
     qint64 id = QJsonDocument::fromJson(sendt.at(0).at(0).toByteArray()).object().value("id").toVariant().toLongLong();
-    QJsonObject resultat;
-    resultat.insert("protocolVersion", 1);
+    QJsonObject result;
+    result.insert("protocolVersion", 1);
     QJsonArray options;
     QJsonObject opt;
     opt.insert("configId", "model");
     opt.insert("name", "Model");
     opt.insert("value", "vibe-large");
     options.append(opt);
-    resultat.insert("configOptions", options);
-    QJsonObject svar;
-    svar.insert("jsonrpc", "2.0");
-    svar.insert("id", QJsonValue(id));
-    svar.insert("result", resultat);
-    klient.feedBytesForTest(QJsonDocument(svar).toJson(QJsonDocument::Compact) + "\n");
+    result.insert("configOptions", options);
+    QJsonObject response;
+    response.insert("jsonrpc", "2.0");
+    response.insert("id", QJsonValue(id));
+    response.insert("result", result);
+    client.feedBytesForTest(QJsonDocument(response).toJson(QJsonDocument::Compact) + "\n");
     QCOMPARE(klar.count(), 1);
-    QCOMPARE(klient.configOptions().size(), 1);
-    QCOMPARE(klient.configOptions().at(0).toMap().value("configId").toString(), QString("model"));
+    QCOMPARE(client.configOptions().size(), 1);
+    QCOMPARE(client.configOptions().at(0).toMap().value("configId").toString(), QString("model"));
 }
 
 void TestAgentprocesOgInitialisering::startfejl_giver_lastError_uden_haeng()
 {
-    AgentProces proces;
-    proces.sætAgentsti("/definitivt/ikke/eksisterende-agent");
+    AgentProcess process;
+    process.setAgentPath("/definitivt/ikke/eksisterende-agent");
     QElapsedTimer ur;
     ur.start();
-    QVERIFY(!proces.start());
+    QVERIFY(!process.start());
     QVERIFY(ur.elapsed() < 2000);
-    QVERIFY(!proces.lastError().isEmpty());
-    QVERIFY(!proces.kører());
+    QVERIFY(!process.lastError().isEmpty());
+    QVERIFY(!process.isRunning());
 
-    AcpClient klient;
-    klient.agentProces()->sætAgentsti("/definitivt/ikke/eksisterende-agent");
-    QVERIFY(!klient.startAgent());
-    QVERIFY(!klient.lastError().isEmpty());
+    AcpClient client;
+    client.agentProcess()->setAgentPath("/definitivt/ikke/eksisterende-agent");
+    QVERIFY(!client.startAgent());
+    QVERIFY(!client.lastError().isEmpty());
 }
 
 #include "tst_agentproces_og_initialisering.moc"

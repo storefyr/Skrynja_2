@@ -5,7 +5,7 @@ Page {
     id: side
 
     SilicaFlickable {
-        id: indhold
+        id: contents
         anchors.fill: parent
         contentHeight: kolonne.height
 
@@ -43,20 +43,20 @@ Page {
 
             Label {
                 x: Theme.horizontalPageMargin
-                text: "Status: " + acp.samtaleStatus + " (runde " + acp.samtaleRunde + ")"
+                text: "Status: " + acp.conversationStatus + " (runde " + acp.conversationRound + ")"
             }
 
             Repeater {
-                model: acp.toolkald
+                model: acp.toolCalls
                 delegate: Label {
                     x: Theme.horizontalPageMargin
                     width: parent.width - 2 * Theme.horizontalPageMargin
                     wrapMode: Text.Wrap
-                    text: modelData.titel + " — " + modelData.status
+                    text: modelData.title + " — " + modelData.status
                     color: modelData.set ? Theme.secondaryColor : Theme.primaryColor
                     MouseArea {
                         anchors.fill: parent
-                        onClicked: acp.kvitterVaerktoejskald(modelData.toolCallId)
+                        onClicked: acp.acknowledgeToolCall(modelData.toolCallId)
                     }
                 }
             }
@@ -65,7 +65,7 @@ Page {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 wrapMode: Text.Wrap
-                text: acp.samtaleTekst
+                text: acp.conversationText
             }
         }
     }

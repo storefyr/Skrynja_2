@@ -24,12 +24,12 @@ private slots:
     void ingen_haengende_proces_efter_stop();
     void stop_og_afvis_er_obligatorisk_i_raekkefoelge();
 private:
-    QByteArray læsFixture(const QString& navn);
-    qint64 idAf(const QByteArray& json);
-    QByteArray svarJson(qint64 id, const QJsonObject& resultat);
+    QByteArray readFixture(const QString& name);
+    qint64 idOf(const QByteArray& json);
+    QByteArray responseJson(qint64 id, const QJsonObject& result);
 };
 
-REGISTRER_TEST(TestStopOgAfvis)
+REGISTER_TEST(TestStopOgAfvis)
 
 static QJsonObject jsonObj(const QByteArray& json)
 {
@@ -39,52 +39,52 @@ static QJsonObject jsonObj(const QByteArray& json)
 void TestStopOgAfvis::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    QString sti = QDir::tempPath() + "/skrynja-tst-settings-stop";
-    QDir().mkpath(sti);
+    QString path = QDir::tempPath() + "/skrynja-tst-settings-stop";
+    QDir().mkpath(path);
     QSettings::setDefaultFormat(QSettings::IniFormat);
-    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, sti);
+    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, path);
     QSettings s;
     s.clear();
     s.sync();
 }
 
-QByteArray TestStopOgAfvis::læsFixture(const QString& navn)
+QByteArray TestStopOgAfvis::readFixture(const QString& name)
 {
-    QString sti = QFINDTESTDATA("fixtures/" + navn);
-    if (sti.isEmpty())
-        sti = "fixtures/" + navn;
-    QFile f(sti);
+    QString path = QFINDTESTDATA("fixtures/" + name);
+    if (path.isEmpty())
+        path = "fixtures/" + name;
+    QFile f(path);
     if (!f.open(QIODevice::ReadOnly))
         return QByteArray();
     return f.readAll();
 }
 
-qint64 TestStopOgAfvis::idAf(const QByteArray& json)
+qint64 TestStopOgAfvis::idOf(const QByteArray& json)
 {
     return jsonObj(json).value("id").toVariant().toLongLong();
 }
 
-QByteArray TestStopOgAfvis::svarJson(qint64 id, const QJsonObject& resultat)
+QByteArray TestStopOgAfvis::responseJson(qint64 id, const QJsonObject& result)
 {
     QJsonObject o;
     o.insert("jsonrpc", "2.0");
     o.insert("id", QJsonValue(id));
-    o.insert("result", resultat);
+    o.insert("result", result);
     return QJsonDocument(o).toJson(QJsonDocument::Compact);
 }
 
 void TestStopOgAfvis::cancel_notification_payload()
 {
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    klient.sendSessionNew("/tmp");
-    qint64 id = idAf(klient.sidsteSendtForTest());
-    QJsonObject resultat;
-    resultat.insert("sessionId", "s1");
-    klient.feedBytesForTest(svarJson(id, resultat) + "\n");
+    AcpClient client;
+    client.setTestMode(true);
+    client.sendSessionNew("/tmp");
+    qint64 id = idOf(client.lastSentForTest());
+    QJsonObject result;
+    result.insert("sessionId", "s1");
+    client.feedBytesForTest(responseJson(id, result) + "\n");
 
-    klient.sessionCancel();
-    QJsonObject o = jsonObj(klient.sidsteSendtForTest());
+    client.sessionCancel();
+    QJsonObject o = jsonObj(client.lastSentForTest());
     QCOMPARE(o.value("method").toString(), QString("session/cancel"));
     QVERIFY(!o.contains("id"));
     QCOMPARE(o.value("params").toObject().value("sessionId").toString(), QString("s1"));
@@ -92,11 +92,11 @@ void TestStopOgAfvis::cancel_notification_payload()
 
 void TestStopOgAfvis::afvisning_outcome_cancelled()
 {
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    klient.feedBytesForTest(læsFixture("fixture_tilladelse.ndjson"));
-    QVERIFY(klient.afvisPermission());
-    QJsonObject o = jsonObj(klient.sidsteSendtForTest());
+    AcpClient client;
+    client.setTestMode(true);
+    client.feedBytesForTest(readFixture("fixture_tilladelse.ndjson"));
+    QVERIFY(client.declinePermission());
+    QJsonObject o = jsonObj(client.lastSentForTest());
     QCOMPARE(o.value("result").toObject().value("outcome").toObject().value("outcome").toString(),
              QString("cancelled"));
 }
@@ -104,41 +104,41 @@ void TestStopOgAfvis::afvisning_outcome_cancelled()
 void TestStopOgAfvis::stopAgent_terminerer_proces()
 {
     QVERIFY(QFileInfo::exists("/bin/sleep"));
-    AgentProces proces;
-    proces.sætProgramOgArgumenterForTest("/bin/sleep", QStringList() << "30");
-    QVERIFY(proces.start());
-    QVERIFY(proces.kører());
+    AgentProcess process;
+    process.setProgramAndArgsForTest("/bin/sleep", QStringList() << "30");
+    QVERIFY(process.start());
+    QVERIFY(process.isRunning());
     QElapsedTimer ur;
     ur.start();
-    proces.stopAgent();
+    process.stopAgent();
     QVERIFY(ur.elapsed() < 5000);
-    QVERIFY(!proces.kører());
+    QVERIFY(!process.isRunning());
 }
 
 void TestStopOgAfvis::ingen_haengende_proces_efter_stop()
 {
-    AgentProces proces;
-    proces.sætProgramOgArgumenterForTest("/bin/sleep", QStringList() << "30");
-    QVERIFY(proces.start());
-    QVERIFY(proces.kører());
-    proces.stopAgent();
-    QCOMPARE(proces.proces()->state(), QProcess::NotRunning);
-    QCOMPARE(proces.proces()->pid(), 0);
+    AgentProcess process;
+    process.setProgramAndArgsForTest("/bin/sleep", QStringList() << "30");
+    QVERIFY(process.start());
+    QVERIFY(process.isRunning());
+    process.stopAgent();
+    QCOMPARE(process.process()->state(), QProcess::NotRunning);
+    QCOMPARE(process.process()->pid(), 0);
 }
 
 void TestStopOgAfvis::stop_og_afvis_er_obligatorisk_i_raekkefoelge()
 {
-    QString rod = QCoreApplication::applicationDirPath() + "/..";
-    if (!QFileInfo::exists(rod + "/tjek_manifest_parrede_tests.py"))
-        rod = "..";
-    QVERIFY2(QFileInfo::exists(rod + "/tjek_manifest_parrede_tests.py"), qPrintable(rod));
+    QString root = QCoreApplication::applicationDirPath() + "/..";
+    if (!QFileInfo::exists(root + "/tjek_manifest_parrede_tests.py"))
+        root = "..";
+    QVERIFY2(QFileInfo::exists(root + "/tjek_manifest_parrede_tests.py"), qPrintable(root));
     QProcess p;
-    p.setWorkingDirectory(rod);
+    p.setWorkingDirectory(root);
     p.start("python3", QStringList() << "tjek_manifest_parrede_tests.py");
     QVERIFY(p.waitForFinished(15000));
-    QString ud = QString::fromUtf8(p.readAllStandardOutput()) + QString::fromUtf8(p.readAllStandardError());
+    QString output = QString::fromUtf8(p.readAllStandardOutput()) + QString::fromUtf8(p.readAllStandardError());
     QCOMPARE(p.exitCode(), 0);
-    QVERIFY2(ud.contains("stop_og_afvis ikke sprunget over"), qPrintable(ud));
+    QVERIFY2(output.contains("stop_og_afvis ikke sprunget over"), qPrintable(output));
 }
 
 #include "tst_stop_og_afvis.moc"

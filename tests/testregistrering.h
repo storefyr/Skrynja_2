@@ -1,5 +1,5 @@
-#ifndef TESTREGISTRERING_H
-#define TESTREGISTRERING_H
+#ifndef TESTREGISTRATION_H
+#define TESTREGISTRATION_H
 
 #include <QList>
 #include <QObject>
@@ -7,29 +7,29 @@
 
 typedef QObject* (*TestFabrik)();
 
-struct TestRegistrering {
-    QString navn;
-    TestFabrik fabrik;
+struct TestRegistration {
+    QString name;
+    TestFabrik factory;
 };
 
-inline QList<TestRegistrering>& testRegistreringer()
+inline QList<TestRegistration>& testRegistrations()
 {
-    static QList<TestRegistrering> registreringer;
+    static QList<TestRegistration> registreringer;
     return registreringer;
 }
 
-struct TestRegistrator {
-    TestRegistrator(const QString& navn, TestFabrik fabrik)
+struct TestRegistrar {
+    TestRegistrar(const QString& name, TestFabrik factory)
     {
-        TestRegistrering r;
-        r.navn = navn;
-        r.fabrik = fabrik;
-        testRegistreringer().append(r);
+        TestRegistration r;
+        r.name = name;
+        r.factory = factory;
+        testRegistrations().append(r);
     }
 };
 
-#define REGISTRER_TEST(klasse) \
+#define REGISTER_TEST(klasse) \
     static QObject* lav_##klasse() { return new klasse; } \
-    static TestRegistrator registrator_##klasse(#klasse, &lav_##klasse);
+    static TestRegistrar registrator_##klasse(#klasse, &lav_##klasse);
 
 #endif

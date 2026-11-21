@@ -14,27 +14,27 @@ public:
     explicit AcpFrameReader(QIODevice* enhed = 0, QObject* parent = 0);
 
     static int standardCap();
-    void sætCap(int maksBytes);
+    void setCap(int maksBytes);
     int cap() const;
 
     void feedBytesForTest(const QByteArray& data);
     void eofForTest();
 
 signals:
-    void beskedKlar(const QByteArray& json);
-    void linjeDroppet(const QByteArray& linje, const QString& årsag);
+    void messageReady(const QByteArray& json);
+    void lineDropped(const QByteArray& line, const QString& reason);
     void haleReady(const QByteArray& hale);
 
 private slots:
-    void læsFraEnhed();
+    void readFromDevice();
 
 private:
-    void bearbejd(const QByteArray& data);
-    void håndterLinje(const QByteArray& linje);
-    static bool gyldigUtf8(const QByteArray& bytes);
-    static QList<QByteArray> splitTopLevel(const QByteArray& linje);
+    void processBuffer(const QByteArray& data);
+    void handleLine(const QByteArray& line);
+    static bool isValidUtf8(const QByteArray& bytes);
+    static QList<QByteArray> splitTopLevel(const QByteArray& line);
 
-    QIODevice* m_enhed;
+    QIODevice* m_device;
     QByteArray m_buffer;
     int m_cap;
 };

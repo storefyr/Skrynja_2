@@ -7,47 +7,47 @@
 #include <QStandardPaths>
 #include <QTextStream>
 
-Logfil* Logfil::instans()
+LogFile* LogFile::instance()
 {
-    static Logfil g_instans;
+    static LogFile g_instans;
     return &g_instans;
 }
 
-Logfil::Logfil(QObject* parent)
+LogFile::LogFile(QObject* parent)
     : QObject(parent)
-    , m_teststi(false)
+    , m_testPath(false)
 {
 }
 
-QString Logfil::logsti() const
+QString LogFile::logPath() const
 {
-    if (m_teststi)
-        return m_logsti;
+    if (m_testPath)
+        return m_logPath;
     QString base = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     if (base.isEmpty())
         base = QDir::homePath() + "/.local/share/harbour-skrynja-2";
     return base + "/skrynja-2.log";
 }
 
-void Logfil::sætLogstiForTest(const QString& sti)
+void LogFile::setLogPathForTest(const QString& path)
 {
-    m_logsti = sti;
-    m_teststi = true;
+    m_logPath = path;
+    m_testPath = true;
 }
 
-bool Logfil::skrivLinje(const QString& hændelse)
+bool LogFile::writeLine(const QString& event)
 {
-    if (hændelse.isEmpty())
+    if (event.isEmpty())
         return false;
-    if (hændelse.contains('\n') || hændelse.contains('\r'))
+    if (event.contains('\n') || event.contains('\r'))
         return false;
-    QString sti = logsti();
-    QDir().mkpath(QFileInfo(sti).absolutePath());
-    QFile fil(sti);
-    if (!fil.open(QIODevice::Append | QIODevice::Text))
+    QString path = logPath();
+    QDir().mkpath(QFileInfo(path).absolutePath());
+    QFile file(path);
+    if (!file.open(QIODevice::Append | QIODevice::Text))
         return false;
-    QTextStream strøm(&fil);
-    strøm.setCodec("UTF-8");
-    strøm << QDateTime::currentDateTime().toString(Qt::ISODate) << " " << hændelse << "\n";
+    QTextStream stream(&file);
+    stream.setCodec("UTF-8");
+    stream << QDateTime::currentDateTime().toString(Qt::ISODate) << " " << event << "\n";
     return true;
 }

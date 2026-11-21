@@ -1,28 +1,28 @@
 #include "sessionlager.h"
 
-SessionLager::SessionLager()
-    : m_indstillinger()
+SessionStore::SessionStore()
+    : m_settings()
 {
 }
 
-void SessionLager::gemSessionId(const QString& id)
+void SessionStore::saveSessionId(const QString& id)
 {
-    m_indstillinger.setValue("session/id", id);
-    m_indstillinger.sync();
+    m_settings.setValue("session/id", id);
+    m_settings.sync();
 }
 
-QString SessionLager::sessionId() const
+QString SessionStore::sessionId() const
 {
-    return m_indstillinger.value("session/id").toString();
+    return m_settings.value("session/id").toString();
 }
 
-bool SessionLager::harSessionId() const
+bool SessionStore::hasSessionId() const
 {
-    return m_indstillinger.contains("session/id");
+    return m_settings.contains("session/id");
 }
 
-void SessionLager::ryd()
+void SessionStore::clear()
 {
-    m_indstillinger.remove("session/id");
-    m_indstillinger.sync();
+    m_settings.remove("session/id");
+    m_settings.sync();
 }

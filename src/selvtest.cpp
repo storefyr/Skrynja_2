@@ -11,122 +11,122 @@
 #include "acpclient.h"
 #include "diffmodel.h"
 
-Selvtest::Selvtest(AcpClient* klient, QObject* parent)
+SelfTest::SelfTest(AcpClient* client, QObject* parent)
     : QObject(parent)
-    , m_klient(klient)
-    , m_verdictSkrevet(false)
-    , m_promptSendt(false)
-    , m_tilladelseBesvaret(false)
-    , m_filSkrevet(false)
+    , m_client(client)
+    , m_verdictWritten(false)
+    , m_promptSent(false)
+    , m_permissionAnswered(false)
+    , m_fileWritten(false)
 {
 }
 
-void Selvtest::start(const QString& prompt, const QString& verdictSti)
+void SelfTest::start(const QString& prompt, const QString& verdictPath)
 {
     m_prompt = prompt;
-    m_verdictSti = verdictSti;
-    connect(m_klient, SIGNAL(agentKlar()), this, SLOT(onAgentKlar()));
-    connect(m_klient, SIGNAL(sessionOprettet(QString)), this, SLOT(onSessionOprettet(QString)));
-    connect(m_klient, SIGNAL(permissionAnmodet()), this, SLOT(onPermissionAnmodet()));
-    connect(m_klient, SIGNAL(rundeAfsluttet()), this, SLOT(onRundeAfsluttet()));
-    connect(m_klient, SIGNAL(agentFejl(QString)), this, SLOT(onAgentFejl(QString)));
-    connect(m_klient, SIGNAL(agentDoed(int)), this, SLOT(onAgentDoed(int)));
-    connect(m_klient, SIGNAL(beskedSendt(QByteArray)), this, SLOT(onBeskedSendt(QByteArray)));
-    connect(m_klient, SIGNAL(diffsAendret()), this, SLOT(onDiffsAendret()));
-    m_klient->startAgent();
+    m_verdictPath = verdictPath;
+    connect(m_client, SIGNAL(agentReady()), this, SLOT(onAgentReady()));
+    connect(m_client, SIGNAL(sessionCreated(QString)), this, SLOT(onSessionCreated(QString)));
+    connect(m_client, SIGNAL(permissionRequested()), this, SLOT(onPermissionRequested()));
+    connect(m_client, SIGNAL(roundFinished()), this, SLOT(onRoundFinished()));
+    connect(m_client, SIGNAL(agentError(QString)), this, SLOT(onAgentError(QString)));
+    connect(m_client, SIGNAL(agentDied(int)), this, SLOT(onAgentDied(int)));
+    connect(m_client, SIGNAL(messageSent(QByteArray)), this, SLOT(onMessageSent(QByteArray)));
+    connect(m_client, SIGNAL(diffsChanged()), this, SLOT(onDiffsChanged()));
+    m_client->startAgent();
 }
 
-bool Selvtest::verdictSkrevet() const
+bool SelfTest::verdictWritten() const
 {
-    return m_verdictSkrevet;
+    return m_verdictWritten;
 }
 
-QJsonObject Selvtest::verdict() const
+QJsonObject SelfTest::verdict() const
 {
-    QFile f(m_verdictSti);
+    QFile f(m_verdictPath);
     if (!f.open(QIODevice::ReadOnly))
         return QJsonObject();
     return QJsonDocument::fromJson(f.readAll()).object();
 }
 
-QString Selvtest::verdictSti() const
+QString SelfTest::verdictPath() const
 {
-    return m_verdictSti;
+    return m_verdictPath;
 }
 
-void Selvtest::onAgentKlar()
+void SelfTest::onAgentReady()
 {
-    m_klient->startSession();
+    m_client->startSession();
 }
 
-void Selvtest::onSessionOprettet(const QString& sessionId)
+void SelfTest::onSessionCreated(const QString& sessionId)
 {
     Q_UNUSED(sessionId);
-    m_klient->sendSessionPrompt(m_prompt);
+    m_client->sendSessionPrompt(m_prompt);
 }
 
-void Selvtest::onBeskedSendt(const QByteArray& linje)
+void SelfTest::onMessageSent(const QByteArray& line)
 {
-    if (linje.contains("\"session/prompt\""))
-        m_promptSendt = true;
+    if (line.contains("\"session/prompt\""))
+        m_promptSent = true;
 }
 
-void Selvtest::onPermissionAnmodet()
+void SelfTest::onPermissionRequested()
 {
-    QVariantMap pending = m_klient->pendingPermission();
+    QVariantMap pending = m_client->pendingPermission();
     QVariantList options = pending.value("options").toList();
     if (!options.isEmpty()) {
         QString optionId = options.at(0).toMap().value("optionId").toString();
-        if (m_klient->answerPermission(optionId))
-            m_tilladelseBesvaret = true;
+        if (m_client->answerPermission(optionId))
+            m_permissionAnswered = true;
     }
 }
 
-void Selvtest::onDiffsAendret()
+void SelfTest::onDiffsChanged()
 {
-    if (m_klient->diffModel()->diffCount() > 0)
-        m_filSkrevet = true;
+    if (m_client->diffModel()->diffCount() > 0)
+        m_fileWritten = true;
 }
 
-void Selvtest::onRundeAfsluttet()
+void SelfTest::onRoundFinished()
 {
-    if (m_promptSendt && m_tilladelseBesvaret && m_filSkrevet)
-        afslut(true, "prompt sendt, tilladelse besvaret, fil skrevet, end_turn modtaget");
+    if (m_promptSent && m_permissionAnswered && m_fileWritten)
+        finish(true, "prompt sendt, tilladelse besvaret, fil skrevet, end_turn modtaget");
     else
-        afslut(false, QString("kæde ufuldstændig: prompt=%1 tilladelse=%2 fil=%3")
-               .arg(m_promptSendt).arg(m_tilladelseBesvaret).arg(m_filSkrevet));
+        finish(false, QString("kæde ufuldstændig: prompt=%1 tilladelse=%2 fil=%3")
+               .arg(m_promptSent).arg(m_permissionAnswered).arg(m_fileWritten));
 }
 
-void Selvtest::onAgentFejl(const QString& fejl)
+void SelfTest::onAgentError(const QString& error)
 {
-    afslut(false, "startfejl/agentfejl: " + fejl);
+    finish(false, "startfejl/agentfejl: " + error);
 }
 
-void Selvtest::onAgentDoed(int kode)
+void SelfTest::onAgentDied(int kode)
 {
-    afslut(false, QString("agentdød (exit %1)").arg(kode));
+    finish(false, QString("agentdød (exit %1)").arg(kode));
 }
 
-void Selvtest::afslut(bool pass, const QString& årsag)
+void SelfTest::finish(bool pass, const QString& reason)
 {
-    if (m_verdictSkrevet)
+    if (m_verdictWritten)
         return;
-    skrivVerdict(pass, årsag);
-    m_klient->stopAgent();
-    emit faerdig(pass ? 0 : 1);
+    writeVerdict(pass, reason);
+    m_client->stopAgent();
+    emit finished(pass ? 0 : 1);
 }
 
-void Selvtest::skrivVerdict(bool pass, const QString& årsag)
+void SelfTest::writeVerdict(bool pass, const QString& reason)
 {
-    if (m_verdictSkrevet)
+    if (m_verdictWritten)
         return;
-    m_verdictSkrevet = true;
+    m_verdictWritten = true;
     QJsonObject o;
-    o.insert("resultat", pass ? QString("pass") : QString("fail"));
-    o.insert("årsag", årsag);
+    o.insert("result", pass ? QString("pass") : QString("fail"));
+    o.insert("årsag", reason);
     o.insert("tidsstempel", QDateTime::currentDateTime().toString(Qt::ISODate));
-    QDir().mkpath(QFileInfo(m_verdictSti).absolutePath());
-    QFile f(m_verdictSti);
+    QDir().mkpath(QFileInfo(m_verdictPath).absolutePath());
+    QFile f(m_verdictPath);
     if (f.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
         f.write(QJsonDocument(o).toJson(QJsonDocument::Compact));
         f.close();

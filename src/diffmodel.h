@@ -16,8 +16,8 @@ class DiffModel : public QAbstractListModel
 public:
     explicit DiffModel(QObject* parent = 0);
 
-    void addDiff(const QString& sti, const QString& diffTekst);
-    void addOutput(const QString& tekst);
+    void addDiff(const QString& path, const QString& diffText);
+    void addOutput(const QString& text);
 
     QVariantList diffs() const;
     QVariantList outputs() const;
@@ -32,8 +32,8 @@ signals:
 
 private:
     struct Diff {
-        QString sti;
-        QStringList linjer;
+        QString path;
+        QStringList lines;
     };
     QList<Diff> m_diffs;
     QStringList m_outputs;

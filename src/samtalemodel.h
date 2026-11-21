@@ -1,24 +1,24 @@
-#ifndef SAMTALEMODEL_H
-#define SAMTALEMODEL_H
+#ifndef CONVERSATIONMODEL_H
+#define CONVERSATIONMODEL_H
 
 #include <QAbstractListModel>
 #include <QString>
 #include <QStringList>
 
-class SamtaleModel : public QAbstractListModel
+class ConversationModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(QString lastText READ lastText NOTIFY changed)
     Q_PROPERTY(int round READ round NOTIFY changed)
     Q_PROPERTY(QString status READ status NOTIFY changed)
 public:
-    enum Roller { TekstRolle = Qt::UserRole + 1 };
+    enum Roles { TextRole = Qt::UserRole + 1 };
 
-    explicit SamtaleModel(QObject* parent = 0);
+    explicit ConversationModel(QObject* parent = 0);
 
-    void addChunk(const QString& tekst);
-    void startRunde();
-    void endRunde();
+    void addChunk(const QString& text);
+    void startRound();
+    void endRound();
 
     QString lastText() const;
     int round() const;
@@ -29,10 +29,10 @@ public:
 
 signals:
     void changed();
-    void rundeAfsluttet();
+    void roundFinished();
 
 private:
-    QStringList m_linjer;
+    QStringList m_lines;
     QString m_lastText;
     int m_round;
     QString m_status;

@@ -1,22 +1,22 @@
 #include "konfigurationsmodel.h"
 
-Konfigurationsmodel::Konfigurationsmodel(QObject* parent)
+ConfigurationModel::ConfigurationModel(QObject* parent)
     : QObject(parent)
 {
 }
 
-void Konfigurationsmodel::setConfigOptions(const QVariantList& options)
+void ConfigurationModel::setConfigOptions(const QVariantList& options)
 {
     m_options = options;
     emit changed();
 }
 
-QVariantList Konfigurationsmodel::configOptions() const
+QVariantList ConfigurationModel::configOptions() const
 {
     return m_options;
 }
 
-QVariantMap Konfigurationsmodel::findConfig(const QString& configId) const
+QVariantMap ConfigurationModel::findConfig(const QString& configId) const
 {
     for (int i = 0; i < m_options.size(); ++i) {
         QVariantMap m = m_options.at(i).toMap();

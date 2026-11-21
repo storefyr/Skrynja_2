@@ -22,12 +22,12 @@ private slots:
     void standard_agentsti_er_vibe_acp();
     void clientCapabilities_fortsat_tom();
 private:
-    QByteArray læsFixture(const QString& navn);
-    qint64 idAf(const QByteArray& json);
-    QByteArray svarJson(qint64 id, const QJsonObject& resultat);
+    QByteArray readFixture(const QString& name);
+    qint64 idOf(const QByteArray& json);
+    QByteArray responseJson(qint64 id, const QJsonObject& result);
 };
 
-REGISTRER_TEST(TestKonfigurationAfAgent)
+REGISTER_TEST(TestKonfigurationAfAgent)
 
 static QJsonObject jsonObj(const QByteArray& json)
 {
@@ -37,65 +37,65 @@ static QJsonObject jsonObj(const QByteArray& json)
 void TestKonfigurationAfAgent::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    QString sti = QDir::tempPath() + "/skrynja-tst-settings-konfig";
-    QDir().mkpath(sti);
+    QString path = QDir::tempPath() + "/skrynja-tst-settings-konfig";
+    QDir().mkpath(path);
     QSettings::setDefaultFormat(QSettings::IniFormat);
-    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, sti);
+    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, path);
     QSettings s;
     s.clear();
     s.sync();
 }
 
-QByteArray TestKonfigurationAfAgent::læsFixture(const QString& navn)
+QByteArray TestKonfigurationAfAgent::readFixture(const QString& name)
 {
-    QString sti = QFINDTESTDATA("fixtures/" + navn);
-    if (sti.isEmpty())
-        sti = "fixtures/" + navn;
-    QFile f(sti);
+    QString path = QFINDTESTDATA("fixtures/" + name);
+    if (path.isEmpty())
+        path = "fixtures/" + name;
+    QFile f(path);
     if (!f.open(QIODevice::ReadOnly))
         return QByteArray();
     return f.readAll();
 }
 
-qint64 TestKonfigurationAfAgent::idAf(const QByteArray& json)
+qint64 TestKonfigurationAfAgent::idOf(const QByteArray& json)
 {
     return jsonObj(json).value("id").toVariant().toLongLong();
 }
 
-QByteArray TestKonfigurationAfAgent::svarJson(qint64 id, const QJsonObject& resultat)
+QByteArray TestKonfigurationAfAgent::responseJson(qint64 id, const QJsonObject& result)
 {
     QJsonObject o;
     o.insert("jsonrpc", "2.0");
     o.insert("id", QJsonValue(id));
-    o.insert("result", resultat);
+    o.insert("result", result);
     return QJsonDocument(o).toJson(QJsonDocument::Compact);
 }
 
 void TestKonfigurationAfAgent::config_options_fra_initialize_svar()
 {
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    klient.sendInitialize();
-    klient.feedBytesForTest(læsFixture("fixture_initialize_config.ndjson"));
-    Konfigurationsmodel* model = klient.konfigurationsmodel();
+    AcpClient client;
+    client.setTestMode(true);
+    client.sendInitialize();
+    client.feedBytesForTest(readFixture("fixture_initialize_config.ndjson"));
+    ConfigurationModel* model = client.configurationModel();
     QCOMPARE(model->configOptions().size(), 2);
     QCOMPARE(model->findConfig("model").value("value").toString(), QString("vibe-large"));
     QCOMPARE(model->findConfig("maxTokens").value("value").toInt(), 4096);
-    QCOMPARE(klient.configOptions().size(), 2);
+    QCOMPARE(client.configOptions().size(), 2);
 }
 
 void TestKonfigurationAfAgent::set_config_option_payload()
 {
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    klient.sendSessionNew("/tmp");
-    qint64 id = idAf(klient.sidsteSendtForTest());
-    QJsonObject resultat;
-    resultat.insert("sessionId", "s1");
-    klient.feedBytesForTest(svarJson(id, resultat) + "\n");
+    AcpClient client;
+    client.setTestMode(true);
+    client.sendSessionNew("/tmp");
+    qint64 id = idOf(client.lastSentForTest());
+    QJsonObject result;
+    result.insert("sessionId", "s1");
+    client.feedBytesForTest(responseJson(id, result) + "\n");
 
-    klient.setConfigOption("model", "vibe-x");
-    QJsonObject o = jsonObj(klient.sidsteSendtForTest());
+    client.setConfigOption("model", "vibe-x");
+    QJsonObject o = jsonObj(client.lastSentForTest());
     QCOMPARE(o.value("method").toString(), QString("session/set_config_option"));
     QJsonObject params = o.value("params").toObject();
     QCOMPARE(params.value("configId").toString(), QString("model"));
@@ -108,11 +108,11 @@ void TestKonfigurationAfAgent::agentsti_override_fra_settings()
     QSettings s;
     s.clear();
     s.sync();
-    AcpClient klient;
-    klient.setAgentsti("/tmp/min-agent");
-    QCOMPARE(klient.agentsti(), QString("/tmp/min-agent"));
-    AgentProces proces;
-    QCOMPARE(proces.agentsti(), QString("/tmp/min-agent"));
+    AcpClient client;
+    client.setAgentsti("/tmp/min-agent");
+    QCOMPARE(client.agentPath(), QString("/tmp/min-agent"));
+    AgentProcess process;
+    QCOMPARE(process.agentPath(), QString("/tmp/min-agent"));
     s.remove("agent/sti");
     s.sync();
 }
@@ -122,16 +122,16 @@ void TestKonfigurationAfAgent::standard_agentsti_er_vibe_acp()
     QSettings s;
     s.remove("agent/sti");
     s.sync();
-    AgentProces proces;
-    QCOMPARE(proces.agentsti(), QString("/home/defaultuser/.local/bin/vibe-acp"));
+    AgentProcess process;
+    QCOMPARE(process.agentPath(), QString("/home/defaultuser/.local/bin/vibe-acp"));
 }
 
 void TestKonfigurationAfAgent::clientCapabilities_fortsat_tom()
 {
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    klient.sendInitialize();
-    QJsonObject params = jsonObj(klient.sidsteSendtForTest()).value("params").toObject();
+    AcpClient client;
+    client.setTestMode(true);
+    client.sendInitialize();
+    QJsonObject params = jsonObj(client.lastSentForTest()).value("params").toObject();
     QJsonValue cap = params.value("clientCapabilities");
     QVERIFY(cap.isObject());
     QVERIFY(cap.toObject().isEmpty());

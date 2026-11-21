@@ -1,31 +1,31 @@
 #include "vaerktoejskaldsmodel.h"
 
-VaerktoejskaldsModel::VaerktoejskaldsModel(QObject* parent)
+ToolCallModel::ToolCallModel(QObject* parent)
     : QAbstractListModel(parent)
 {
 }
 
-void VaerktoejskaldsModel::addToolCall(const QString& toolCallId, const QString& titel, const QString& status)
+void ToolCallModel::addToolCall(const QString& toolCallId, const QString& title, const QString& status)
 {
-    Kald k;
+    Call k;
     k.toolCallId = toolCallId;
-    k.titel = titel;
+    k.title = title;
     k.status = status.isEmpty() ? QString("pending") : status;
     k.set = false;
-    beginInsertRows(QModelIndex(), m_kald.size(), m_kald.size());
-    m_kald.append(k);
+    beginInsertRows(QModelIndex(), m_calls.size(), m_calls.size());
+    m_calls.append(k);
     endInsertRows();
     emit changed();
 }
 
-void VaerktoejskaldsModel::updateToolCall(const QString& toolCallId, const QString& status, const QString& titel)
+void ToolCallModel::updateToolCall(const QString& toolCallId, const QString& status, const QString& title)
 {
-    for (int i = 0; i < m_kald.size(); ++i) {
-        if (m_kald.at(i).toolCallId == toolCallId) {
+    for (int i = 0; i < m_calls.size(); ++i) {
+        if (m_calls.at(i).toolCallId == toolCallId) {
             if (!status.isEmpty())
-                m_kald[i].status = status;
-            if (!titel.isEmpty())
-                m_kald[i].titel = titel;
+                m_calls[i].status = status;
+            if (!title.isEmpty())
+                m_calls[i].title = title;
             QModelIndex idx = index(i);
             emit dataChanged(idx, idx);
             emit changed();
@@ -34,13 +34,13 @@ void VaerktoejskaldsModel::updateToolCall(const QString& toolCallId, const QStri
     }
 }
 
-bool VaerktoejskaldsModel::acknowledge(const QString& toolCallId)
+bool ToolCallModel::acknowledge(const QString& toolCallId)
 {
-    for (int i = 0; i < m_kald.size(); ++i) {
-        if (m_kald.at(i).toolCallId == toolCallId) {
-            if (m_kald.at(i).set)
+    for (int i = 0; i < m_calls.size(); ++i) {
+        if (m_calls.at(i).toolCallId == toolCallId) {
+            if (m_calls.at(i).set)
                 return false;
-            m_kald[i].set = true;
+            m_calls[i].set = true;
             QModelIndex idx = index(i);
             emit dataChanged(idx, idx);
             emit changed();
@@ -50,54 +50,54 @@ bool VaerktoejskaldsModel::acknowledge(const QString& toolCallId)
     return false;
 }
 
-QVariantList VaerktoejskaldsModel::toolCalls() const
+QVariantList ToolCallModel::toolCalls() const
 {
-    QVariantList liste;
-    for (int i = 0; i < m_kald.size(); ++i) {
+    QVariantList list;
+    for (int i = 0; i < m_calls.size(); ++i) {
         QVariantMap m;
-        m.insert("toolCallId", m_kald.at(i).toolCallId);
-        m.insert("titel", m_kald.at(i).titel);
-        m.insert("status", m_kald.at(i).status);
-        m.insert("set", m_kald.at(i).set);
-        liste.append(m);
+        m.insert("toolCallId", m_calls.at(i).toolCallId);
+        m.insert("title", m_calls.at(i).title);
+        m.insert("status", m_calls.at(i).status);
+        m.insert("set", m_calls.at(i).set);
+        list.append(m);
     }
-    return liste;
+    return list;
 }
 
-QVariantMap VaerktoejskaldsModel::find(const QString& toolCallId) const
+QVariantMap ToolCallModel::find(const QString& toolCallId) const
 {
-    for (int i = 0; i < m_kald.size(); ++i) {
-        if (m_kald.at(i).toolCallId == toolCallId) {
+    for (int i = 0; i < m_calls.size(); ++i) {
+        if (m_calls.at(i).toolCallId == toolCallId) {
             QVariantMap m;
-            m.insert("toolCallId", m_kald.at(i).toolCallId);
-            m.insert("titel", m_kald.at(i).titel);
-            m.insert("status", m_kald.at(i).status);
-            m.insert("set", m_kald.at(i).set);
+            m.insert("toolCallId", m_calls.at(i).toolCallId);
+            m.insert("title", m_calls.at(i).title);
+            m.insert("status", m_calls.at(i).status);
+            m.insert("set", m_calls.at(i).set);
             return m;
         }
     }
     return QVariantMap();
 }
 
-int VaerktoejskaldsModel::count() const
+int ToolCallModel::count() const
 {
-    return m_kald.size();
+    return m_calls.size();
 }
 
-int VaerktoejskaldsModel::rowCount(const QModelIndex& parent) const
+int ToolCallModel::rowCount(const QModelIndex& parent) const
 {
     if (parent.isValid())
         return 0;
-    return m_kald.size();
+    return m_calls.size();
 }
 
-QVariant VaerktoejskaldsModel::data(const QModelIndex& index, int role) const
+QVariant ToolCallModel::data(const QModelIndex& index, int role) const
 {
-    if (!index.isValid() || index.row() < 0 || index.row() >= m_kald.size())
+    if (!index.isValid() || index.row() < 0 || index.row() >= m_calls.size())
         return QVariant();
-    const Kald& k = m_kald.at(index.row());
+    const Call& k = m_calls.at(index.row());
     if (role == Qt::DisplayRole)
-        return k.titel + " (" + k.status + ")";
+        return k.title + " (" + k.status + ")";
     if (role == Qt::UserRole + 1)
         return k.toolCallId;
     if (role == Qt::UserRole + 2)

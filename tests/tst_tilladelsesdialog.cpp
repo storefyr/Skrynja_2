@@ -23,10 +23,10 @@ private slots:
     void afvisning_giver_outcome_cancelled();
     void ingen_dobbelt_svar();
 private:
-    QByteArray læsFixture(const QString& navn);
+    QByteArray readFixture(const QString& name);
 };
 
-REGISTRER_TEST(TestTilladelsesdialog)
+REGISTER_TEST(TestTilladelsesdialog)
 
 static QJsonObject jsonObj(const QByteArray& json)
 {
@@ -36,21 +36,21 @@ static QJsonObject jsonObj(const QByteArray& json)
 void TestTilladelsesdialog::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    QString sti = QDir::tempPath() + "/skrynja-tst-settings-tilladelse";
-    QDir().mkpath(sti);
+    QString path = QDir::tempPath() + "/skrynja-tst-settings-tilladelse";
+    QDir().mkpath(path);
     QSettings::setDefaultFormat(QSettings::IniFormat);
-    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, sti);
+    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, path);
     QSettings s;
     s.clear();
     s.sync();
 }
 
-QByteArray TestTilladelsesdialog::læsFixture(const QString& navn)
+QByteArray TestTilladelsesdialog::readFixture(const QString& name)
 {
-    QString sti = QFINDTESTDATA("fixtures/" + navn);
-    if (sti.isEmpty())
-        sti = "fixtures/" + navn;
-    QFile f(sti);
+    QString path = QFINDTESTDATA("fixtures/" + name);
+    if (path.isEmpty())
+        path = "fixtures/" + name;
+    QFile f(path);
     if (!f.open(QIODevice::ReadOnly))
         return QByteArray();
     return f.readAll();
@@ -58,23 +58,23 @@ QByteArray TestTilladelsesdialog::læsFixture(const QString& navn)
 
 void TestTilladelsesdialog::anmodning_parses_til_pendingPermission()
 {
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    QSignalSpy anmodet(&klient, SIGNAL(permissionAnmodet()));
-    klient.feedBytesForTest(læsFixture("fixture_tilladelse.ndjson"));
-    QCOMPARE(anmodet.count(), 1);
-    Tilladelsesmodel* model = klient.tilladelsesmodel();
-    QVERIFY(model->afventende());
+    AcpClient client;
+    client.setTestMode(true);
+    QSignalSpy requested(&client, SIGNAL(permissionRequested()));
+    client.feedBytesForTest(readFixture("fixture_tilladelse.ndjson"));
+    QCOMPARE(requested.count(), 1);
+    PermissionModel* model = client.permissionModel();
+    QVERIFY(model->isPending());
     QVERIFY(!model->pendingPermission().isEmpty());
-    QCOMPARE(model->anmodningsId(), 100);
+    QCOMPARE(model->requestId(), 100);
 }
 
 void TestTilladelsesdialog::options_liste_med_optionId()
 {
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    klient.feedBytesForTest(læsFixture("fixture_tilladelse.ndjson"));
-    QVariantMap pending = klient.tilladelsesmodel()->pendingPermission();
+    AcpClient client;
+    client.setTestMode(true);
+    client.feedBytesForTest(readFixture("fixture_tilladelse.ndjson"));
+    QVariantMap pending = client.permissionModel()->pendingPermission();
     QVariantList options = pending.value("options").toList();
     QCOMPARE(options.size(), 2);
     QCOMPARE(options.at(0).toMap().value("optionId").toString(), QString("allow"));
@@ -84,11 +84,11 @@ void TestTilladelsesdialog::options_liste_med_optionId()
 
 void TestTilladelsesdialog::svar_payload_selected_optionId()
 {
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    klient.feedBytesForTest(læsFixture("fixture_tilladelse.ndjson"));
-    QVERIFY(klient.answerPermission("allow"));
-    QJsonObject o = jsonObj(klient.sidsteSendtForTest());
+    AcpClient client;
+    client.setTestMode(true);
+    client.feedBytesForTest(readFixture("fixture_tilladelse.ndjson"));
+    QVERIFY(client.answerPermission("allow"));
+    QJsonObject o = jsonObj(client.lastSentForTest());
     QCOMPARE(o.value("id").toVariant().toLongLong(), 100);
     QJsonObject outcome = o.value("result").toObject().value("outcome").toObject();
     QCOMPARE(outcome.value("outcome").toString(), QString("selected"));
@@ -97,32 +97,32 @@ void TestTilladelsesdialog::svar_payload_selected_optionId()
 
 void TestTilladelsesdialog::afvisning_giver_outcome_cancelled()
 {
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    klient.feedBytesForTest(læsFixture("fixture_tilladelse.ndjson"));
-    QVERIFY(klient.afvisPermission());
-    QJsonObject o = jsonObj(klient.sidsteSendtForTest());
+    AcpClient client;
+    client.setTestMode(true);
+    client.feedBytesForTest(readFixture("fixture_tilladelse.ndjson"));
+    QVERIFY(client.declinePermission());
+    QJsonObject o = jsonObj(client.lastSentForTest());
     QJsonObject outcome = o.value("result").toObject().value("outcome").toObject();
     QCOMPARE(outcome.value("outcome").toString(), QString("cancelled"));
 }
 
 void TestTilladelsesdialog::ingen_dobbelt_svar()
 {
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    klient.feedBytesForTest(læsFixture("fixture_tilladelse.ndjson"));
-    QCOMPARE(klient.tilladelsesmodel()->anmodninger(), 1);
-    QVERIFY(klient.answerPermission("allow"));
-    QVERIFY(!klient.answerPermission("deny"));
-    QVERIFY(!klient.afvisPermission());
-    int svarTalt = 0;
-    QList<QByteArray> sendte = klient.sendteForTest();
-    for (int i = 0; i < sendte.size(); ++i) {
-        QJsonObject o = jsonObj(sendte.at(i));
+    AcpClient client;
+    client.setTestMode(true);
+    client.feedBytesForTest(readFixture("fixture_tilladelse.ndjson"));
+    QCOMPARE(client.permissionModel()->requests(), 1);
+    QVERIFY(client.answerPermission("allow"));
+    QVERIFY(!client.answerPermission("deny"));
+    QVERIFY(!client.declinePermission());
+    int responseCount = 0;
+    QList<QByteArray> sent = client.sentForTest();
+    for (int i = 0; i < sent.size(); ++i) {
+        QJsonObject o = jsonObj(sent.at(i));
         if (o.contains("id") && o.value("id").toVariant().toLongLong() == 100 && o.contains("result"))
-            ++svarTalt;
+            ++responseCount;
     }
-    QCOMPARE(svarTalt, 1);
+    QCOMPARE(responseCount, 1);
 }
 
 #include "tst_tilladelsesdialog.moc"

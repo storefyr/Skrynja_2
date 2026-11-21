@@ -23,7 +23,7 @@ Dialog {
                     width: parent.width
                     Label {
                         x: Theme.horizontalPageMargin
-                        text: modelData.sti
+                        text: modelData.path
                         font.bold: true
                     }
                     Label {
@@ -31,7 +31,7 @@ Dialog {
                         width: parent.width - 2 * Theme.horizontalPageMargin
                         wrapMode: Text.Wrap
                         font.family: "monospace"
-                        text: modelData.tekst
+                        text: modelData.text
                     }
                 }
             }

@@ -24,29 +24,29 @@ private slots:
     void outputs_akkumuleres();
     void diff_vises_mens_det_sker();
 private:
-    QByteArray læsFixture(const QString& navn);
+    QByteArray readFixture(const QString& name);
 };
 
-REGISTRER_TEST(TestDiffOgUddata)
+REGISTER_TEST(TestDiffOgUddata)
 
 void TestDiffOgUddata::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    QString sti = QDir::tempPath() + "/skrynja-tst-settings-diff";
-    QDir().mkpath(sti);
+    QString path = QDir::tempPath() + "/skrynja-tst-settings-diff";
+    QDir().mkpath(path);
     QSettings::setDefaultFormat(QSettings::IniFormat);
-    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, sti);
+    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, path);
     QSettings s;
     s.clear();
     s.sync();
 }
 
-QByteArray TestDiffOgUddata::læsFixture(const QString& navn)
+QByteArray TestDiffOgUddata::readFixture(const QString& name)
 {
-    QString sti = QFINDTESTDATA("fixtures/" + navn);
-    if (sti.isEmpty())
-        sti = "fixtures/" + navn;
-    QFile f(sti);
+    QString path = QFINDTESTDATA("fixtures/" + name);
+    if (path.isEmpty())
+        path = "fixtures/" + name;
+    QFile f(path);
     if (!f.open(QIODevice::ReadOnly))
         return QByteArray();
     return f.readAll();
@@ -54,36 +54,36 @@ QByteArray TestDiffOgUddata::læsFixture(const QString& navn)
 
 void TestDiffOgUddata::diff_blok_parses()
 {
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    klient.feedBytesForTest(læsFixture("fixture_diff.ndjson"));
-    DiffModel* model = klient.diffModel();
+    AcpClient client;
+    client.setTestMode(true);
+    client.feedBytesForTest(readFixture("fixture_diff.ndjson"));
+    DiffModel* model = client.diffModel();
     QCOMPARE(model->diffCount(), 2);
     QVariantList diffs = model->diffs();
-    QCOMPARE(diffs.at(0).toMap().value("sti").toString(), QString("/tmp/fil.txt"));
-    QVERIFY(diffs.at(0).toMap().value("linjer").toStringList().contains("+ny"));
-    QCOMPARE(diffs.at(1).toMap().value("sti").toString(), QString("/tmp/fil2.txt"));
+    QCOMPARE(diffs.at(0).toMap().value("path").toString(), QString("/tmp/fil.txt"));
+    QVERIFY(diffs.at(0).toMap().value("lines").toStringList().contains("+ny"));
+    QCOMPARE(diffs.at(1).toMap().value("path").toString(), QString("/tmp/fil2.txt"));
 }
 
 void TestDiffOgUddata::diff_linjer_cappes()
 {
     DiffModel model;
-    QString langLinje(AcpFrameReader::standardCap() + 100, 'x');
-    model.addDiff("/tmp/lang.txt", langLinje + "\n" + "kort");
+    QString longLine(AcpFrameReader::standardCap() + 100, 'x');
+    model.addDiff("/tmp/lang.txt", longLine + "\n" + "kort");
     QCOMPARE(model.diffCount(), 1);
-    QStringList linjer = model.diffs().at(0).toMap().value("linjer").toStringList();
-    QCOMPARE(linjer.size(), 2);
-    QVERIFY(linjer.at(0).size() <= AcpFrameReader::standardCap());
-    QCOMPARE(linjer.at(0).size(), AcpFrameReader::standardCap());
-    QCOMPARE(linjer.at(1), QString("kort"));
+    QStringList lines = model.diffs().at(0).toMap().value("lines").toStringList();
+    QCOMPARE(lines.size(), 2);
+    QVERIFY(lines.at(0).size() <= AcpFrameReader::standardCap());
+    QCOMPARE(lines.at(0).size(), AcpFrameReader::standardCap());
+    QCOMPARE(lines.at(1), QString("kort"));
 }
 
 void TestDiffOgUddata::outputs_akkumuleres()
 {
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    klient.feedBytesForTest(læsFixture("fixture_uddata.ndjson"));
-    DiffModel* model = klient.diffModel();
+    AcpClient client;
+    client.setTestMode(true);
+    client.feedBytesForTest(readFixture("fixture_uddata.ndjson"));
+    DiffModel* model = client.diffModel();
     QCOMPARE(model->outputCount(), 2);
     QVERIFY(model->outputs().contains("kommando kørte fint"));
     QVERIFY(model->outputs().contains("mere output"));
@@ -91,15 +91,15 @@ void TestDiffOgUddata::outputs_akkumuleres()
 
 void TestDiffOgUddata::diff_vises_mens_det_sker()
 {
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    QSignalSpy ændret(klient.diffModel(), SIGNAL(changed()));
-    QByteArray alle = læsFixture("fixture_diff.ndjson");
-    QByteArray førsteLinje = alle.left(alle.indexOf('\n') + 1);
-    klient.feedBytesForTest(førsteLinje);
-    QVERIFY(ændret.count() >= 1);
-    QCOMPARE(klient.diffModel()->diffCount(), 1);
-    QCOMPARE(klient.samtaleModel()->status(), QString("klar"));
+    AcpClient client;
+    client.setTestMode(true);
+    QSignalSpy changed(client.diffModel(), SIGNAL(changed()));
+    QByteArray all = readFixture("fixture_diff.ndjson");
+    QByteArray firstLine = all.left(all.indexOf('\n') + 1);
+    client.feedBytesForTest(firstLine);
+    QVERIFY(changed.count() >= 1);
+    QCOMPARE(client.diffModel()->diffCount(), 1);
+    QCOMPARE(client.conversationModel()->status(), QString("klar"));
 }
 
 #include "tst_diff_og_uddata.moc"

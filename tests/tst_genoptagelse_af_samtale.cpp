@@ -24,12 +24,12 @@ private slots:
     void hadRestoredHistory_saettes_korrekt();
     void resumeregel_laeser_manifest_og_finder_foerste_false();
 private:
-    qint64 idAf(const QByteArray& json);
-    QByteArray fejlSvarJson(qint64 id, int kode, const QString& besked);
-    QByteArray svarJson(qint64 id, const QJsonObject& resultat);
+    qint64 idOf(const QByteArray& json);
+    QByteArray errorResponseJson(qint64 id, int kode, const QString& message);
+    QByteArray responseJson(qint64 id, const QJsonObject& result);
 };
 
-REGISTRER_TEST(TestGenoptagelseAfSamtale)
+REGISTER_TEST(TestGenoptagelseAfSamtale)
 
 static QJsonObject jsonObj(const QByteArray& json)
 {
@@ -39,38 +39,38 @@ static QJsonObject jsonObj(const QByteArray& json)
 void TestGenoptagelseAfSamtale::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    QString sti = QDir::tempPath() + "/skrynja-tst-settings-genoptag";
-    QDir().mkpath(sti);
+    QString path = QDir::tempPath() + "/skrynja-tst-settings-genoptag";
+    QDir().mkpath(path);
     QSettings::setDefaultFormat(QSettings::IniFormat);
-    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, sti);
+    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, path);
     QSettings s;
     s.clear();
     s.sync();
 }
 
-qint64 TestGenoptagelseAfSamtale::idAf(const QByteArray& json)
+qint64 TestGenoptagelseAfSamtale::idOf(const QByteArray& json)
 {
     return jsonObj(json).value("id").toVariant().toLongLong();
 }
 
-QByteArray TestGenoptagelseAfSamtale::fejlSvarJson(qint64 id, int kode, const QString& besked)
+QByteArray TestGenoptagelseAfSamtale::errorResponseJson(qint64 id, int kode, const QString& message)
 {
-    QJsonObject fejl;
-    fejl.insert("code", kode);
-    fejl.insert("message", besked);
+    QJsonObject error;
+    error.insert("code", kode);
+    error.insert("message", message);
     QJsonObject o;
     o.insert("jsonrpc", "2.0");
     o.insert("id", QJsonValue(id));
-    o.insert("error", fejl);
+    o.insert("error", error);
     return QJsonDocument(o).toJson(QJsonDocument::Compact);
 }
 
-QByteArray TestGenoptagelseAfSamtale::svarJson(qint64 id, const QJsonObject& resultat)
+QByteArray TestGenoptagelseAfSamtale::responseJson(qint64 id, const QJsonObject& result)
 {
     QJsonObject o;
     o.insert("jsonrpc", "2.0");
     o.insert("id", QJsonValue(id));
-    o.insert("result", resultat);
+    o.insert("result", result);
     return QJsonDocument(o).toJson(QJsonDocument::Compact);
 }
 
@@ -79,12 +79,12 @@ void TestGenoptagelseAfSamtale::session_id_gemmes_i_settings()
     QSettings s;
     s.clear();
     s.sync();
-    SessionLager lager;
-    QVERIFY(!lager.harSessionId());
-    lager.gemSessionId("sess-abc");
-    QVERIFY(lager.harSessionId());
-    QCOMPARE(lager.sessionId(), QString("sess-abc"));
-    SessionLager igen;
+    SessionStore store;
+    QVERIFY(!store.hasSessionId());
+    store.saveSessionId("sess-abc");
+    QVERIFY(store.hasSessionId());
+    QCOMPARE(store.sessionId(), QString("sess-abc"));
+    SessionStore igen;
     QCOMPARE(igen.sessionId(), QString("sess-abc"));
 }
 
@@ -93,12 +93,12 @@ void TestGenoptagelseAfSamtale::load_med_gemt_session_id()
     QSettings s;
     s.clear();
     s.sync();
-    SessionLager lager;
-    lager.gemSessionId("sess-gammel");
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    klient.startSession();
-    QJsonObject o = jsonObj(klient.sidsteSendtForTest());
+    SessionStore store;
+    store.saveSessionId("sess-gammel");
+    AcpClient client;
+    client.setTestMode(true);
+    client.startSession();
+    QJsonObject o = jsonObj(client.lastSentForTest());
     QCOMPARE(o.value("method").toString(), QString("session/load"));
     QCOMPARE(o.value("params").toObject().value("sessionId").toString(), QString("sess-gammel"));
 }
@@ -108,16 +108,16 @@ void TestGenoptagelseAfSamtale::fallback_til_new_ved_load_fejl()
     QSettings s;
     s.clear();
     s.sync();
-    SessionLager lager;
-    lager.gemSessionId("sess-gammel");
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    klient.startSession();
-    qint64 id = idAf(klient.sidsteSendtForTest());
-    klient.feedBytesForTest(fejlSvarJson(id, -32602, "ukendt session") + "\n");
-    QJsonObject o = jsonObj(klient.sidsteSendtForTest());
+    SessionStore store;
+    store.saveSessionId("sess-gammel");
+    AcpClient client;
+    client.setTestMode(true);
+    client.startSession();
+    qint64 id = idOf(client.lastSentForTest());
+    client.feedBytesForTest(errorResponseJson(id, -32602, "ukendt session") + "\n");
+    QJsonObject o = jsonObj(client.lastSentForTest());
     QCOMPARE(o.value("method").toString(), QString("session/new"));
-    QVERIFY(!klient.hadRestoredHistory());
+    QVERIFY(!client.hadRestoredHistory());
 }
 
 void TestGenoptagelseAfSamtale::hadRestoredHistory_saettes_korrekt()
@@ -125,55 +125,55 @@ void TestGenoptagelseAfSamtale::hadRestoredHistory_saettes_korrekt()
     QSettings s;
     s.clear();
     s.sync();
-    SessionLager lager;
-    lager.gemSessionId("sess-gammel");
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    klient.startSession();
-    qint64 id = idAf(klient.sidsteSendtForTest());
-    QVERIFY(!klient.hadRestoredHistory());
-    QJsonObject resultat;
-    resultat.insert("sessionId", "sess-gammel");
-    klient.feedBytesForTest(svarJson(id, resultat) + "\n");
-    QVERIFY(klient.hadRestoredHistory());
-    QCOMPARE(klient.sessionId(), QString("sess-gammel"));
+    SessionStore store;
+    store.saveSessionId("sess-gammel");
+    AcpClient client;
+    client.setTestMode(true);
+    client.startSession();
+    qint64 id = idOf(client.lastSentForTest());
+    QVERIFY(!client.hadRestoredHistory());
+    QJsonObject result;
+    result.insert("sessionId", "sess-gammel");
+    client.feedBytesForTest(responseJson(id, result) + "\n");
+    QVERIFY(client.hadRestoredHistory());
+    QCOMPARE(client.sessionId(), QString("sess-gammel"));
 }
 
 void TestGenoptagelseAfSamtale::resumeregel_laeser_manifest_og_finder_foerste_false()
 {
-    QString sti = QCoreApplication::applicationDirPath()
+    QString path = QCoreApplication::applicationDirPath()
                   + "/../realiseringsmanifest_for_funktioner_og_parrede_tests.json";
-    if (!QFileInfo::exists(sti))
-        sti = "../realiseringsmanifest_for_funktioner_og_parrede_tests.json";
-    QVERIFY2(QFileInfo::exists(sti), qPrintable(sti));
-    QFile f(sti);
+    if (!QFileInfo::exists(path))
+        path = "../realiseringsmanifest_for_funktioner_og_parrede_tests.json";
+    QVERIFY2(QFileInfo::exists(path), qPrintable(path));
+    QFile f(path);
     QVERIFY(f.open(QIODevice::ReadOnly));
     QJsonObject manifest = QJsonDocument::fromJson(f.readAll()).object();
     f.close();
-    QJsonArray rækkefølge = manifest.value("strategisk_rækkefølge").toArray();
+    QJsonArray order = manifest.value("strategisk_rækkefølge").toArray();
     QJsonArray funktioner = manifest.value("funktioner").toArray();
-    QCOMPARE(funktioner.size(), rækkefølge.size());
+    QCOMPARE(funktioner.size(), order.size());
     QHash<QString, bool> passerer;
     for (int i = 0; i < funktioner.size(); ++i)
         passerer.insert(funktioner.at(i).toObject().value("id").toString(),
                         funktioner.at(i).toObject().value("passerer").toBool());
-    QString førsteIRækkefølge;
-    for (int i = 0; i < rækkefølge.size(); ++i) {
-        QString id = rækkefølge.at(i).toString();
+    QString firstInOrder;
+    for (int i = 0; i < order.size(); ++i) {
+        QString id = order.at(i).toString();
         if (!passerer.value(id)) {
-            førsteIRækkefølge = id;
+            firstInOrder = id;
             break;
         }
     }
-    QString førsteIFunktioner;
+    QString firstInFunctions;
     for (int i = 0; i < funktioner.size(); ++i) {
         QJsonObject fn = funktioner.at(i).toObject();
         if (!fn.value("passerer").toBool()) {
-            førsteIFunktioner = fn.value("id").toString();
+            firstInFunctions = fn.value("id").toString();
             break;
         }
     }
-    QCOMPARE(førsteIRækkefølge, førsteIFunktioner);
+    QCOMPARE(firstInOrder, firstInFunctions);
 }
 
 #include "tst_genoptagelse_af_samtale.moc"

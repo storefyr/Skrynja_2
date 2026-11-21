@@ -22,43 +22,43 @@ static const QString kSetConfigOption = QLatin1String("session/set_config_option
 
 AcpClient::AcpClient(QObject* parent)
     : QObject(parent)
-    , m_proces(new AgentProces(this))
-    , m_læser(new AcpFrameReader(m_proces->proces(), this))
-    , m_samtale(new SamtaleModel(this))
-    , m_lager(new SessionLager)
-    , m_vaerktoejskald(new VaerktoejskaldsModel(this))
-    , m_tilladelse(new Tilladelsesmodel(this))
+    , m_process(new AgentProcess(this))
+    , m_reader(new AcpFrameReader(m_process->process(), this))
+    , m_conversation(new ConversationModel(this))
+    , m_store(new SessionStore)
+    , m_toolCallModel(new ToolCallModel(this))
+    , m_permissionModel(new PermissionModel(this))
     , m_diff(new DiffModel(this))
-    , m_konfiguration(new Konfigurationsmodel(this))
-    , m_næsteId(1)
-    , m_testTilstand(false)
+    , m_configModel(new ConfigurationModel(this))
+    , m_nextId(1)
+    , m_testMode(false)
     , m_hadRestoredHistory(false)
 {
-    connect(m_læser, SIGNAL(beskedKlar(QByteArray)), this, SLOT(modtagLinje(QByteArray)));
-    connect(m_proces, SIGNAL(fejl(QString)), this, SLOT(modtagAgentFejl(QString)));
-    connect(m_proces, SIGNAL(faerdig(int)), this, SLOT(procesFaerdig(int)));
-    connect(m_vaerktoejskald, SIGNAL(changed()), this, SIGNAL(vaerktoejskaldAendret()));
-    connect(m_samtale, SIGNAL(changed()), this, SIGNAL(samtaleAendret()));
-    connect(m_tilladelse, SIGNAL(changed()), this, SIGNAL(tilladelseAendret()));
-    connect(m_diff, SIGNAL(changed()), this, SIGNAL(diffsAendret()));
-    connect(m_diff, SIGNAL(changed()), this, SIGNAL(outputsAendret()));
-    connect(m_konfiguration, SIGNAL(changed()), this, SIGNAL(konfigurationAendret()));
+    connect(m_reader, SIGNAL(messageReady(QByteArray)), this, SLOT(receiveLine(QByteArray)));
+    connect(m_process, SIGNAL(error(QString)), this, SLOT(receiveAgentError(QString)));
+    connect(m_process, SIGNAL(finished(int)), this, SLOT(processFinished(int)));
+    connect(m_toolCallModel, SIGNAL(changed()), this, SIGNAL(toolCallsChanged()));
+    connect(m_conversation, SIGNAL(changed()), this, SIGNAL(conversationChanged()));
+    connect(m_permissionModel, SIGNAL(changed()), this, SIGNAL(permissionChanged()));
+    connect(m_diff, SIGNAL(changed()), this, SIGNAL(diffsChanged()));
+    connect(m_diff, SIGNAL(changed()), this, SIGNAL(outputsChanged()));
+    connect(m_configModel, SIGNAL(changed()), this, SIGNAL(configChanged()));
 }
 
 AcpClient::~AcpClient()
 {
-    m_proces->stopAgent();
+    m_process->stopAgent();
 }
 
 bool AcpClient::startAgent()
 {
-    if (m_testTilstand) {
+    if (m_testMode) {
         sendInitialize();
         return true;
     }
-    if (!m_proces->start()) {
-        m_lastError = m_proces->lastError();
-        emit agentFejl(m_lastError);
+    if (!m_process->start()) {
+        m_lastError = m_process->lastError();
+        emit agentError(m_lastError);
         return false;
     }
     sendInitialize();
@@ -75,13 +75,13 @@ void AcpClient::sendInitialize()
     clientInfo.insert("version", "1.0.0");
     params.insert("clientInfo", clientInfo);
     qint64 id = sendRequest("initialize", params);
-    m_åbneAnmodninger.insert(id, "initialize");
+    m_pendingRequests.insert(id, "initialize");
 }
 
 void AcpClient::startSession()
 {
-    if (m_lager->harSessionId())
-        sendSessionLoad(m_lager->sessionId());
+    if (m_store->hasSessionId())
+        sendSessionLoad(m_store->sessionId());
     else
         sendSessionNew(QDir::homePath());
 }
@@ -91,7 +91,7 @@ void AcpClient::sendSessionLoad(const QString& sessionId)
     QJsonObject params;
     params.insert("sessionId", sessionId);
     qint64 id = sendRequest("session/load", params);
-    m_åbneAnmodninger.insert(id, "session/load");
+    m_pendingRequests.insert(id, "session/load");
 }
 
 void AcpClient::sendSessionNew(const QString& cwd)
@@ -99,12 +99,12 @@ void AcpClient::sendSessionNew(const QString& cwd)
     QJsonObject params;
     params.insert("cwd", cwd);
     qint64 id = sendRequest("session/new", params);
-    m_åbneAnmodninger.insert(id, "session/new");
+    m_pendingRequests.insert(id, "session/new");
 }
 
 void AcpClient::sendSessionPrompt(const QString& prompt)
 {
-    m_samtale->startRunde();
+    m_conversation->startRound();
     QJsonObject blok;
     blok.insert("type", "text");
     blok.insert("text", prompt);
@@ -114,68 +114,68 @@ void AcpClient::sendSessionPrompt(const QString& prompt)
     params.insert("sessionId", m_sessionId);
     params.insert("prompt", blokke);
     qint64 id = sendRequest(kSessionPrompt, params);
-    m_åbneAnmodninger.insert(id, kSessionPrompt);
+    m_pendingRequests.insert(id, kSessionPrompt);
 }
 
-SamtaleModel* AcpClient::samtaleModel() const
+ConversationModel* AcpClient::conversationModel() const
 {
-    return m_samtale;
+    return m_conversation;
 }
 
-VaerktoejskaldsModel* AcpClient::vaerktoejskaldsModel() const
+ToolCallModel* AcpClient::toolCallModel() const
 {
-    return m_vaerktoejskald;
+    return m_toolCallModel;
 }
 
-QVariantList AcpClient::toolkald() const
+QVariantList AcpClient::toolCalls() const
 {
-    return m_vaerktoejskald->toolCalls();
+    return m_toolCallModel->toolCalls();
 }
 
-QString AcpClient::samtaleTekst() const
+QString AcpClient::conversationText() const
 {
-    return m_samtale->lastText();
+    return m_conversation->lastText();
 }
 
-int AcpClient::samtaleRunde() const
+int AcpClient::conversationRound() const
 {
-    return m_samtale->round();
+    return m_conversation->round();
 }
 
-QString AcpClient::samtaleStatus() const
+QString AcpClient::conversationStatus() const
 {
-    return m_samtale->status();
+    return m_conversation->status();
 }
 
-void AcpClient::kvitterVaerktoejskald(const QString& toolCallId)
+void AcpClient::acknowledgeToolCall(const QString& toolCallId)
 {
-    m_vaerktoejskald->acknowledge(toolCallId);
+    m_toolCallModel->acknowledge(toolCallId);
 }
 
 bool AcpClient::answerPermission(const QString& optionId)
 {
-    if (!m_tilladelse->afventende())
+    if (!m_permissionModel->isPending())
         return false;
     QJsonObject outcome;
     outcome.insert("outcome", "selected");
     outcome.insert("optionId", optionId);
     QJsonObject result;
     result.insert("outcome", outcome);
-    sendBesked(AcpBesked::svar(m_tilladelse->anmodningsId(), result));
-    m_tilladelse->setSvaret();
+    sendMessage(AcpMessage::response(m_permissionModel->requestId(), result));
+    m_permissionModel->setAnswered();
     return true;
 }
 
-bool AcpClient::afvisPermission()
+bool AcpClient::declinePermission()
 {
-    if (!m_tilladelse->afventende())
+    if (!m_permissionModel->isPending())
         return false;
     QJsonObject outcome;
     outcome.insert("outcome", "cancelled");
     QJsonObject result;
     result.insert("outcome", outcome);
-    sendBesked(AcpBesked::svar(m_tilladelse->anmodningsId(), result));
-    m_tilladelse->setSvaret();
+    sendMessage(AcpMessage::response(m_permissionModel->requestId(), result));
+    m_permissionModel->setAnswered();
     return true;
 }
 
@@ -183,27 +183,27 @@ void AcpClient::sessionCancel()
 {
     QJsonObject params;
     params.insert("sessionId", m_sessionId);
-    sendNotifikation(kSessionCancel, params);
+    sendNotification(kSessionCancel, params);
 }
 
 void AcpClient::stopAgent()
 {
-    m_proces->stopAgent();
+    m_process->stopAgent();
 }
 
-Tilladelsesmodel* AcpClient::tilladelsesmodel() const
+PermissionModel* AcpClient::permissionModel() const
 {
-    return m_tilladelse;
+    return m_permissionModel;
 }
 
 QVariantMap AcpClient::pendingPermission() const
 {
-    return m_tilladelse->pendingPermission();
+    return m_permissionModel->pendingPermission();
 }
 
-int AcpClient::tilladelseAntal() const
+int AcpClient::permissionCount() const
 {
-    return m_tilladelse->anmodninger();
+    return m_permissionModel->requests();
 }
 
 DiffModel* AcpClient::diffModel() const
@@ -221,30 +221,30 @@ QVariantList AcpClient::outputs() const
     return m_diff->outputs();
 }
 
-Konfigurationsmodel* AcpClient::konfigurationsmodel() const
+ConfigurationModel* AcpClient::configurationModel() const
 {
-    return m_konfiguration;
+    return m_configModel;
 }
 
-void AcpClient::setConfigOption(const QString& configId, const QVariant& værdi)
+void AcpClient::setConfigOption(const QString& configId, const QVariant& value)
 {
     QJsonObject params;
     params.insert("sessionId", m_sessionId);
     params.insert("configId", configId);
-    params.insert("value", QJsonValue::fromVariant(værdi));
+    params.insert("value", QJsonValue::fromVariant(value));
     qint64 id = sendRequest(kSetConfigOption, params);
-    m_åbneAnmodninger.insert(id, kSetConfigOption);
+    m_pendingRequests.insert(id, kSetConfigOption);
 }
 
-QString AcpClient::agentsti() const
+QString AcpClient::agentPath() const
 {
-    return m_proces->agentsti();
+    return m_process->agentPath();
 }
 
-void AcpClient::setAgentsti(const QString& sti)
+void AcpClient::setAgentsti(const QString& path)
 {
-    m_proces->sætAgentsti(sti);
-    emit agentstiAendret();
+    m_process->setAgentPath(path);
+    emit agentPathChanged();
 }
 
 QString AcpClient::sessionId() const
@@ -267,9 +267,9 @@ QString AcpClient::lastError() const
     return m_lastError;
 }
 
-AgentProces* AcpClient::agentProces() const
+AgentProcess* AcpClient::agentProcess() const
 {
-    return m_proces;
+    return m_process;
 }
 
 QVariantList AcpClient::configOptions() const
@@ -277,151 +277,151 @@ QVariantList AcpClient::configOptions() const
     return m_configOptions;
 }
 
-void AcpClient::sætTestTilstand(bool tilstand)
+void AcpClient::setTestMode(bool tilstand)
 {
-    m_testTilstand = tilstand;
+    m_testMode = tilstand;
 }
 
-bool AcpClient::testTilstand() const
+bool AcpClient::testMode() const
 {
-    return m_testTilstand;
+    return m_testMode;
 }
 
 void AcpClient::feedBytesForTest(const QByteArray& data)
 {
-    m_læser->feedBytesForTest(data);
+    m_reader->feedBytesForTest(data);
 }
 
-void AcpClient::simulerAgentDødForTest(int kode)
+void AcpClient::simulateAgentDeathForTest(int kode)
 {
-    procesFaerdig(kode);
+    processFinished(kode);
 }
 
-QList<QByteArray> AcpClient::sendteForTest() const
+QList<QByteArray> AcpClient::sentForTest() const
 {
     return m_sendte;
 }
 
-QByteArray AcpClient::sidsteSendtForTest() const
+QByteArray AcpClient::lastSentForTest() const
 {
     if (m_sendte.isEmpty())
         return QByteArray();
     return m_sendte.last();
 }
 
-void AcpClient::nulstilForTest()
+void AcpClient::resetForTest()
 {
     m_sendte.clear();
-    m_åbneAnmodninger.clear();
+    m_pendingRequests.clear();
     m_configOptions.clear();
     m_lastError.clear();
     m_sessionId.clear();
     m_stopReason.clear();
 }
 
-qint64 AcpClient::næsteId()
+qint64 AcpClient::nextId()
 {
-    return m_næsteId++;
+    return m_nextId++;
 }
 
-qint64 AcpClient::sendRequest(const QString& metode, const QJsonObject& params)
+qint64 AcpClient::sendRequest(const QString& method, const QJsonObject& params)
 {
-    qint64 id = næsteId();
-    sendBesked(AcpBesked::anmodning(id, metode, params));
+    qint64 id = nextId();
+    sendMessage(AcpMessage::request(id, method, params));
     return id;
 }
 
-void AcpClient::sendNotifikation(const QString& metode, const QJsonObject& params)
+void AcpClient::sendNotification(const QString& method, const QJsonObject& params)
 {
-    sendBesked(AcpBesked::notifikation(metode, params));
+    sendMessage(AcpMessage::notification(method, params));
 }
 
-void AcpClient::sendBesked(const AcpBesked& besked)
+void AcpClient::sendMessage(const AcpMessage& message)
 {
-    skriv(besked.tilJson() + "\n");
+    write(message.tilJson() + "\n");
 }
 
-void AcpClient::skriv(const QByteArray& linje)
+void AcpClient::write(const QByteArray& line)
 {
-    if (m_testTilstand) {
-        m_sendte.append(linje);
-    } else if (m_proces->proces()->isOpen()) {
-        m_proces->proces()->write(linje);
+    if (m_testMode) {
+        m_sendte.append(line);
+    } else if (m_process->process()->isOpen()) {
+        m_process->process()->write(line);
     }
-    emit beskedSendt(linje);
+    emit messageSent(line);
 }
 
-void AcpClient::modtagLinje(const QByteArray& linje)
+void AcpClient::receiveLine(const QByteArray& line)
 {
     bool ok = false;
-    AcpBesked besked = AcpBesked::fraJson(linje, &ok);
+    AcpMessage message = AcpMessage::fraJson(line, &ok);
     if (ok)
-        håndterBesked(besked);
+        handleMessage(message);
 }
 
-void AcpClient::håndterBesked(const AcpBesked& besked)
+void AcpClient::handleMessage(const AcpMessage& message)
 {
-    if (besked.type() == AcpBesked::Svar && besked.harId()) {
-        QString metode = m_åbneAnmodninger.take(besked.id());
-        if (metode == "session/load" && besked.erFejl()) {
+    if (message.type() == AcpMessage::Response && message.hasId()) {
+        QString method = m_pendingRequests.take(message.id());
+        if (method == "session/load" && message.isError()) {
             m_hadRestoredHistory = false;
-            emit historieAendret();
+            emit historyChanged();
             sendSessionNew(QDir::homePath());
             return;
         }
-        if (besked.erFejl()) {
-            m_lastError = besked.fejl().value("message").toString();
-            if (metode == "initialize")
-                emit agentFejl(m_lastError);
+        if (message.isError()) {
+            m_lastError = message.error().value("message").toString();
+            if (method == "initialize")
+                emit agentError(m_lastError);
             return;
         }
-        QJsonObject resultat = besked.resultat().toObject();
-        if (metode == "initialize") {
-            QJsonArray options = resultat.value("configOptions").toArray();
+        QJsonObject result = message.result().toObject();
+        if (method == "initialize") {
+            QJsonArray options = result.value("configOptions").toArray();
             m_configOptions.clear();
             for (int i = 0; i < options.size(); ++i)
                 m_configOptions.append(options.at(i).toObject().toVariantMap());
-            m_konfiguration->setConfigOptions(m_configOptions);
-            emit initializeSvar(resultat);
-            emit agentKlar();
-        } else if (metode == "session/load") {
-            m_sessionId = resultat.value("sessionId").toString();
+            m_configModel->setConfigOptions(m_configOptions);
+            emit initializeResponse(result);
+            emit agentReady();
+        } else if (method == "session/load") {
+            m_sessionId = result.value("sessionId").toString();
             m_hadRestoredHistory = true;
-            m_lager->gemSessionId(m_sessionId);
-            emit sessionOprettet(m_sessionId);
-            emit historieAendret();
-        } else if (metode == "session/new") {
-            m_sessionId = resultat.value("sessionId").toString();
+            m_store->saveSessionId(m_sessionId);
+            emit sessionCreated(m_sessionId);
+            emit historyChanged();
+        } else if (method == "session/new") {
+            m_sessionId = result.value("sessionId").toString();
             m_hadRestoredHistory = false;
-            m_lager->gemSessionId(m_sessionId);
-            emit sessionOprettet(m_sessionId);
-            emit historieAendret();
-        } else if (metode == kSessionPrompt) {
-            m_stopReason = resultat.value("stopReason").toString();
+            m_store->saveSessionId(m_sessionId);
+            emit sessionCreated(m_sessionId);
+            emit historyChanged();
+        } else if (method == kSessionPrompt) {
+            m_stopReason = result.value("stopReason").toString();
         }
-    } else if (besked.type() == AcpBesked::Notifikation) {
-        håndterNotifikation(besked);
-    } else if (besked.type() == AcpBesked::Anmodning && besked.harId()) {
-        if (besked.metode() == "session/request_permission") {
-            m_tilladelse->setAnmodning(besked.id(), besked.params());
-            emit permissionAnmodet();
+    } else if (message.type() == AcpMessage::Notification) {
+        handleNotification(message);
+    } else if (message.type() == AcpMessage::Request && message.hasId()) {
+        if (message.method() == "session/request_permission") {
+            m_permissionModel->setRequest(message.id(), message.params());
+            emit permissionRequested();
         } else {
-            sendBesked(AcpBesked::fejlSvar(besked.id(), -32601, "ukendt metode"));
+            sendMessage(AcpMessage::errorResponse(message.id(), -32601, "ukendt metode"));
         }
     }
 }
 
-void AcpClient::håndterNotifikation(const AcpBesked& besked)
+void AcpClient::handleNotification(const AcpMessage& message)
 {
-    if (besked.metode() == "session/update")
-        håndterSessionUpdate(besked.params());
-    else if (besked.metode() == "end_turn") {
-        m_samtale->endRunde();
-        emit rundeAfsluttet();
+    if (message.method() == "session/update")
+        handleSessionUpdate(message.params());
+    else if (message.method() == "end_turn") {
+        m_conversation->endRound();
+        emit roundFinished();
     }
 }
 
-void AcpClient::håndterContentBlokke(const QJsonObject& update)
+void AcpClient::handleContentBlocks(const QJsonObject& update)
 {
     QJsonArray content = update.value("content").toArray();
     for (int i = 0; i < content.size(); ++i) {
@@ -434,36 +434,36 @@ void AcpClient::håndterContentBlokke(const QJsonObject& update)
     }
 }
 
-void AcpClient::håndterSessionUpdate(const QJsonObject& params)
+void AcpClient::handleSessionUpdate(const QJsonObject& params)
 {
     QJsonObject update = params.value("update").toObject();
     QString art = update.value("sessionUpdate").toString();
     if (art == "agent_message_chunk") {
         QJsonObject content = update.value("content").toObject();
-        m_samtale->addChunk(content.value("text").toString());
+        m_conversation->addChunk(content.value("text").toString());
     } else if (art == "tool_call") {
-        m_vaerktoejskald->addToolCall(update.value("toolCallId").toString(),
+        m_toolCallModel->addToolCall(update.value("toolCallId").toString(),
                                       update.value("title").toString(),
                                       update.value("status").toString());
-        håndterContentBlokke(update);
+        handleContentBlocks(update);
     } else if (art == "tool_call_update") {
-        m_vaerktoejskald->updateToolCall(update.value("toolCallId").toString(),
+        m_toolCallModel->updateToolCall(update.value("toolCallId").toString(),
                                          update.value("status").toString(),
                                          update.value("title").toString());
-        håndterContentBlokke(update);
+        handleContentBlocks(update);
     } else if (art == "turn_end") {
-        m_samtale->endRunde();
-        emit rundeAfsluttet();
+        m_conversation->endRound();
+        emit roundFinished();
     }
 }
 
-void AcpClient::modtagAgentFejl(const QString& fejl)
+void AcpClient::receiveAgentError(const QString& error)
 {
-    m_lastError = fejl;
-    emit agentFejl(fejl);
+    m_lastError = error;
+    emit agentError(error);
 }
 
-void AcpClient::procesFaerdig(int exitKode)
+void AcpClient::processFinished(int exitKode)
 {
-    emit agentDoed(exitKode);
+    emit agentDied(exitKode);
 }

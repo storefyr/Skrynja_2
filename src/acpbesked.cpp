@@ -2,148 +2,148 @@
 
 #include <QJsonDocument>
 
-AcpBesked::AcpBesked()
-    : m_type(Ugyldig)
+AcpMessage::AcpMessage()
+    : m_type(Invalid)
     , m_id(0)
-    , m_harId(false)
-    , m_erFejl(false)
+    , m_hasId(false)
+    , m_isError(false)
 {
 }
 
-AcpBesked AcpBesked::fraJson(const QByteArray& json, bool* ok)
+AcpMessage AcpMessage::fraJson(const QByteArray& json, bool* ok)
 {
     if (ok)
         *ok = false;
     QJsonParseError err;
     QJsonDocument doc = QJsonDocument::fromJson(json, &err);
     if (err.error != QJsonParseError::NoError || !doc.isObject())
-        return AcpBesked();
+        return AcpMessage();
     QJsonObject obj = doc.object();
-    AcpBesked b;
+    AcpMessage b;
     if (obj.contains("method")) {
-        b.m_metode = obj.value("method").toString();
+        b.m_method = obj.value("method").toString();
         if (obj.contains("id")) {
-            b.m_type = Anmodning;
-            b.m_harId = true;
+            b.m_type = Request;
+            b.m_hasId = true;
             b.m_id = obj.value("id").toVariant().toLongLong();
         } else {
-            b.m_type = Notifikation;
+            b.m_type = Notification;
         }
         b.m_params = obj.value("params").toObject();
     } else if (obj.contains("id")) {
-        b.m_type = Svar;
-        b.m_harId = true;
+        b.m_type = Response;
+        b.m_hasId = true;
         b.m_id = obj.value("id").toVariant().toLongLong();
         if (obj.contains("error")) {
-            b.m_erFejl = true;
-            b.m_fejl = obj.value("error").toObject();
+            b.m_isError = true;
+            b.m_error = obj.value("error").toObject();
         } else {
-            b.m_resultat = obj.value("result");
+            b.m_result = obj.value("result");
         }
     } else {
-        return AcpBesked();
+        return AcpMessage();
     }
     if (ok)
         *ok = true;
     return b;
 }
 
-QByteArray AcpBesked::tilJson() const
+QByteArray AcpMessage::tilJson() const
 {
     QJsonObject obj;
     obj.insert("jsonrpc", "2.0");
-    if (m_harId)
+    if (m_hasId)
         obj.insert("id", QJsonValue(m_id));
-    if (m_type == Anmodning || m_type == Notifikation) {
-        obj.insert("method", m_metode);
+    if (m_type == Request || m_type == Notification) {
+        obj.insert("method", m_method);
         obj.insert("params", m_params);
-    } else if (m_type == Svar) {
-        if (m_erFejl)
-            obj.insert("error", m_fejl);
+    } else if (m_type == Response) {
+        if (m_isError)
+            obj.insert("error", m_error);
         else
-            obj.insert("result", m_resultat);
+            obj.insert("result", m_result);
     }
     return QJsonDocument(obj).toJson(QJsonDocument::Compact);
 }
 
-AcpBesked::Type AcpBesked::type() const
+AcpMessage::Type AcpMessage::type() const
 {
     return m_type;
 }
 
-bool AcpBesked::harId() const
+bool AcpMessage::hasId() const
 {
-    return m_harId;
+    return m_hasId;
 }
 
-qint64 AcpBesked::id() const
+qint64 AcpMessage::id() const
 {
     return m_id;
 }
 
-QString AcpBesked::metode() const
+QString AcpMessage::method() const
 {
-    return m_metode;
+    return m_method;
 }
 
-QJsonObject AcpBesked::params() const
+QJsonObject AcpMessage::params() const
 {
     return m_params;
 }
 
-QJsonValue AcpBesked::resultat() const
+QJsonValue AcpMessage::result() const
 {
-    return m_resultat;
+    return m_result;
 }
 
-bool AcpBesked::erFejl() const
+bool AcpMessage::isError() const
 {
-    return m_erFejl;
+    return m_isError;
 }
 
-QJsonObject AcpBesked::fejl() const
+QJsonObject AcpMessage::error() const
 {
-    return m_fejl;
+    return m_error;
 }
 
-AcpBesked AcpBesked::anmodning(qint64 id, const QString& metode, const QJsonObject& params)
+AcpMessage AcpMessage::request(qint64 id, const QString& method, const QJsonObject& params)
 {
-    AcpBesked b;
-    b.m_type = Anmodning;
-    b.m_harId = true;
+    AcpMessage b;
+    b.m_type = Request;
+    b.m_hasId = true;
     b.m_id = id;
-    b.m_metode = metode;
+    b.m_method = method;
     b.m_params = params;
     return b;
 }
 
-AcpBesked AcpBesked::svar(qint64 id, const QJsonValue& resultat)
+AcpMessage AcpMessage::response(qint64 id, const QJsonValue& result)
 {
-    AcpBesked b;
-    b.m_type = Svar;
-    b.m_harId = true;
+    AcpMessage b;
+    b.m_type = Response;
+    b.m_hasId = true;
     b.m_id = id;
-    b.m_resultat = resultat;
+    b.m_result = result;
     return b;
 }
 
-AcpBesked AcpBesked::fejlSvar(qint64 id, int kode, const QString& besked)
+AcpMessage AcpMessage::errorResponse(qint64 id, int kode, const QString& message)
 {
-    AcpBesked b;
-    b.m_type = Svar;
-    b.m_harId = true;
+    AcpMessage b;
+    b.m_type = Response;
+    b.m_hasId = true;
     b.m_id = id;
-    b.m_erFejl = true;
-    b.m_fejl.insert("code", kode);
-    b.m_fejl.insert("message", besked);
+    b.m_isError = true;
+    b.m_error.insert("code", kode);
+    b.m_error.insert("message", message);
     return b;
 }
 
-AcpBesked AcpBesked::notifikation(const QString& metode, const QJsonObject& params)
+AcpMessage AcpMessage::notification(const QString& method, const QJsonObject& params)
 {
-    AcpBesked b;
-    b.m_type = Notifikation;
-    b.m_metode = metode;
+    AcpMessage b;
+    b.m_type = Notification;
+    b.m_method = method;
     b.m_params = params;
     return b;
 }

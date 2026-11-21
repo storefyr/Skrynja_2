@@ -17,35 +17,35 @@ private slots:
     void ingen_silica_afhaengighed_i_tests_pro();
     void suite_omfatter_alle_13_testklasser();
 private:
-    QString repoRod();
-    QJsonObject læsManifest();
-    QString læsTestsPro();
+    QString repoRoot();
+    QJsonObject readManifest();
+    QString readTestsPro();
 };
 
-REGISTRER_TEST(TestProevesuiteITests)
+REGISTER_TEST(TestProevesuiteITests)
 
-QString TestProevesuiteITests::repoRod()
+QString TestProevesuiteITests::repoRoot()
 {
-    QString rod = QCoreApplication::applicationDirPath() + "/..";
-    if (!QFileInfo::exists(rod + "/realiseringsmanifest_for_funktioner_og_parrede_tests.json"))
-        rod = "..";
-    return rod;
+    QString root = QCoreApplication::applicationDirPath() + "/..";
+    if (!QFileInfo::exists(root + "/realiseringsmanifest_for_funktioner_og_parrede_tests.json"))
+        root = "..";
+    return root;
 }
 
-QJsonObject TestProevesuiteITests::læsManifest()
+QJsonObject TestProevesuiteITests::readManifest()
 {
-    QFile f(repoRod() + "/realiseringsmanifest_for_funktioner_og_parrede_tests.json");
+    QFile f(repoRoot() + "/realiseringsmanifest_for_funktioner_og_parrede_tests.json");
     if (!f.open(QIODevice::ReadOnly))
         return QJsonObject();
     return QJsonDocument::fromJson(f.readAll()).object();
 }
 
-QString TestProevesuiteITests::læsTestsPro()
+QString TestProevesuiteITests::readTestsPro()
 {
-    QString sti = QCoreApplication::applicationDirPath() + "/tests.pro";
-    if (!QFileInfo::exists(sti))
-        sti = "tests.pro";
-    QFile f(sti);
+    QString path = QCoreApplication::applicationDirPath() + "/tests.pro";
+    if (!QFileInfo::exists(path))
+        path = "tests.pro";
+    QFile f(path);
     if (!f.open(QIODevice::ReadOnly))
         return QString();
     return QString::fromUtf8(f.readAll());
@@ -53,7 +53,7 @@ QString TestProevesuiteITests::læsTestsPro()
 
 void TestProevesuiteITests::manifest_har_13_parrede_tests()
 {
-    QJsonObject manifest = læsManifest();
+    QJsonObject manifest = readManifest();
     QVERIFY(!manifest.isEmpty());
     QJsonArray funktioner = manifest.value("funktioner").toArray();
     QCOMPARE(funktioner.size(), 13);
@@ -69,34 +69,34 @@ void TestProevesuiteITests::manifest_har_13_parrede_tests()
 
 void TestProevesuiteITests::alle_manifest_testfiler_er_i_tests_pro()
 {
-    QJsonObject manifest = læsManifest();
-    QString testsPro = læsTestsPro();
-    QVERIFY(!testsPro.isEmpty());
+    QJsonObject manifest = readManifest();
+    QString testsProContent = readTestsPro();
+    QVERIFY(!testsProContent.isEmpty());
     QJsonArray funktioner = manifest.value("funktioner").toArray();
     for (int i = 0; i < funktioner.size(); ++i) {
         QJsonObject pt = funktioner.at(i).toObject().value("parret_test").toObject();
         QString testfil = pt.value("testfil").toString();
-        QVERIFY2(QFileInfo::exists(repoRod() + "/" + testfil), qPrintable(testfil));
-        QVERIFY2(testsPro.contains(QFileInfo(testfil).fileName()),
+        QVERIFY2(QFileInfo::exists(repoRoot() + "/" + testfil), qPrintable(testfil));
+        QVERIFY2(testsProContent.contains(QFileInfo(testfil).fileName()),
                  qPrintable("ikke i tests.pro: " + testfil));
     }
 }
 
 void TestProevesuiteITests::ingen_silica_afhaengighed_i_tests_pro()
 {
-    QString testsPro = læsTestsPro();
-    QVERIFY(testsPro.contains("testlib"));
-    QVERIFY(!testsPro.contains("silica", Qt::CaseInsensitive));
-    QVERIFY(!testsPro.contains("Sailfish", Qt::CaseInsensitive));
+    QString testsProContent = readTestsPro();
+    QVERIFY(testsProContent.contains("testlib"));
+    QVERIFY(!testsProContent.contains("silica", Qt::CaseInsensitive));
+    QVERIFY(!testsProContent.contains("Sailfish", Qt::CaseInsensitive));
 }
 
 void TestProevesuiteITests::suite_omfatter_alle_13_testklasser()
 {
-    QJsonObject manifest = læsManifest();
+    QJsonObject manifest = readManifest();
     QJsonArray funktioner = manifest.value("funktioner").toArray();
     QStringList registrerede;
-    for (int i = 0; i < testRegistreringer().size(); ++i)
-        registrerede.append(testRegistreringer().at(i).navn);
+    for (int i = 0; i < testRegistrations().size(); ++i)
+        registrerede.append(testRegistrations().at(i).name);
     QCOMPARE(registrerede.size(), 13);
     for (int i = 0; i < funktioner.size(); ++i) {
         QString klasse = funktioner.at(i).toObject().value("parret_test").toObject()

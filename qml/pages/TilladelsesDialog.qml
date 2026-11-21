@@ -3,7 +3,7 @@ import Sailfish.Silica 1.0
 
 Dialog {
     id: dialog
-    property var anmodning: acp.pendingPermission
+    property var request: acp.pendingPermission
 
     canAccept: false
 
@@ -24,11 +24,11 @@ Dialog {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 wrapMode: Text.Wrap
-                text: anmodning && anmodning.toolCall ? anmodning.toolCall.title : ""
+                text: request && request.toolCall ? request.toolCall.title : ""
             }
 
             Repeater {
-                model: anmodning && anmodning.options ? anmodning.options : []
+                model: request && request.options ? request.options : []
                 delegate: Button {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: modelData.label
@@ -43,7 +43,7 @@ Dialog {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: "Afvis"
                 onClicked: {
-                    acp.afvisPermission()
+                    acp.declinePermission()
                     dialog.accept()
                 }
             }

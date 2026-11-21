@@ -3,68 +3,68 @@
 #include <QJsonArray>
 #include <QJsonObject>
 
-Tilladelsesmodel::Tilladelsesmodel(QObject* parent)
+PermissionModel::PermissionModel(QObject* parent)
     : QObject(parent)
     , m_requestId(0)
-    , m_afventende(false)
-    , m_svaret(false)
-    , m_antal(0)
+    , m_isPending(false)
+    , m_answered(false)
+    , m_count(0)
 {
 }
 
-void Tilladelsesmodel::setAnmodning(qint64 requestId, const QJsonObject& params)
+void PermissionModel::setRequest(qint64 requestId, const QJsonObject& params)
 {
     m_requestId = requestId;
     m_pending.clear();
     m_pending.insert("requestId", QVariant::fromValue<qint64>(requestId));
     m_pending.insert("toolCall", params.value("toolCall").toObject().toVariantMap());
     QJsonArray options = params.value("options").toArray();
-    QVariantList liste;
+    QVariantList list;
     for (int i = 0; i < options.size(); ++i)
-        liste.append(options.at(i).toObject().toVariantMap());
-    m_pending.insert("options", liste);
-    m_afventende = true;
-    m_svaret = false;
-    ++m_antal;
+        list.append(options.at(i).toObject().toVariantMap());
+    m_pending.insert("options", list);
+    m_isPending = true;
+    m_answered = false;
+    ++m_count;
     emit changed();
 }
 
-void Tilladelsesmodel::setSvaret()
+void PermissionModel::setAnswered()
 {
-    m_svaret = true;
-    m_afventende = false;
+    m_answered = true;
+    m_isPending = false;
     emit changed();
 }
 
-void Tilladelsesmodel::clear()
+void PermissionModel::clear()
 {
     m_pending.clear();
-    m_afventende = false;
+    m_isPending = false;
     m_requestId = 0;
     emit changed();
 }
 
-QVariantMap Tilladelsesmodel::pendingPermission() const
+QVariantMap PermissionModel::pendingPermission() const
 {
     return m_pending;
 }
 
-qint64 Tilladelsesmodel::anmodningsId() const
+qint64 PermissionModel::requestId() const
 {
     return m_requestId;
 }
 
-bool Tilladelsesmodel::afventende() const
+bool PermissionModel::isPending() const
 {
-    return m_afventende && !m_svaret;
+    return m_isPending && !m_answered;
 }
 
-bool Tilladelsesmodel::svaret() const
+bool PermissionModel::isAnswered() const
 {
-    return m_svaret;
+    return m_answered;
 }
 
-int Tilladelsesmodel::anmodninger() const
+int PermissionModel::requests() const
 {
-    return m_antal;
+    return m_count;
 }

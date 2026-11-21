@@ -21,14 +21,14 @@ private slots:
     void verdict_ved_startfejl();
     void verdict_fil_skrives_og_laeses_tilbage();
 private:
-    QByteArray læsFixture(const QString& navn);
-    qint64 idAf(const QByteArray& json);
-    QByteArray svarJson(qint64 id, const QJsonObject& resultat);
-    QString verdictSti() const;
-    void kørKædeTilSession(AcpClient& klient);
+    QByteArray readFixture(const QString& name);
+    qint64 idOf(const QByteArray& json);
+    QByteArray responseJson(qint64 id, const QJsonObject& result);
+    QString verdictPath() const;
+    void runChainToSession(AcpClient& client);
 };
 
-REGISTRER_TEST(TestSelvtestMedVerdict)
+REGISTER_TEST(TestSelvtestMedVerdict)
 
 static QJsonObject jsonObj(const QByteArray& json)
 {
@@ -38,171 +38,171 @@ static QJsonObject jsonObj(const QByteArray& json)
 void TestSelvtestMedVerdict::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
-    QString sti = QDir::tempPath() + "/skrynja-tst-settings-selvtest";
-    QDir().mkpath(sti);
+    QString path = QDir::tempPath() + "/skrynja-tst-settings-selvtest";
+    QDir().mkpath(path);
     QSettings::setDefaultFormat(QSettings::IniFormat);
-    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, sti);
+    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, path);
     QSettings s;
     s.clear();
     s.sync();
     QDir(QDir::tempPath() + "/skrynja-tst-selvtest").mkpath(".");
 }
 
-QString TestSelvtestMedVerdict::verdictSti() const
+QString TestSelvtestMedVerdict::verdictPath() const
 {
     return QDir::tempPath() + "/skrynja-tst-selvtest/verdict.json";
 }
 
-QByteArray TestSelvtestMedVerdict::læsFixture(const QString& navn)
+QByteArray TestSelvtestMedVerdict::readFixture(const QString& name)
 {
-    QString sti = QFINDTESTDATA("fixtures/" + navn);
-    if (sti.isEmpty())
-        sti = "fixtures/" + navn;
-    QFile f(sti);
+    QString path = QFINDTESTDATA("fixtures/" + name);
+    if (path.isEmpty())
+        path = "fixtures/" + name;
+    QFile f(path);
     if (!f.open(QIODevice::ReadOnly))
         return QByteArray();
     return f.readAll();
 }
 
-qint64 TestSelvtestMedVerdict::idAf(const QByteArray& json)
+qint64 TestSelvtestMedVerdict::idOf(const QByteArray& json)
 {
     return jsonObj(json).value("id").toVariant().toLongLong();
 }
 
-QByteArray TestSelvtestMedVerdict::svarJson(qint64 id, const QJsonObject& resultat)
+QByteArray TestSelvtestMedVerdict::responseJson(qint64 id, const QJsonObject& result)
 {
     QJsonObject o;
     o.insert("jsonrpc", "2.0");
     o.insert("id", QJsonValue(id));
-    o.insert("result", resultat);
+    o.insert("result", result);
     return QJsonDocument(o).toJson(QJsonDocument::Compact);
 }
 
-void TestSelvtestMedVerdict::kørKædeTilSession(AcpClient& klient)
+void TestSelvtestMedVerdict::runChainToSession(AcpClient& client)
 {
-    QJsonObject initResultat;
-    initResultat.insert("protocolVersion", 1);
-    initResultat.insert("configOptions", QJsonArray());
-    qint64 initId = idAf(klient.sendteForTest().isEmpty() ? QByteArray() : klient.sendteForTest().first());
-    klient.feedBytesForTest(svarJson(initId, initResultat) + "\n");
-    klient.startSession();
-    qint64 newId = idAf(klient.sidsteSendtForTest());
-    QJsonObject sessionResultat;
-    sessionResultat.insert("sessionId", "s");
-    klient.feedBytesForTest(svarJson(newId, sessionResultat) + "\n");
+    QJsonObject initResult;
+    initResult.insert("protocolVersion", 1);
+    initResult.insert("configOptions", QJsonArray());
+    qint64 initId = idOf(client.sentForTest().isEmpty() ? QByteArray() : client.sentForTest().first());
+    client.feedBytesForTest(responseJson(initId, initResult) + "\n");
+    client.startSession();
+    qint64 newId = idOf(client.lastSentForTest());
+    QJsonObject sessionResult;
+    sessionResult.insert("sessionId", "s");
+    client.feedBytesForTest(responseJson(newId, sessionResult) + "\n");
 }
 
 void TestSelvtestMedVerdict::verdict_pass_ved_end_turn_og_exit_0()
 {
-    QFile::remove(verdictSti());
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    Selvtest selvtest(&klient);
-    QSignalSpy færdig(&selvtest, SIGNAL(faerdig(int)));
-    selvtest.start("selvtest-prompt", verdictSti());
-    kørKædeTilSession(klient);
-    klient.feedBytesForTest(læsFixture("fixture_tilladelse_og_svar.ndjson"));
-    klient.feedBytesForTest(læsFixture("fixture_end_turn.ndjson"));
-    QCOMPARE(færdig.count(), 1);
-    QCOMPARE(færdig.at(0).at(0).toInt(), 0);
-    QVERIFY(selvtest.verdictSkrevet());
-    QCOMPARE(selvtest.verdict().value("resultat").toString(), QString("pass"));
+    QFile::remove(verdictPath());
+    AcpClient client;
+    client.setTestMode(true);
+    SelfTest selfTest(&client);
+    QSignalSpy finished(&selfTest, SIGNAL(finished(int)));
+    selfTest.start("selvtest-prompt", verdictPath());
+    runChainToSession(client);
+    client.feedBytesForTest(readFixture("fixture_tilladelse_og_svar.ndjson"));
+    client.feedBytesForTest(readFixture("fixture_end_turn.ndjson"));
+    QCOMPARE(finished.count(), 1);
+    QCOMPARE(finished.at(0).at(0).toInt(), 0);
+    QVERIFY(selfTest.verdictWritten());
+    QCOMPARE(selfTest.verdict().value("result").toString(), QString("pass"));
 }
 
 void TestSelvtestMedVerdict::verdict_fail_uden_toolcall()
 {
-    QFile::remove(verdictSti());
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    Selvtest selvtest(&klient);
-    QSignalSpy færdig(&selvtest, SIGNAL(faerdig(int)));
-    selvtest.start("selvtest-prompt", verdictSti());
-    kørKædeTilSession(klient);
-    klient.feedBytesForTest(læsFixture("fixture_end_turn.ndjson"));
-    QCOMPARE(færdig.count(), 1);
-    QCOMPARE(færdig.at(0).at(0).toInt(), 1);
-    QCOMPARE(selvtest.verdict().value("resultat").toString(), QString("fail"));
+    QFile::remove(verdictPath());
+    AcpClient client;
+    client.setTestMode(true);
+    SelfTest selfTest(&client);
+    QSignalSpy finished(&selfTest, SIGNAL(finished(int)));
+    selfTest.start("selvtest-prompt", verdictPath());
+    runChainToSession(client);
+    client.feedBytesForTest(readFixture("fixture_end_turn.ndjson"));
+    QCOMPARE(finished.count(), 1);
+    QCOMPARE(finished.at(0).at(0).toInt(), 1);
+    QCOMPARE(selfTest.verdict().value("result").toString(), QString("fail"));
 }
 
 void TestSelvtestMedVerdict::ingen_dobbelt_verdict()
 {
-    QFile::remove(verdictSti());
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    Selvtest selvtest(&klient);
-    QSignalSpy færdig(&selvtest, SIGNAL(faerdig(int)));
-    selvtest.start("selvtest-prompt", verdictSti());
-    kørKædeTilSession(klient);
-    klient.feedBytesForTest(læsFixture("fixture_tilladelse_og_svar.ndjson"));
-    klient.feedBytesForTest(læsFixture("fixture_end_turn.ndjson"));
-    QCOMPARE(færdig.count(), 1);
-    QFile f(verdictSti());
+    QFile::remove(verdictPath());
+    AcpClient client;
+    client.setTestMode(true);
+    SelfTest selfTest(&client);
+    QSignalSpy finished(&selfTest, SIGNAL(finished(int)));
+    selfTest.start("selvtest-prompt", verdictPath());
+    runChainToSession(client);
+    client.feedBytesForTest(readFixture("fixture_tilladelse_og_svar.ndjson"));
+    client.feedBytesForTest(readFixture("fixture_end_turn.ndjson"));
+    QCOMPARE(finished.count(), 1);
+    QFile f(verdictPath());
     QVERIFY(f.open(QIODevice::ReadOnly));
-    QByteArray før = f.readAll();
+    QByteArray before = f.readAll();
     f.close();
-    klient.feedBytesForTest(læsFixture("fixture_end_turn.ndjson"));
-    klient.feedBytesForTest(læsFixture("fixture_tilladelse_og_svar.ndjson"));
-    QCOMPARE(færdig.count(), 1);
+    client.feedBytesForTest(readFixture("fixture_end_turn.ndjson"));
+    client.feedBytesForTest(readFixture("fixture_tilladelse_og_svar.ndjson"));
+    QCOMPARE(finished.count(), 1);
     QVERIFY(f.open(QIODevice::ReadOnly));
-    QCOMPARE(QString::fromUtf8(f.readAll()), QString::fromUtf8(før));
+    QCOMPARE(QString::fromUtf8(f.readAll()), QString::fromUtf8(before));
     f.close();
 }
 
 void TestSelvtestMedVerdict::verdict_ved_agentdoed()
 {
-    QFile::remove(verdictSti());
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    Selvtest selvtest(&klient);
-    QSignalSpy færdig(&selvtest, SIGNAL(faerdig(int)));
-    selvtest.start("selvtest-prompt", verdictSti());
-    klient.simulerAgentDødForTest(1);
-    QCOMPARE(færdig.count(), 1);
-    QCOMPARE(færdig.at(0).at(0).toInt(), 1);
-    QCOMPARE(selvtest.verdict().value("resultat").toString(), QString("fail"));
-    QVERIFY(selvtest.verdict().value("årsag").toString().contains("agentdød"));
+    QFile::remove(verdictPath());
+    AcpClient client;
+    client.setTestMode(true);
+    SelfTest selfTest(&client);
+    QSignalSpy finished(&selfTest, SIGNAL(finished(int)));
+    selfTest.start("selvtest-prompt", verdictPath());
+    client.simulateAgentDeathForTest(1);
+    QCOMPARE(finished.count(), 1);
+    QCOMPARE(finished.at(0).at(0).toInt(), 1);
+    QCOMPARE(selfTest.verdict().value("result").toString(), QString("fail"));
+    QVERIFY(selfTest.verdict().value("årsag").toString().contains("agentdød"));
 }
 
 void TestSelvtestMedVerdict::verdict_ved_startfejl()
 {
-    QFile::remove(verdictSti());
+    QFile::remove(verdictPath());
     QSettings s;
     s.clear();
     s.sync();
-    AcpClient klient;
-    klient.setAgentsti("/definitivt/ikke/eksisterende-agent-selvtest");
-    Selvtest selvtest(&klient);
-    QSignalSpy færdig(&selvtest, SIGNAL(faerdig(int)));
-    selvtest.start("selvtest-prompt", verdictSti());
-    QCOMPARE(færdig.count(), 1);
-    QCOMPARE(færdig.at(0).at(0).toInt(), 1);
-    QVERIFY(selvtest.verdictSkrevet());
-    QCOMPARE(selvtest.verdict().value("resultat").toString(), QString("fail"));
+    AcpClient client;
+    client.setAgentsti("/definitivt/ikke/eksisterende-agent-selvtest");
+    SelfTest selfTest(&client);
+    QSignalSpy finished(&selfTest, SIGNAL(finished(int)));
+    selfTest.start("selvtest-prompt", verdictPath());
+    QCOMPARE(finished.count(), 1);
+    QCOMPARE(finished.at(0).at(0).toInt(), 1);
+    QVERIFY(selfTest.verdictWritten());
+    QCOMPARE(selfTest.verdict().value("result").toString(), QString("fail"));
     s.remove("agent/sti");
     s.sync();
 }
 
 void TestSelvtestMedVerdict::verdict_fil_skrives_og_laeses_tilbage()
 {
-    QFile::remove(verdictSti());
-    AcpClient klient;
-    klient.sætTestTilstand(true);
-    Selvtest selvtest(&klient);
-    QSignalSpy færdig(&selvtest, SIGNAL(faerdig(int)));
-    selvtest.start("selvtest-prompt", verdictSti());
-    kørKædeTilSession(klient);
-    klient.feedBytesForTest(læsFixture("fixture_tilladelse_og_svar.ndjson"));
-    klient.feedBytesForTest(læsFixture("fixture_end_turn.ndjson"));
-    QCOMPARE(færdig.count(), 1);
-    QVERIFY(QFileInfo::exists(verdictSti()));
-    QFile f(verdictSti());
+    QFile::remove(verdictPath());
+    AcpClient client;
+    client.setTestMode(true);
+    SelfTest selfTest(&client);
+    QSignalSpy finished(&selfTest, SIGNAL(finished(int)));
+    selfTest.start("selvtest-prompt", verdictPath());
+    runChainToSession(client);
+    client.feedBytesForTest(readFixture("fixture_tilladelse_og_svar.ndjson"));
+    client.feedBytesForTest(readFixture("fixture_end_turn.ndjson"));
+    QCOMPARE(finished.count(), 1);
+    QVERIFY(QFileInfo::exists(verdictPath()));
+    QFile f(verdictPath());
     QVERIFY(f.open(QIODevice::ReadOnly));
-    QJsonObject fraFil = QJsonDocument::fromJson(f.readAll()).object();
+    QJsonObject fromFile = QJsonDocument::fromJson(f.readAll()).object();
     f.close();
-    QCOMPARE(fraFil.value("resultat").toString(), QString("pass"));
-    QVERIFY(fraFil.contains("årsag"));
-    QVERIFY(fraFil.contains("tidsstempel"));
-    QCOMPARE(selvtest.verdict().value("resultat").toString(), fraFil.value("resultat").toString());
+    QCOMPARE(fromFile.value("result").toString(), QString("pass"));
+    QVERIFY(fromFile.contains("årsag"));
+    QVERIFY(fromFile.contains("tidsstempel"));
+    QCOMPARE(selfTest.verdict().value("result").toString(), fromFile.value("result").toString());
 }
 
 #include "tst_selvtest_med_verdict.moc"

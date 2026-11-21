@@ -1,44 +1,44 @@
-#ifndef AGENTPROCES_H
-#define AGENTPROCES_H
+#ifndef AGENTPROCESS_H
+#define AGENTPROCESS_H
 
 #include <QProcess>
 #include <QObject>
 #include <QString>
 #include <QStringList>
 
-class AgentProces : public QObject
+class AgentProcess : public QObject
 {
     Q_OBJECT
 public:
-    explicit AgentProces(QObject* parent = 0);
+    explicit AgentProcess(QObject* parent = 0);
 
-    QString agentsti() const;
-    void sætAgentsti(const QString& sti);
-    QString arbejdsmappe() const;
-    void sætArbejdsmappe(const QString& mappe);
+    QString agentPath() const;
+    void setAgentPath(const QString& path);
+    QString workingDirectory() const;
+    void setWorkingDirectory(const QString& folder);
 
     bool start();
     void stopAgent();
-    bool kører() const;
+    bool isRunning() const;
     QString lastError() const;
-    QProcess* proces() const;
+    QProcess* process() const;
 
-    void sætProgramOgArgumenterForTest(const QString& program, const QStringList& argumenter);
+    void setProgramAndArgsForTest(const QString& program, const QStringList& argumenter);
 
 signals:
-    void fejl(const QString& besked);
-    void faerdig(int exitKode);
+    void error(const QString& message);
+    void finished(int exitKode);
 
 private slots:
-    void procesFejl(QProcess::ProcessError fejlkode);
-    void procesFaerdig(int exitKode, QProcess::ExitStatus status);
+    void processError(QProcess::ProcessError errorCode);
+    void processFinished(int exitKode, QProcess::ExitStatus status);
 
 private:
-    QProcess* m_proces;
+    QProcess* m_process;
     QString m_lastError;
-    QString m_arbejdsmappe;
+    QString m_workingDirectory;
     QString m_programForTest;
-    QStringList m_argumenterForTest;
+    QStringList m_argsForTest;
 };
 
 #endif

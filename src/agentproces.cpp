@@ -4,106 +4,106 @@
 #include <QProcess>
 #include <QSettings>
 
-AgentProces::AgentProces(QObject* parent)
+AgentProcess::AgentProcess(QObject* parent)
     : QObject(parent)
-    , m_proces(new QProcess(this))
+    , m_process(new QProcess(this))
 {
-    connect(m_proces, SIGNAL(errorOccurred(QProcess::ProcessError)),
-            this, SLOT(procesFejl(QProcess::ProcessError)));
-    connect(m_proces, SIGNAL(finished(int,QProcess::ExitStatus)),
-            this, SLOT(procesFaerdig(int,QProcess::ExitStatus)));
+    connect(m_process, SIGNAL(errorOccurred(QProcess::ProcessError)),
+            this, SLOT(processError(QProcess::ProcessError)));
+    connect(m_process, SIGNAL(finished(int,QProcess::ExitStatus)),
+            this, SLOT(processFinished(int,QProcess::ExitStatus)));
 }
 
-QString AgentProces::agentsti() const
+QString AgentProcess::agentPath() const
 {
-    QSettings indstillinger;
-    return indstillinger.value("agent/sti", "/home/defaultuser/.local/bin/vibe-acp").toString();
+    QSettings settings;
+    return settings.value("agent/sti", "/home/defaultuser/.local/bin/vibe-acp").toString();
 }
 
-void AgentProces::sætAgentsti(const QString& sti)
+void AgentProcess::setAgentPath(const QString& path)
 {
-    QSettings indstillinger;
-    indstillinger.setValue("agent/sti", sti);
-    indstillinger.sync();
+    QSettings settings;
+    settings.setValue("agent/sti", path);
+    settings.sync();
 }
 
-QString AgentProces::arbejdsmappe() const
+QString AgentProcess::workingDirectory() const
 {
-    return m_arbejdsmappe;
+    return m_workingDirectory;
 }
 
-void AgentProces::sætArbejdsmappe(const QString& mappe)
+void AgentProcess::setWorkingDirectory(const QString& folder)
 {
-    m_arbejdsmappe = mappe;
+    m_workingDirectory = folder;
 }
 
-bool AgentProces::start()
+bool AgentProcess::start()
 {
     m_lastError.clear();
-    QString program = m_programForTest.isEmpty() ? agentsti() : m_programForTest;
+    QString program = m_programForTest.isEmpty() ? agentPath() : m_programForTest;
     if (!QFileInfo::exists(program)) {
         m_lastError = "agent ikke fundet: " + program;
-        emit fejl(m_lastError);
+        emit error(m_lastError);
         return false;
     }
-    if (m_proces->state() != QProcess::NotRunning)
+    if (m_process->state() != QProcess::NotRunning)
         return true;
-    m_proces->setProgram(program);
-    m_proces->setArguments(m_argumenterForTest);
-    if (!m_arbejdsmappe.isEmpty())
-        m_proces->setWorkingDirectory(m_arbejdsmappe);
-    m_proces->start();
-    if (!m_proces->waitForStarted(3000)) {
+    m_process->setProgram(program);
+    m_process->setArguments(m_argsForTest);
+    if (!m_workingDirectory.isEmpty())
+        m_process->setWorkingDirectory(m_workingDirectory);
+    m_process->start();
+    if (!m_process->waitForStarted(3000)) {
         m_lastError = "agent kunne ikke startes: " + program;
-        emit fejl(m_lastError);
+        emit error(m_lastError);
         return false;
     }
     return true;
 }
 
-void AgentProces::stopAgent()
+void AgentProcess::stopAgent()
 {
-    if (m_proces->state() == QProcess::Running) {
-        m_proces->terminate();
-        if (!m_proces->waitForFinished(2000))
-            m_proces->kill();
-        m_proces->waitForFinished(1000);
+    if (m_process->state() == QProcess::Running) {
+        m_process->terminate();
+        if (!m_process->waitForFinished(2000))
+            m_process->kill();
+        m_process->waitForFinished(1000);
     }
 }
 
-bool AgentProces::kører() const
+bool AgentProcess::isRunning() const
 {
-    return m_proces->state() == QProcess::Running;
+    return m_process->state() == QProcess::Running;
 }
 
-QString AgentProces::lastError() const
+QString AgentProcess::lastError() const
 {
     return m_lastError;
 }
 
-QProcess* AgentProces::proces() const
+QProcess* AgentProcess::process() const
 {
-    return m_proces;
+    return m_process;
 }
 
-void AgentProces::sætProgramOgArgumenterForTest(const QString& program, const QStringList& argumenter)
+void AgentProcess::setProgramAndArgsForTest(const QString& program, const QStringList& argumenter)
 {
     m_programForTest = program;
-    m_argumenterForTest = argumenter;
+    m_argsForTest = argumenter;
 }
 
-void AgentProces::procesFejl(QProcess::ProcessError fejlkode)
+void AgentProcess::processError(QProcess::ProcessError errorCode)
 {
-    Q_UNUSED(fejlkode);
-    if (m_proces->error() == QProcess::FailedToStart)
-        m_lastError = "agent kunne ikke startes: " + m_proces->program();
+    Q_UNUSED(errorCode);
+    if (m_process->error() == QProcess::FailedToStart)
+        m_lastError = "agent kunne ikke startes: " + m_process->program();
     else
         m_lastError = "agentproces fejlede";
-    emit fejl(m_lastError);
+    emit error(m_lastError);
 }
 
-void AgentProces::procesFaerdig(int exitKode, QProcess::ExitStatus status)
+void AgentProcess::processFinished(int exitKode, QProcess::ExitStatus status)
 {
     Q_UNUSED(status);
-    emit faerdig(exitKode);
+    emit finished(exitKode);
 }
