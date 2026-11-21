@@ -6,6 +6,7 @@
 #include <QString>
 
 class AcpClient;
+class QTimer;
 
 class SelfTest : public QObject
 {
@@ -14,6 +15,7 @@ public:
     explicit SelfTest(AcpClient* client, QObject* parent = 0);
 
     void start(const QString& prompt, const QString& verdictPath);
+    void setWatchdogMsForTest(int ms);
     bool verdictWritten() const;
     QJsonObject verdict() const;
     QString verdictPath() const;
@@ -30,6 +32,7 @@ private slots:
     void onAgentDied(int kode);
     void onMessageSent(const QByteArray& line);
     void onDiffsChanged();
+    void onWatchdogTimeout();
 
 private:
     void writeVerdict(bool pass, const QString& reason);
@@ -42,6 +45,8 @@ private:
     bool m_promptSent;
     bool m_permissionAnswered;
     bool m_fileWritten;
+    QTimer* m_watchdog;
+    int m_watchdogMs;
 };
 
 #endif

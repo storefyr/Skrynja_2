@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QJsonDocument>
+#include <QTimer>
 #include <QVariantList>
 #include <QVariantMap>
 
@@ -18,7 +19,11 @@ SelfTest::SelfTest(AcpClient* client, QObject* parent)
     , m_promptSent(false)
     , m_permissionAnswered(false)
     , m_fileWritten(false)
+    , m_watchdog(new QTimer(this))
+    , m_watchdogMs(30000)
 {
+    m_watchdog->setSingleShot(true);
+    connect(m_watchdog, SIGNAL(timeout()), this, SLOT(onWatchdogTimeout()));
 }
 
 void SelfTest::start(const QString& prompt, const QString& verdictPath)
@@ -33,7 +38,18 @@ void SelfTest::start(const QString& prompt, const QString& verdictPath)
     connect(m_client, SIGNAL(agentDied(int)), this, SLOT(onAgentDied(int)));
     connect(m_client, SIGNAL(messageSent(QByteArray)), this, SLOT(onMessageSent(QByteArray)));
     connect(m_client, SIGNAL(diffsChanged()), this, SLOT(onDiffsChanged()));
+    m_watchdog->start(m_watchdogMs);
     m_client->startAgent();
+}
+
+void SelfTest::setWatchdogMsForTest(int ms)
+{
+    m_watchdogMs = ms;
+}
+
+void SelfTest::onWatchdogTimeout()
+{
+    finish(false, "watchdog: selvtest hængte (timeout udløst)");
 }
 
 bool SelfTest::verdictWritten() const
@@ -119,6 +135,7 @@ void SelfTest::finish(bool pass, const QString& reason)
 {
     if (m_verdictWritten)
         return;
+    m_watchdog->stop();
     writeVerdict(pass, reason);
     m_client->stopAgent();
     emit finished(pass ? 0 : 1);

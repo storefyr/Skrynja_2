@@ -20,6 +20,7 @@ private slots:
     void verdict_ved_agentdoed();
     void verdict_ved_startfejl();
     void verdict_fil_skrives_og_laeses_tilbage();
+    void watchdog_udloeser_verdict_fail_ved_haeng();
 private:
     QString verdictPath() const;
     void runChainToSession(AcpClient& client);
@@ -169,6 +170,23 @@ void TestSelvtestMedVerdict::verdict_fil_skrives_og_laeses_tilbage()
     QVERIFY(fromFile.contains("årsag"));
     QVERIFY(fromFile.contains("tidsstempel"));
     QCOMPARE(selfTest.verdict().value("resultat").toString(), fromFile.value("resultat").toString());
+}
+
+void TestSelvtestMedVerdict::watchdog_udloeser_verdict_fail_ved_haeng()
+{
+    QFile::remove(verdictPath());
+    AcpClient client;
+    injectTestModels(&client, this);
+    client.setTestMode(true);
+    SelfTest selfTest(&client);
+    selfTest.setWatchdogMsForTest(50);
+    QSignalSpy finished(&selfTest, SIGNAL(finished(int)));
+    selfTest.start("prompt-uden-svar", verdictPath());
+    QTest::qWait(500);
+    QCOMPARE(finished.count(), 1);
+    QCOMPARE(finished.at(0).at(0).toInt(), 1);
+    QVERIFY(selfTest.verdictWritten());
+    QCOMPARE(selfTest.verdict().value("resultat").toString(), QString("fail"));
 }
 
 #include "tst_selvtest_med_verdict.moc"
