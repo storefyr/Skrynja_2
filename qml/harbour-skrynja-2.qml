@@ -5,4 +5,10 @@ import "pages"
 ApplicationWindow {
     id: vindue
     initialPage: Component { StartSide {} }
+
+    Connections {
+        target: acp
+        onAgentError: console.warn("agentfejl: " + error)
+        onPermissionRequested: pageStack.push(Qt.resolvedUrl("pages/TilladelsesDialog.qml"))
+    }
 }

@@ -361,9 +361,9 @@ void AcpClient::onMessageOut(const AcpMessage& message)
 
 void AcpClient::onResponseError(const QString& method, const QString& message)
 {
+    Q_UNUSED(method);
     m_lastError = message;
-    if (method == "initialize")
-        emit agentError(m_lastError);
+    emit agentError(m_lastError);
 }
 
 void AcpClient::onInitializeResponded(const QJsonObject& result)

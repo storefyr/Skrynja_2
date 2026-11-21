@@ -61,6 +61,10 @@ void AcpProtokol::handleMessage(const AcpMessage& message)
             emit responseError(method, message.error().value("message").toString());
             return;
         }
+        if (method.isEmpty()) {
+            emit responseError(method, QString("ukendt svar-id %1").arg(message.id()));
+            return;
+        }
         QJsonObject result = message.result().toObject();
         if (method == kInitialize) {
             emit initializeResponded(result);
