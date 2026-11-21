@@ -49,14 +49,20 @@ bool AgentProcess::start()
     return true;
 }
 
-void AgentProcess::stopAgent()
+bool AgentProcess::stopAgent()
 {
-    if (m_process->state() == QProcess::Running) {
-        m_process->terminate();
-        if (!m_process->waitForFinished(2000))
-            m_process->kill();
-        m_process->waitForFinished(1000);
+    if (m_process->state() != QProcess::Running)
+        return true;
+    m_process->terminate();
+    if (!m_process->waitForFinished(2000)) {
+        m_process->kill();
+        if (!m_process->waitForFinished(2000)) {
+            m_lastError = "agent overlevede kill: " + m_process->program();
+            emit error(m_lastError);
+            return false;
+        }
     }
+    return true;
 }
 
 bool AgentProcess::isRunning() const

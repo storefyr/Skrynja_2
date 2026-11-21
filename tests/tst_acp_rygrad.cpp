@@ -28,6 +28,7 @@ private slots:
     void besked_id_korrelation();
     void lineDropped_logges_i_produktion();
     void haleReady_logges_i_produktion();
+    void afskaaren_hale_logges();
 private:
     QString logFil(const QString& navn);
 };
@@ -222,6 +223,17 @@ void TestAcpRygrad::haleReady_logges_i_produktion()
     client.eofForTest();
     QString log = readAll(path);
     QVERIFY2(log.contains("haleReady"), qPrintable(log));
+}
+
+void TestAcpRygrad::afskaaren_hale_logges()
+{
+    QString path = logFil("afskaaren-hale");
+    AcpClient client;
+    injectTestModels(&client, this);
+    client.setTestMode(true);
+    client.feedBytesForTest("{\"foo\":1}\n");
+    QString log = readAll(path);
+    QVERIFY2(log.contains("kasseret hale"), qPrintable(log));
 }
 
 #include "tst_acp_rygrad.moc"

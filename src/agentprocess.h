@@ -16,7 +16,7 @@ public:
     void setAgentPath(const QString& path);
 
     bool start();
-    void stopAgent();
+    bool stopAgent();
     bool isRunning() const;
     QString lastError() const;
     QProcess* process() const;

@@ -20,6 +20,7 @@ private slots:
     void suite_omfatter_alle_13_testklasser();
     void faelles_hjaelpere_i_testregistrering_h();
     void ingen_dublerede_slots_paa_tvaers();
+    void ingen_global_settings_mutation_i_tests();
 private:
     QJsonObject readManifest();
     QString readTestsPro();
@@ -165,6 +166,25 @@ void TestProevesuiteITests::ingen_dublerede_slots_paa_tvaers()
         QVERIFY2(it.value().size() == 1,
                  qPrintable("dubleret slot " + it.key() + " i " + it.value().join(",")));
     }
+}
+
+void TestProevesuiteITests::ingen_global_settings_mutation_i_tests()
+{
+    QDir dir(testRepoRoot() + "/tests");
+    QStringList filer = dir.entryList(QStringList() << "tst_*.cpp", QDir::Files);
+    QVERIFY(filer.size() >= 16);
+    for (int i = 0; i < filer.size(); ++i) {
+        QString src = testReadSource("tests/" + filer.at(i));
+        QVERIFY2(!src.contains("QSettings::setPath"),
+                 qPrintable("direkte global QSettings::setPath i " + filer.at(i)));
+        QVERIFY2(!src.contains("QSettings::setDefaultFormat"),
+                 qPrintable("direkte global QSettings::setDefaultFormat i " + filer.at(i)));
+        if (src.contains("QSettings") && src.contains("void") && src.contains("initTestCase"))
+            QVERIFY2(src.contains("opretTestSettingsSti"),
+                     qPrintable("initTestCase uden opretTestSettingsSti i " + filer.at(i)));
+    }
+    QString h = testReadSource("tests/testregistrering.h");
+    QVERIFY(h.contains("QSettings::setPath"));
 }
 
 #include "tst_proevesuite_i_tests.moc"

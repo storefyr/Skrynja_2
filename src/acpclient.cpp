@@ -199,7 +199,8 @@ void AcpClient::sessionCancel()
 
 void AcpClient::stopAgent()
 {
-    m_process->stopAgent();
+    if (!m_process->stopAgent())
+        emit agentError(m_process->lastError());
 }
 
 PermissionModel* AcpClient::permissionModel() const
@@ -350,8 +351,11 @@ void AcpClient::receiveLine(const QByteArray& line)
 {
     bool ok = false;
     AcpMessage message = AcpMessage::fraJson(line, &ok);
-    if (ok)
+    if (ok) {
         m_protokol->handleMessage(message);
+    } else {
+        LogFile::instance()->writeLine(QString("kasseret hale (ugyldig json): %1 bytes").arg(line.size()));
+    }
 }
 
 void AcpClient::onMessageOut(const AcpMessage& message)

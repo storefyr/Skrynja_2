@@ -25,6 +25,7 @@ private slots:
     void stop_og_afvis_er_obligatorisk_i_raekkefoelge();
     void alle_qml_sider_reachable();
     void stopAgent_kaldes_fra_qml();
+    void stopAgent_rapporterer_overlevende_proces();
 private:
 };
 
@@ -125,6 +126,23 @@ void TestStopOgAfvis::stopAgent_kaldes_fra_qml()
     QVERIFY(!start.isEmpty());
     QVERIFY2(start.contains("acp.sessionCancel("), "sessionCancel ikke kaldt fra QML");
     QVERIFY2(start.contains("acp.stopAgent("), "stopAgent ikke kaldt fra QML");
+}
+
+void TestStopOgAfvis::stopAgent_rapporterer_overlevende_proces()
+{
+    QString kilde = testReadSource("src/agentprocess.cpp");
+    QVERIFY(!kilde.isEmpty());
+    int pos = kilde.indexOf("AgentProcess::stopAgent");
+    QVERIFY(pos >= 0);
+    QString kroppen = kilde.mid(pos);
+    QVERIFY2(kroppen.contains("waitForFinished"), "stopAgent tjekker ikke waitForFinished");
+    QVERIFY2(kroppen.contains("emit error"), "stopAgent rapporterer ikke overlevende proces");
+
+    AgentProcess p;
+    p.setProgramAndArgsForTest("sleep", QStringList() << "30");
+    QVERIFY(p.start());
+    QVERIFY(p.stopAgent());
+    QVERIFY(!p.isRunning());
 }
 
 #include "tst_stop_og_afvis.moc"

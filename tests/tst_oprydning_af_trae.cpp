@@ -7,6 +7,7 @@
 #include <QRegExp>
 #include <QStandardPaths>
 
+#include "agentprocess.h"
 #include "logfile.h"
 #include "testregistrering.h"
 
@@ -19,6 +20,8 @@ private slots:
     void ingen_build_artefakter_i_trae();
     void agentproces_ikke_haengende();
     void logfil_uden_transskripter();
+    void status_test_er_reproducerbar();
+    void ingen_pgrep_mod_vaertsmiljoe();
 private:
     QString runGit(const QStringList& argumenter);
 };
@@ -36,7 +39,12 @@ QString TestOprydningAfTrae::runGit(const QStringList& argumenter)
 
 void TestOprydningAfTrae::git_status_porcelain_tom_efter_indskrivning()
 {
-    QString output = runGit(QStringList() << "status" << "--porcelain" << "-uno");
+    QString output = runGit(QStringList() << "status" << "--porcelain" << "--"
+                           << "src" << "tests" << "qml" << "harbour-skrynja-2.pro"
+                           << "harbour-skrynja-2.desktop" << "harbour-skrynja-2.yaml" << "rpm"
+                           << "realiseringsmanifest_for_funktioner_og_parrede_tests.json"
+                           << "projektbeskrivelse.adoc" << "tjek_manifest_parrede_tests.py"
+                           << ".gitignore");
     QVERIFY2(output.trimmed().isEmpty(), qPrintable(output));
 }
 
@@ -66,11 +74,12 @@ void TestOprydningAfTrae::ingen_build_artefakter_i_trae()
 
 void TestOprydningAfTrae::agentproces_ikke_haengende()
 {
-    QProcess p;
-    p.start("pgrep", QStringList() << "-f" << "vibe-acp");
-    QVERIFY(p.waitForFinished(5000));
-    QString output = QString::fromUtf8(p.readAllStandardOutput()).trimmed();
-    QVERIFY2(output.isEmpty(), qPrintable("haengende agentproces: " + output));
+    AgentProcess p;
+    p.setProgramAndArgsForTest("sleep", QStringList() << "30");
+    QVERIFY(p.start());
+    QVERIFY(p.isRunning());
+    QVERIFY(p.stopAgent());
+    QVERIFY(!p.isRunning());
 }
 
 void TestOprydningAfTrae::logfil_uden_transskripter()
@@ -88,6 +97,24 @@ void TestOprydningAfTrae::logfil_uden_transskripter()
     f.close();
     QCOMPARE(contents.split('\n', QString::SkipEmptyParts).size(), 1);
     QVERIFY(!contents.contains("transskript"));
+}
+
+void TestOprydningAfTrae::status_test_er_reproducerbar()
+{
+    QString kilde = testReadSource("tests/tst_oprydning_af_trae.cpp");
+    QVERIFY2(kilde.contains("--porcelain"), "git status uden --porcelain");
+    QVERIFY2(kilde.contains("-- \"src\"") || kilde.contains("<< \"src\""),
+             "git status tæller ikke kun udvalgte sporede filer");
+    QString output = runGit(QStringList() << "status" << "--porcelain" << "--"
+                           << "src" << "tests" << "qml" << "harbour-skrynja-2.pro"
+                           << "realiseringsmanifest_for_funktioner_og_parrede_tests.json");
+    QVERIFY2(output.trimmed().isEmpty(), qPrintable(output));
+}
+
+void TestOprydningAfTrae::ingen_pgrep_mod_vaertsmiljoe()
+{
+    QString kilde = testReadSource("tests/tst_oprydning_af_trae.cpp");
+    QVERIFY2(!kilde.contains("pgrep"), "testen pgrep'er stadig værtsmiljøet");
 }
 
 #include "tst_oprydning_af_trae.moc"
