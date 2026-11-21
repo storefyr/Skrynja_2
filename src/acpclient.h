@@ -2,7 +2,6 @@
 #define ACPCLIENT_H
 
 #include <QByteArray>
-#include <QHash>
 #include <QList>
 #include <QObject>
 #include <QVariantList>
@@ -10,6 +9,7 @@
 #include "acpbesked.h"
 
 class AcpFrameReader;
+class AcpProtokol;
 class AgentProcess;
 class DiffModel;
 class ConfigurationModel;
@@ -97,29 +97,23 @@ signals:
     void agentPathChanged();
 
 protected:
-    qint64 nextId();
     qint64 sendRequest(const QString& method, const QJsonObject& params);
     void sendSessionLoad(const QString& sessionId);
     void sendNotification(const QString& method, const QJsonObject& params);
     void sendMessage(const AcpMessage& message);
     void write(const QByteArray& line);
-    virtual void handleMessage(const AcpMessage& message);
-    void handleNotification(const AcpMessage& message);
-    void handleSessionUpdate(const QJsonObject& params);
-    void handleContentBlocks(const QJsonObject& update);
 
     AgentProcess* m_process;
     AcpFrameReader* m_reader;
+    AcpProtokol* m_protokol;
     ConversationModel* m_conversation;
     SessionStore* m_store;
     ToolCallModel* m_toolCallModel;
     PermissionModel* m_permissionModel;
     DiffModel* m_diff;
     ConfigurationModel* m_configModel;
-    qint64 m_nextId;
     bool m_testMode;
     QList<QByteArray> m_sendte;
-    QHash<qint64, QString> m_pendingRequests;
     QString m_lastError;
     QString m_sessionId;
     QString m_stopReason;
@@ -130,6 +124,19 @@ private slots:
     void receiveLine(const QByteArray& line);
     void receiveAgentError(const QString& error);
     void processFinished(int exitKode);
+    void onMessageOut(const AcpMessage& message);
+    void onResponseError(const QString& method, const QString& message);
+    void onInitializeResponded(const QJsonObject& result);
+    void onSessionLoadFailed();
+    void onSessionEstablished(const QString& sessionId, bool restored);
+    void onPromptResponded(const QString& stopReason);
+    void onPermissionRequest(qint64 requestId, const QJsonObject& params);
+    void onAgentMessageChunk(const QString& text);
+    void onToolCallAdded(const QString& toolCallId, const QString& title, const QString& status);
+    void onToolCallUpdated(const QString& toolCallId, const QString& status, const QString& title);
+    void onDiffContent(const QString& path, const QString& diff);
+    void onOutputContent(const QString& text);
+    void onRoundEnded();
 };
 
 #endif

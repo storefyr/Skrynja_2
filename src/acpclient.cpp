@@ -6,6 +6,7 @@
 #include <QProcess>
 
 #include "acpframereader.h"
+#include "acpprotokol.h"
 #include "agentproces.h"
 #include "diffmodel.h"
 #include "konfigurationsmodel.h"
@@ -24,13 +25,13 @@ AcpClient::AcpClient(QObject* parent)
     : QObject(parent)
     , m_process(new AgentProcess(this))
     , m_reader(new AcpFrameReader(m_process->process(), this))
+    , m_protokol(new AcpProtokol(this))
     , m_conversation(new ConversationModel(this))
     , m_store(new SessionStore)
     , m_toolCallModel(new ToolCallModel(this))
     , m_permissionModel(new PermissionModel(this))
     , m_diff(new DiffModel(this))
     , m_configModel(new ConfigurationModel(this))
-    , m_nextId(1)
     , m_testMode(false)
     , m_hadRestoredHistory(false)
 {
@@ -43,6 +44,19 @@ AcpClient::AcpClient(QObject* parent)
     connect(m_diff, SIGNAL(changed()), this, SIGNAL(diffsChanged()));
     connect(m_diff, SIGNAL(changed()), this, SIGNAL(outputsChanged()));
     connect(m_configModel, SIGNAL(changed()), this, SIGNAL(configChanged()));
+    connect(m_protokol, SIGNAL(messageOut(AcpMessage)), this, SLOT(onMessageOut(AcpMessage)));
+    connect(m_protokol, SIGNAL(responseError(QString,QString)), this, SLOT(onResponseError(QString,QString)));
+    connect(m_protokol, SIGNAL(initializeResponded(QJsonObject)), this, SLOT(onInitializeResponded(QJsonObject)));
+    connect(m_protokol, SIGNAL(sessionLoadFailed()), this, SLOT(onSessionLoadFailed()));
+    connect(m_protokol, SIGNAL(sessionEstablished(QString,bool)), this, SLOT(onSessionEstablished(QString,bool)));
+    connect(m_protokol, SIGNAL(promptResponded(QString)), this, SLOT(onPromptResponded(QString)));
+    connect(m_protokol, SIGNAL(permissionRequestReceived(qint64,QJsonObject)), this, SLOT(onPermissionRequest(qint64,QJsonObject)));
+    connect(m_protokol, SIGNAL(agentMessageChunk(QString)), this, SLOT(onAgentMessageChunk(QString)));
+    connect(m_protokol, SIGNAL(toolCallAdded(QString,QString,QString)), this, SLOT(onToolCallAdded(QString,QString,QString)));
+    connect(m_protokol, SIGNAL(toolCallUpdated(QString,QString,QString)), this, SLOT(onToolCallUpdated(QString,QString,QString)));
+    connect(m_protokol, SIGNAL(diffContent(QString,QString)), this, SLOT(onDiffContent(QString,QString)));
+    connect(m_protokol, SIGNAL(outputContent(QString)), this, SLOT(onOutputContent(QString)));
+    connect(m_protokol, SIGNAL(roundEnded()), this, SLOT(onRoundEnded()));
 }
 
 AcpClient::~AcpClient()
@@ -74,8 +88,7 @@ void AcpClient::sendInitialize()
     clientInfo.insert("name", "harbour-skrynja-2");
     clientInfo.insert("version", "1.0.0");
     params.insert("clientInfo", clientInfo);
-    qint64 id = sendRequest("initialize", params);
-    m_pendingRequests.insert(id, "initialize");
+    sendRequest("initialize", params);
 }
 
 void AcpClient::startSession()
@@ -90,16 +103,14 @@ void AcpClient::sendSessionLoad(const QString& sessionId)
 {
     QJsonObject params;
     params.insert("sessionId", sessionId);
-    qint64 id = sendRequest("session/load", params);
-    m_pendingRequests.insert(id, "session/load");
+    sendRequest("session/load", params);
 }
 
 void AcpClient::sendSessionNew(const QString& cwd)
 {
     QJsonObject params;
     params.insert("cwd", cwd);
-    qint64 id = sendRequest("session/new", params);
-    m_pendingRequests.insert(id, "session/new");
+    sendRequest("session/new", params);
 }
 
 void AcpClient::sendSessionPrompt(const QString& prompt)
@@ -113,8 +124,7 @@ void AcpClient::sendSessionPrompt(const QString& prompt)
     QJsonObject params;
     params.insert("sessionId", m_sessionId);
     params.insert("prompt", blokke);
-    qint64 id = sendRequest(kSessionPrompt, params);
-    m_pendingRequests.insert(id, kSessionPrompt);
+    sendRequest(kSessionPrompt, params);
 }
 
 ConversationModel* AcpClient::conversationModel() const
@@ -232,8 +242,7 @@ void AcpClient::setConfigOption(const QString& configId, const QVariant& value)
     params.insert("sessionId", m_sessionId);
     params.insert("configId", configId);
     params.insert("value", QJsonValue::fromVariant(value));
-    qint64 id = sendRequest(kSetConfigOption, params);
-    m_pendingRequests.insert(id, kSetConfigOption);
+    sendRequest(kSetConfigOption, params);
 }
 
 QString AcpClient::agentPath() const
@@ -312,21 +321,16 @@ QByteArray AcpClient::lastSentForTest() const
 void AcpClient::resetForTest()
 {
     m_sendte.clear();
-    m_pendingRequests.clear();
+    m_protokol->clearPendingRequests();
     m_configOptions.clear();
     m_lastError.clear();
     m_sessionId.clear();
     m_stopReason.clear();
 }
 
-qint64 AcpClient::nextId()
-{
-    return m_nextId++;
-}
-
 qint64 AcpClient::sendRequest(const QString& method, const QJsonObject& params)
 {
-    qint64 id = nextId();
+    qint64 id = m_protokol->registerRequest(method);
     sendMessage(AcpMessage::request(id, method, params));
     return id;
 }
@@ -356,105 +360,88 @@ void AcpClient::receiveLine(const QByteArray& line)
     bool ok = false;
     AcpMessage message = AcpMessage::fraJson(line, &ok);
     if (ok)
-        handleMessage(message);
+        m_protokol->handleMessage(message);
 }
 
-void AcpClient::handleMessage(const AcpMessage& message)
+void AcpClient::onMessageOut(const AcpMessage& message)
 {
-    if (message.type() == AcpMessage::Response && message.hasId()) {
-        QString method = m_pendingRequests.take(message.id());
-        if (method == "session/load" && message.isError()) {
-            m_hadRestoredHistory = false;
-            emit historyChanged();
-            sendSessionNew(QDir::homePath());
-            return;
-        }
-        if (message.isError()) {
-            m_lastError = message.error().value("message").toString();
-            if (method == "initialize")
-                emit agentError(m_lastError);
-            return;
-        }
-        QJsonObject result = message.result().toObject();
-        if (method == "initialize") {
-            QJsonArray options = result.value("configOptions").toArray();
-            m_configOptions.clear();
-            for (int i = 0; i < options.size(); ++i)
-                m_configOptions.append(options.at(i).toObject().toVariantMap());
-            m_configModel->setConfigOptions(m_configOptions);
-            emit initializeResponse(result);
-            emit agentReady();
-        } else if (method == "session/load") {
-            m_sessionId = result.value("sessionId").toString();
-            m_hadRestoredHistory = true;
-            m_store->saveSessionId(m_sessionId);
-            emit sessionCreated(m_sessionId);
-            emit historyChanged();
-        } else if (method == "session/new") {
-            m_sessionId = result.value("sessionId").toString();
-            m_hadRestoredHistory = false;
-            m_store->saveSessionId(m_sessionId);
-            emit sessionCreated(m_sessionId);
-            emit historyChanged();
-        } else if (method == kSessionPrompt) {
-            m_stopReason = result.value("stopReason").toString();
-        }
-    } else if (message.type() == AcpMessage::Notification) {
-        handleNotification(message);
-    } else if (message.type() == AcpMessage::Request && message.hasId()) {
-        if (message.method() == "session/request_permission") {
-            m_permissionModel->setRequest(message.id(), message.params());
-            emit permissionRequested();
-        } else {
-            sendMessage(AcpMessage::errorResponse(message.id(), -32601, "ukendt metode"));
-        }
-    }
+    sendMessage(message);
 }
 
-void AcpClient::handleNotification(const AcpMessage& message)
+void AcpClient::onResponseError(const QString& method, const QString& message)
 {
-    if (message.method() == "session/update")
-        handleSessionUpdate(message.params());
-    else if (message.method() == "end_turn") {
-        m_conversation->endRound();
-        emit roundFinished();
-    }
+    m_lastError = message;
+    if (method == "initialize")
+        emit agentError(m_lastError);
 }
 
-void AcpClient::handleContentBlocks(const QJsonObject& update)
+void AcpClient::onInitializeResponded(const QJsonObject& result)
 {
-    QJsonArray content = update.value("content").toArray();
-    for (int i = 0; i < content.size(); ++i) {
-        QJsonObject blok = content.at(i).toObject();
-        QString type = blok.value("type").toString();
-        if (type == "diff")
-            m_diff->addDiff(blok.value("path").toString(), blok.value("diff").toString());
-        else if (type == "output")
-            m_diff->addOutput(blok.value("text").toString());
-    }
+    QJsonArray options = result.value("configOptions").toArray();
+    m_configOptions.clear();
+    for (int i = 0; i < options.size(); ++i)
+        m_configOptions.append(options.at(i).toObject().toVariantMap());
+    m_configModel->setConfigOptions(m_configOptions);
+    emit initializeResponse(result);
+    emit agentReady();
 }
 
-void AcpClient::handleSessionUpdate(const QJsonObject& params)
+void AcpClient::onSessionLoadFailed()
 {
-    QJsonObject update = params.value("update").toObject();
-    QString art = update.value("sessionUpdate").toString();
-    if (art == "agent_message_chunk") {
-        QJsonObject content = update.value("content").toObject();
-        m_conversation->addChunk(content.value("text").toString());
-    } else if (art == "tool_call") {
-        m_toolCallModel->addToolCall(update.value("toolCallId").toString(),
-                                      update.value("title").toString(),
-                                      update.value("status").toString());
-        handleContentBlocks(update);
-    } else if (art == "tool_call_update") {
-        m_toolCallModel->updateToolCall(update.value("toolCallId").toString(),
-                                         update.value("status").toString(),
-                                         update.value("title").toString());
-        handleContentBlocks(update);
-    } else if (art == "turn_end") {
-        m_conversation->endRound();
-        emit roundFinished();
-    }
+    m_hadRestoredHistory = false;
+    emit historyChanged();
+    sendSessionNew(QDir::homePath());
+}
+
+void AcpClient::onSessionEstablished(const QString& sessionId, bool restored)
+{
+    m_sessionId = sessionId;
+    m_hadRestoredHistory = restored;
+    m_store->saveSessionId(m_sessionId);
+    emit sessionCreated(m_sessionId);
+    emit historyChanged();
+}
+
+void AcpClient::onPromptResponded(const QString& stopReason)
+{
+    m_stopReason = stopReason;
+}
+
+void AcpClient::onPermissionRequest(qint64 requestId, const QJsonObject& params)
+{
+    m_permissionModel->setRequest(requestId, params);
+    emit permissionRequested();
+}
+
+void AcpClient::onAgentMessageChunk(const QString& text)
+{
+    m_conversation->addChunk(text);
+}
+
+void AcpClient::onToolCallAdded(const QString& toolCallId, const QString& title, const QString& status)
+{
+    m_toolCallModel->addToolCall(toolCallId, title, status);
+}
+
+void AcpClient::onToolCallUpdated(const QString& toolCallId, const QString& status, const QString& title)
+{
+    m_toolCallModel->updateToolCall(toolCallId, status, title);
+}
+
+void AcpClient::onDiffContent(const QString& path, const QString& diff)
+{
+    m_diff->addDiff(path, diff);
+}
+
+void AcpClient::onOutputContent(const QString& text)
+{
+    m_diff->addOutput(text);
+}
+
+void AcpClient::onRoundEnded()
+{
+    m_conversation->endRound();
+    emit roundFinished();
 }
 
 void AcpClient::receiveAgentError(const QString& error)
