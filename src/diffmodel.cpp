@@ -1,6 +1,6 @@
 #include "diffmodel.h"
 
-#include "acpframereader.h"
+#include "acpprotokol.h"
 
 DiffModel::DiffModel(QObject* parent)
     : QAbstractListModel(parent)
@@ -12,7 +12,7 @@ void DiffModel::addDiff(const QString& path, const QString& diffText)
     Diff d;
     d.path = path;
     QStringList lines = diffText.split('\n', QString::KeepEmptyParts);
-    int cap = AcpFrameReader::standardCap();
+    int cap = AcpProtokol::standardCap();
     for (int i = 0; i < lines.size(); ++i) {
         if (lines.at(i).size() > cap)
             lines[i] = lines.at(i).left(cap);

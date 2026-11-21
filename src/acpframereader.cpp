@@ -1,12 +1,14 @@
 #include "acpframereader.h"
 
+#include "acpprotokol.h"
+
 #include <QIODevice>
 #include <QJsonDocument>
 #include <QJsonParseError>
 
 int AcpFrameReader::standardCap()
 {
-    return 65536;
+    return AcpProtokol::standardCap();
 }
 
 AcpFrameReader::AcpFrameReader(QIODevice* enhed, QObject* parent)

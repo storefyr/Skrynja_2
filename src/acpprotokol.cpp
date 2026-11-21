@@ -13,6 +13,11 @@ const QString AcpProtokol::kSessionUpdate = QLatin1String("session/update");
 const QString AcpProtokol::kEndTurn = QLatin1String("end_turn");
 const QString AcpProtokol::kRequestPermission = QLatin1String("session/request_permission");
 
+int AcpProtokol::standardCap()
+{
+    return 65536;
+}
+
 AcpProtokol::AcpProtokol(QObject* parent)
     : QObject(parent)
     , m_nextId(1)

@@ -21,6 +21,8 @@ public:
     static const QString kEndTurn;
     static const QString kRequestPermission;
 
+    static int standardCap();
+
     explicit AcpProtokol(QObject* parent = 0);
 
     qint64 nextId();
