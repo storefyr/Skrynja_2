@@ -122,7 +122,7 @@ Rammen er ikke-forhandlingsbar og arves fra forgængerprojekterne og fra license
 * Ingen SailJail: `Sandboxing=Disabled` i `.desktop`-filen fra første indskrivning, ellers er agentstien ikke nåbar.
 * Agentsti: `/home/defaultuser/.local/bin/vibe-acp`.
 * Sprog: kode og kommentarer er engelske; dokumentation, brugerflade og commits er danske.
-* Ortografi: mest muligt foregår på ortografisk dansk (æ, ø, å) — dokumentation, artefakt- og filnavne, JSON-nøgler, commit-beskeder og PR-titler. Undtagelser kun hvor teknikken tvinger: C++-identifikatorer og kildefilnavne (moc håndterer ikke æøå), ACP-protokolstrenge på wire-format, og `harbour-`-appnavnet (harbour-regler kræver ascii).
+* Ortografi: i dette artefakt (`projektbeskrivelse.adoc`) skrives der altid ortografisk dansk (æ, ø, å) — uden undtagelse i prosa, overskrifter, artefakt- og filnavne, JSON-nøgler, commit-beskeder og PR-titler. Ascii forekommer kun når tekniske navne citeres i backticks eller kode-blokke (C++-identifikatorer og kildefilnavne, hvor moc ikke håndterer æøå; ACP-protokolstrenge på wire-format; `harbour-`-appnavnet) — aldrig i dansk prosa, så ae/oe/aa i dansk tekst er en fejl.
 * Prøver: QtTest i `tests/` uden Silica-afhængighed; prøven indskrives før den kilde, den afprøver.
 * Filer: nye kildefiler registreres i `.pro`-filen; nye QML-filer registreres til installation.
 * Hemmeligheder: ingen nøgler, tokens eller samtale-transskripter må nogensinde ind i depotet.
