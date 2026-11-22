@@ -37,7 +37,8 @@
     "Efter hver arbejdsgang indskrives ændringerne med en beskrivende besked, så næste samtale kan læse fremdriften i git-historikken.",
     "Ingen nøgler, tokens eller samtale-transskripter ind i depotet.",
     "Værtsløkke (vært/CI): qmake + make + hele QtTest-suiten i tests/ kører på værten og dækker kodekvalitet — værtsløkkens resultater tæller ikke som mål.",
-    "Enhedsløkke (mål): kun aarch64/Qt 5.6 mål-byg i Sailfish SDK og på enhed kørsel på Jolla Phone 2026 tæller som mål; passerer for mål-afhængige funktioner (f.eks. distributionsartefakt_rpm) sættes først efter målt enhedsløkke."
+    "Enhedsløkke (mål): kun aarch64/Qt 5.6 mål-byg i Sailfish SDK og på enhed kørsel på Jolla Phone 2026 tæller som mål; passerer for mål-afhængige funktioner (f.eks. distributionsartefakt_rpm) sættes først efter målt enhedsløkke.",
+    "Spejlingsregel (plan ↔ manifest, PR #46): projektbeskrivelse.adoc og dette manifest må aldrig divergere — ændres det ene artefakt, opdateres det andet af sin ejer i samme PR. Håndhæves automatisk af den parrede kontrol tjek_plan_manifest_spejl.py i væertsløkken (funktion 26); en PR, der kun rører det ene artefakt, fejler kontrollen."
   ],
   "triage_logik": {
     "input": "vurdering_af_realiseringsartefaktets_arkitektur_fragilitet_og_støjindhold_for_stokastikere.json (faktisk filnavn på main med ø; projektbeskrivelse.adoc refererer stadig med ascii 'stoejindhold' — dokumentationsstøj for Strategistokastikeren)",
@@ -119,7 +120,7 @@
       {"id": "ark-6", "type": "arkitektur", "mål_funktion": "værktøjskald_visning", "ordre": "Enten fjern de ubrugte QAbstractListModel-roller fra ConversationModel/ToolCallModel/DiffModel, eller skift QML til at bruge model-rollerne — ikke begge dele.", "parret_test": "tests/tst_vaerktoejskald_visning.cpp + ny slot: qml_bruger_en_eneste_model_mekanisme", "gennemført": true}
     ]
   },
-  "succeskriterium": "prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0, samtidig med at alle 25 funktioner (13 oprindelige + 3 ark-1-opdelinger fra PR #10 + 5 ark-2..6-trin fra PR #18 + 2 distributionsartefakt-trin + funktion 24 skærmbillede-i-session + funktion 25 terminal-tilladelse på enhed) har passerer: sand og alle parrede tests i tests/ er grønne; distributionsartefaktet (.rpm) er desuden bygget som aarch64 mål-byg i Sailfish SDK, installeret på Jolla Phone 2026, og succeskriteriet er målt på enhed med exit 0.",
+  "succeskriterium": "prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0, samtidig med at alle 26 funktioner (13 oprindelige + 3 ark-1-opdelinger fra PR #10 + 5 ark-2..6-trin fra PR #18 + 2 distributionsartefakt-trin + funktion 24 skærmbillede-i-session + funktion 25 terminal-tilladelse på enhed + funktion 26 spejlkontrol) har passerer: sand og alle parrede tests i tests/ er grønne; distributionsartefaktet (.rpm) er desuden bygget som aarch64 mål-byg i Sailfish SDK, installeret på Jolla Phone 2026, og succeskriteriet er målt på enhed med exit 0.",
   "strategisk_rækkefølge": [
     "byggesti_og_logfil",
     "acp_rygrad",
@@ -145,7 +146,8 @@
     "distributionsartefakt_ikoner",
     "distributionsartefakt_rpm",
     "skærmbillede_i_session",
-    "terminal_tilladelse_på_enhed"
+    "terminal_tilladelse_på_enhed",
+    "spejl_kontrol_plan_manifest"
   ],
   "funktioner": [
     {
@@ -1252,6 +1254,49 @@
           "trin": "Enhedsløkke: terminal-adgang på Jolla Phone 2026 med sikkerhedsrammer (efter funktion 23 er grøn)",
           "kommando": "på enheden: kør session med terminal/* aktiveret; verificer at kald uden godkendt tilladelse afvises, allowlist håndhæves, hemmelighedsfilter fanger token-lignende strenge; --selvtest før og efter",
           "forventet_uddata": "uautoriserede kald afvises; --selvtest exit=0 før og efter; ingen tokens/nøgler i log eller depot"
+        }
+      ],
+      "passerer": false
+    },
+    {
+      "id": "spejl_kontrol_plan_manifest",
+      "navn": "Spejlkontrol: plan ↔ manifest",
+      "beskrivelse": "Parret kontrol ved siden af tjek_manifest_parrede_tests.py: tjek_plan_manifest_spejl.py kører i væertsløkken og tjekker, at planens funktionsrækkefølge (projektbeskrivelse.adoc) == manifestets strategisk_rækkefølge, og at nøglereglerne (ortografi-maksimum, leveringskæde via GitHub Release, værtsløkke/enhedsløkke, spejlingsregel) findes i begge artefakter. En PR, der kun rører det ene artefakt, fejler kontrollen. Implementerer spejlingsreglen fra PR #46.",
+      "filer": [
+        "tjek_plan_manifest_spejl.py",
+        "tests/tst_proevesuite_i_tests.cpp",
+        "projektbeskrivelse.adoc",
+        "realiseringsmanifest_for_funktioner_og_parrede_tests.json"
+      ],
+      "parret_test": {
+        "testfil": "tests/tst_proevesuite_i_tests.cpp",
+        "testklasse": "TestProevesuiteITests",
+        "testslots": [
+          "plan_og_manifest_spejler_hinanden"
+        ],
+        "fixtures": [],
+        "bemærkning": "Ny slot i den eksisterende parrede testfil (kører tjek_plan_manifest_spejl.py); prøven skrives før scriptet"
+      },
+      "verifikations_trin": [
+        {
+          "trin": "Spejlkontrol grøn på main (plan og manifest i samme PR-historie)",
+          "kommando": "python3 tjek_plan_manifest_spejl.py",
+          "forventet_uddata": "spejl ok: rækkefølge == strategisk_rækkefølge (26); nøgleregler i begge artefakter; exit 0"
+        },
+        {
+          "trin": "Negativ kontrol: fjern én funktion fra manifest-rækkefølgen i en temp-kopi",
+          "kommando": "python3 tjek_plan_manifest_spejl.py --manifest <temp-kopi uden én funktion>",
+          "forventet_uddata": "FEJL: rækkefølge afviger; exit != 0"
+        },
+        {
+          "trin": "Host-suite grøn med ny slot",
+          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "forventet_uddata": "ALL TESTS PASSED (inkl. TestProevesuiteITests::plan_og_manifest_spejler_hinanden)"
+        },
+        {
+          "trin": "Manifest-tjek grøn",
+          "kommando": "python3 tjek_manifest_parrede_tests.py",
+          "forventet_uddata": "rækkefølge ok; exit 0"
         }
       ],
       "passerer": false
