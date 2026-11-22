@@ -273,7 +273,7 @@ Strategisk begrundelse (spørgsmål fra orkestratoren, besvaret 2026-11-21): Ja,
 * `distributionsartefakt_ikoner` (funktion 22) — app-ikoner i hicolor-stier, wired i `.pro`, spec, yaml og `.desktop`.
 * `distributionsartefakt_rpm` (funktion 23, `passerer: false` indtil mål-byg køres) — leveringskæden i den virkelige verden (verdensbillede fra orkestratoren 2026-11-21: mål-enheden er din eneste enhed, Jolla Phone 2026; du skriver via Vibe-appen; stokastikerne kører i hver deres sandkasse):
   . Mål-byg i en stokastiker-sandkasse med Sailfish SDK: aarch64/Qt 5.6 via `sfdk`/mb2 (`harbour-skrynja-2.yaml`) eller `rpmbuild` med `rpm/harbour-skrynja-2.spec` → `harbour-skrynja-2-1.0.0-1.aarch64.rpm`.
-  . Udgiv .rpm som **GitHub Release**-asset på `storefyr/Skrynja_2` — som i tidligere Skrynja-forsøg anskaffes .rpm fra kildekodelageret på github.com. Udgivelsesfiler ligger uden for git-træet, så reglen `ingen_rpm_eller_log_i_depotet` (ingen `*.rpm`/`*.log` i depotet) stadig overholdes.
+  . Udgiv .rpm som vedhæftet fil på en **GitHub Release** på `storefyr/Skrynja_2` — som i tidligere Skrynja-forsøg anskaffes .rpm fra kildekodelageret på github.com. Udgivelsesfiler ligger uden for git-træet, så reglen `ingen_rpm_eller_log_i_depotet` (ingen `*.rpm`/`*.log` i depotet) stadig overholdes.
   . Hent .rpm på Jolla Phone 2026 fra github.com → `rpm -qpl`-tjek (binær, `.desktop`, QML, 4 ikoner) → `pkcon install-local` på telefonen.
   . Succeskriterium på enheden efter install: prompt → tilladelse → besvaret → fil skrevet → end_turn → exit 0. Resultatet er det målbare grundlag for slutbruger-vurderings-JSON'erne.
 
