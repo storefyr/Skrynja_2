@@ -7,6 +7,7 @@
 #include <QJsonObject>
 #include <QMap>
 #include <QRegExp>
+#include <QProcess>
 
 #include "testregistrering.h"
 
@@ -23,6 +24,7 @@ private slots:
     void ingen_global_settings_mutation_i_tests();
     void meta_test_afledt_af_manifest_ikke_hardkodet();
     void ingen_testkroge_i_produktionsklasser();
+    void plan_og_manifest_spejler_hinanden();
 private:
     QJsonObject readManifest();
     QString readTestsPro();
@@ -219,6 +221,41 @@ void TestProevesuiteITests::ingen_testkroge_i_produktionsklasser()
         QVERIFY2(!src.contains("ForTest"), qPrintable("ForTest-krog i " + filer.at(i)));
         QVERIFY2(!src.contains("m_testMode"), qPrintable("m_testMode i " + filer.at(i)));
     }
+}
+
+void TestProevesuiteITests::plan_og_manifest_spejler_hinanden()
+{
+    QString script = testRepoRoot() + "/tjek_plan_manifest_spejl.py";
+    QVERIFY2(QFileInfo::exists(script), "tjek_plan_manifest_spejl.py mangler");
+
+    QProcess prosess;
+    prosess.setWorkingDirectory(testRepoRoot());
+    prosess.start("python3", QStringList() << script);
+    QVERIFY(prosess.waitForFinished(30000));
+    QCOMPARE(prosess.exitCode(), 0);
+    QString ud = QString::fromUtf8(prosess.readAllStandardOutput()) + QString::fromUtf8(prosess.readAllStandardError());
+    QVERIFY2(ud.contains("spejl ok"), qPrintable(ud));
+
+    QJsonObject manifest = readManifest();
+    QJsonArray raekkefoelge = manifest.value("strategisk_rækkefølge").toArray();
+    QVERIFY(raekkefoelge.size() > 1);
+    QJsonArray brudt = raekkefoelge;
+    brudt.removeLast();
+    manifest.insert("strategisk_rækkefølge", brudt);
+    QString tempSti = QDir::tempPath() + "/skrynja-tst-spejl-brudt-manifest.json";
+    QFile temp(tempSti);
+    QVERIFY(temp.open(QIODevice::WriteOnly));
+    temp.write(QJsonDocument(manifest).toJson());
+    temp.close();
+
+    QProcess negativ;
+    negativ.setWorkingDirectory(testRepoRoot());
+    negativ.start("python3", QStringList() << script << "--manifest" << tempSti);
+    QVERIFY(negativ.waitForFinished(30000));
+    QVERIFY(negativ.exitCode() != 0);
+    QString negativUd = QString::fromUtf8(negativ.readAllStandardOutput()) + QString::fromUtf8(negativ.readAllStandardError());
+    QVERIFY2(negativUd.contains("FEJL"), qPrintable(negativUd));
+    QFile::remove(tempSti);
 }
 
 #include "tst_proevesuite_i_tests.moc"
