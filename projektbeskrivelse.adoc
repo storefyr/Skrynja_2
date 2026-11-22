@@ -103,6 +103,7 @@ Kæden er lukket og sporbar i begge retninger:
 * Strategistokastikeren *leverer den endelige plan* til Projektstokastikeren, som omsætter den til taktiske ordrer.
 * Projektstokastikeren udsteder *taktiske ordrer* til Realiseringsstokastikeren via realiseringsmanifestet.
 * Alle artefakter gøres persistente af Suffløren i kildekodelageret.
+* Stedordsregel: i artefakter og relæer mellem stokastikere bruges aldrig "jeg/du/dig/mig" — brug rollens navn (orkestratoren, strategistokastikeren, projektstokastikeren, ...), så det altid er entydigt, hvem der menes. I direkte dialog mellem to parter er stedordene entydige og tilladt.
 
 == Strategistokastikerens mandat
 
@@ -274,13 +275,13 @@ Denne plan fastlægger 26 funktioner i følgende rækkefølge (svarende til mani
 Strategisk begrundelse (spørgsmål fra orkestratoren, besvaret 2026-11-21): Ja, der skal være et bygget .rpm. Distributionsartefaktet (RPM) er en del af visionen — det er Realiseringsstokastikerens artefakt — og Slutbrugeranvendelighedssonderingsstokastikeren kan kun vurdere overskuelighed, intuitivitet, kohærens og ansvarlighed på den kørende app på mål-enheden, ikke på værtstest eller ved kodelæsning. Projektstokastikeren har registreret det som funktion 22–23 i manifestet (PR #28).
 
 * `distributionsartefakt_ikoner` (funktion 22) — app-ikoner i hicolor-stier, wired i `.pro`, spec, yaml og `.desktop`.
-* `distributionsartefakt_rpm` (funktion 23, `passerer: false` indtil mål-byg køres) — leveringskæden i den virkelige verden (verdensbillede fra orkestratoren 2026-11-21: mål-enheden er din eneste enhed, Jolla Phone 2026; du skriver via Vibe-appen; stokastikerne kører i hver deres sandkasse):
+* `distributionsartefakt_rpm` (funktion 23, `passerer: false` indtil mål-byg køres) — leveringskæden i den virkelige verden (verdensbillede fra orkestratoren 2026-11-21: mål-enheden er orkestratorens eneste enhed, Jolla Phone 2026; orkestratoren skriver via Vibe-appen; stokastikerne kører i hver deres sandkasse):
   . Mål-byg i en stokastiker-sandkasse med Sailfish SDK: aarch64/Qt 5.6 via `sfdk`/mb2 (`harbour-skrynja-2.yaml`) eller `rpmbuild` med `rpm/harbour-skrynja-2.spec` → `harbour-skrynja-2-1.0.0-1.aarch64.rpm`.
   . Udgiv .rpm som vedhæftet fil på en **GitHub Release** på `storefyr/Skrynja_2` — som i tidligere Skrynja-forsøg anskaffes .rpm fra kildekodelageret på github.com. Udgivelsesfiler ligger uden for git-træet, så reglen `ingen_rpm_eller_log_i_depotet` (ingen `*.rpm`/`*.log` i depotet) stadig overholdes.
   . Hent .rpm på Jolla Phone 2026 fra github.com → `rpm -qpl`-tjek (binær, `.desktop`, QML, 4 ikoner) → `pkcon install-local` på telefonen.
   . Succeskriterium på enheden efter install: prompt → tilladelse → besvaret → fil skrevet → end_turn → exit 0. Resultatet er det målbare grundlag for slutbruger-vurderings-JSON'erne.
 
-*Begrænsning:* denne sandkasse kan ikke bygge RPM (ingen sfdk/rpmbuild/qmake, vært x86_64) — mål-bygget kører i en sandkasse med Sailfish SDK, ikke hos dig og ikke i dette miljø; værtssuiten (QtTest) dækker fortsat kodekvalitet her.
+*Begrænsning:* denne sandkasse kan ikke bygge RPM (ingen sfdk/rpmbuild/qmake, vært x86_64) — mål-bygget kører i en sandkasse med Sailfish SDK, ikke hos orkestratoren og ikke i denne sandkasse; værtssuiten (QtTest) dækker fortsat kodekvalitet her.
 
 *Parret test:* nye væverts-slots `spec_og_yaml_er_konsistente_med_pro` og `ingen_rpm_eller_log_i_depotet` i `tests/tst_byggesti_og_logfil.cpp` (prøve før kilde; ingen .rpm eller logfil må nogensinde ligge i depotet).
 
