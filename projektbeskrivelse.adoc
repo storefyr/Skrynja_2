@@ -168,7 +168,7 @@ Rammen er ikke-forhandlingsbar og arves fra forgængerprojekterne og fra license
 
 == Strategisk rækkefølge
 
-Denne plan fastlægger 24 funktioner i følgende rækkefølge (svarende til manifestets `strategisk_rækkefølge`); Projektstokastikeren registrerer dem i realiseringsmanifestet — strategien er at gennemføre dem én ad gangen uden at springe trin over (særligt `stop_og_afvis` må ikke springes over). Funktion 14–21 er arkitektur-opdelings-trinnene fra eskaleringerne ark-1..6 (se afsnittet *Arkitektur-eskaleringer* nedenfor); funktion 22–23 er distributionsartefakt-trinnene; funktion 24 er skærmbillede-i-session til slutbruger-sondering på enheden (se sidste afsnit):
+Denne plan fastlægger 25 funktioner i følgende rækkefølge (svarende til manifestets `strategisk_rækkefølge`); Projektstokastikeren registrerer dem i realiseringsmanifestet — strategien er at gennemføre dem én ad gangen uden at springe trin over (særligt `stop_og_afvis` må ikke springes over). Funktion 14–21 er arkitektur-opdelings-trinnene fra eskaleringerne ark-1..6 (se afsnittet *Arkitektur-eskaleringer* nedenfor); funktion 22–23 er distributionsartefakt-trinnene; funktion 24 er skærmbillede-i-session til slutbruger-sondering på enheden; funktion 25 er terminal-tilladelse på enheden (se sidste afsnit):
 
 . `byggesti_og_logfil`
 . `acp_rygrad`
@@ -194,6 +194,7 @@ Denne plan fastlægger 24 funktioner i følgende rækkefølge (svarende til mani
 . `distributionsartefakt_ikoner`
 . `distributionsartefakt_rpm`
 . `skærmbillede_i_session`
+. `terminal_tilladelse_paa_enhed`
 
 == Arkitektur-eskaleringer (besvaret af Strategistokastikeren)
 
@@ -306,6 +307,20 @@ Strategi godkendt af orkestratoren (2026-11-21): slutbruger-vurderingerne venter
 
 *Uafhængig fallback:* afprøvning via Vibe-chat med orkestratoren beholdes som supplement, så de to målinger kan sammenlignes (en stokastiker, der kører inden i appen, kan påvirkes af appens egne fejl).
 
+== Terminal-tilladelse på enheden (funktion 25)
+
+Når stokastiker-sessioner kører i Skrynja_2 direkte på Jolla Phone 2026, giver terminal-adgang på enheden nye muligheder: git og gh direkte fra telefonen, pkcon, og mål-byg/on-device-kørsel helt på enheden. Det kræver en bevidst revision af rammen — ikke et uheld:
+
+* `terminal_tilladelse_paa_enhed` (funktion 25) — på enheden udvides `clientCapabilities`, så agenten må kalde `terminal/*` og `fs/*`, MEN:
+  . hver kommando går gennem tilladelsesdialogen (`session/request_permission`) og besvares med et tryk;
+  . allowlist: læsninger, git status/log, gh-læsning, qmake/make, `pkcon install-local`; skrivende/destruktive kommandoer (rm, `pkcon remove`, git push) kun med eksplicit og tydelig godkendelse;
+  . trinvis åbning: først read-only (fil-læsning, git status/log, gh read); først når det er målt grønt, åbnes skrive-kommandoer;
+  . hemmelighedsfilter i loggen: tokens og nøgler logges aldrig og committes aldrig (gh-token ligger i telefonens nøglering, ikke i filer); ingen samtale-transskripter i log eller depot;
+  . `--selvtest` før og efter hver session med terminal-adgang.
+* Parret test: nye slots i `tests/` — clientCapabilities på enheden er ikke tom; terminal-kald uden godkendt tilladelse afvises; hemmelighedsfilter fanger token-lignende strenge i log.
+* Risiko: telefonen er orkestratorens eneste enhed — terminal-adgang kan i værste fald ødelægge systemet; derfor godkendelse pr. kommando og trinvis åbning.
+* Projektstokastikeren spejler funktion 25 og den reviderede clientCapabilities-regel i manifestet.
+
 == Succeskriterium for økosystemet
 
-Økosystemet betragtes som realiseret, når kæden kører end-to-end på mål-enheden: prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0, samtidig med at alle stokastiker-artefakter (denne beskrivelse, manifestet med alle 24 funktioner `passerer: sand`, de parrede tests og vurderings-JSON'erne) ligger sporbare i kildekodelageret, og distributionsartefaktet (.rpm) desuden er bygget som aarch64 mål-byg i en sandkasse med Sailfish SDK, udgivet som GitHub Release på kildekodelageret, hentet og installeret på Jolla Phone 2026 og kørt igennem på enheden med exit 0.
+Økosystemet betragtes som realiseret, når kæden kører end-to-end på mål-enheden: prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0, samtidig med at alle stokastiker-artefakter (denne beskrivelse, manifestet med alle 25 funktioner `passerer: sand`, de parrede tests og vurderings-JSON'erne) ligger sporbare i kildekodelageret, og distributionsartefaktet (.rpm) desuden er bygget som aarch64 mål-byg i en sandkasse med Sailfish SDK, udgivet som GitHub Release på kildekodelageret, hentet og installeret på Jolla Phone 2026 og kørt igennem på enheden med exit 0.
