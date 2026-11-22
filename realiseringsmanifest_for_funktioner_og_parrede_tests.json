@@ -23,11 +23,13 @@
     "agentsti": "/home/defaultuser/.local/bin/vibe-acp",
     "acp": "ACP over stdio, protocolVersion 1, tom clientCapabilities ved initialize — agenten må ikke kalde fs/* eller terminal/*",
     "prøver": "QtTest i tests/ uden Silica-afhængighed (QT += core testlib); prøven indskrives før kilden; nye kildefiler registreres i harbour-skrynja-2.pro; nye QML-filer registreres til installation",
-    "sprog": "Kode og kommentarer er engelske; dokumentation, brugerflade og indskrivningsbeskeder er danske — ændret 2026-11-20 på den menneskelige orkestrators ønske, som eneste kilde til strategiske ønsker; JSON-nøgler er dansk snake_case med ægte æøå; C++-identifikatorer (testklasser og testslots) er ascii, fordi moc ikke håndterer æøå. Ortografi-reglen: udvanding ae/oe/aa tæller som fejl i nøgler, filnavne og dansk prosa — ægte lånord undtages kun med begrundelse; ascii-udvanding er kun tilladt i C++-identifikatorer. Alle stokastikere — også nystartede — kommunikerer desuden udelukkende på dansk med hinanden og med den menneskelige orkestrator; intet andet sprog i nogen samtale (den menneskelige orkestrators ønske 2026-11-22)",
-    "terminologi": "Dansk frem for engelsk fagsprog i prosa: hvor et præcist dansk alternativ findes, bruges det — specifikt `merge` erstattes med `integration` (substantiv) eller `integreres`/`integreret` (verbum), `draft` med kladde, `commit` med indskrivning, `backend` med bagvedliggende system, `branch` med gren, `token` med adgangstoken. Egennavne, protokol-/platformtermer samt kommandoer og API-stier (GitHub, PR, ACP, CI, `git push`, `merge` som API-sti) undtages; i historiske logposter (triage-poster, eskaleringslog) bevares id'er, hashes og citeret tekst, men terminologien i denne regel gælder også dér (orkestratorens krav 2026-11-22)",
+    "sprog": "Kode og kommentarer er engelske; dokumentation, brugerflade og indskrivninger er danske. Alle stokastikere — også nystartede — kommunikerer udelukkende på dansk med hinanden og med den menneskelige realiseringsorkestrator (orkestratorens ønske 2026-11-22). JSON-nøgler er dansk snake_case med ægte æøå; C++-identifikatorer (testklasser og testslots) er ascii, fordi moc ikke håndterer æøå. Ortografi (hele realiseringsøkosystemet, uden undtagelse i prosa): ingen ascii-udvanding (aa/ae/oe) af dansk i prosa, nøgler, id'er eller navne; fysisk tvangne undtagelser (C++-identifikatorer, kildefilnavne, test-slot-navne, ACP-protokolstrenge på ledningsformat, harbour-appnavnet) minimeres og dokumenteres hver gang.",
+    "terminologi": "Dansk frem for engelsk fagsprog i prosa: merge→integration/integreres/integreret, draft→kladde, commit→indskrivning, backend→bagvedliggende system, branch→gren, token→adgangstoken. Egennavne, protokol-/platformtermer samt kommandoer og API-stier i backticks (GitHub, PR, ACP, CI, `git push`, `merge` som API-sti) undtages; i historiske logposter bevares id'er, hashes og citeret tekst, men terminologien gælder også dér (orkestratorens krav 2026-11-22).",
     "sprog_eskalering": "besvaret af Strategistokastikeren 2026-11-20 via PR #5 (kladde, indskrivning 10396c3, gren vibe/sprog-eskalering-df693a): sprog-linjen i projektbeskrivelse.adoc revideret til 'kode og kommentarer er engelske; dokumentation, brugerflade og commits er danske' — plan og manifest er kohærente, når PR #5 integreres i main",
     "sprog_eskalering_2026_11_22": "besvaret af Strategistokastikeren 2026-11-22 på den menneskelige orkestrators ønske: sprog-reglen udvidet, så alle nystartede stokastikere kommunikerer udelukkende på dansk; projektbeskrivelse.adoc og dette manifest revideret i samme PR jf. spejlingsreglen",
-    "hemmeligheder": "Ingen nøgler, tokens eller samtale-transskripter må nogensinde ind i depotet"
+    "hemmeligheder": "Ingen nøgler, tokens eller samtale-transskripter må nogensinde ind i depotet",
+    "harbour": "Appnavnet beholder `harbour-`-præfikset; kun tilladte importer.",
+    "navngivning": "Selvdokumenterende navne uden afkortninger eller præfiks-koder: fragilitet_... — aldrig fra-...; arkitektur_... — aldrig ark-...; støj-... er i orden, fordi støj er hele ordet. Undtagelse: historiske id'er i lukkede triage-poster (ark-*, fra-*, støj-*, test-*) er uforanderlige log og omdøbes ikke; reglen gælder alle nye navne."
   },
   "arbejdsregler": [
     "Én funktion ad gangen i strategisk_rækkefølge — ingen trin springes over; særligt stop_og_afvis må ikke springes over.",
@@ -37,13 +39,15 @@
     "Ved genoptagelse af en arbejdsgang: kør pwd og git status, kør git log --oneline -20, læs dette manifest, og vælg den første funktion i rækken med passerer: false.",
     "Nye kildefiler registreres i harbour-skrynja-2.pro; nye QML-filer registreres til installation.",
     "Efter hver arbejdsgang indskrives ændringerne med en beskrivende besked, så næste samtale kan læse fremdriften i git-historikken.",
-    "Ingen nøgler, tokens eller samtale-transskripter ind i depotet.",
+    "Ingen nøgler, adgangstokens eller samtale-transskripter ind i depotet.",
     "Værtsløkke (vært/CI): qmake + make + hele QtTest-suiten i tests/ kører på værten og dækker kodekvalitet — værtsløkkens resultater tæller ikke som mål.",
     "Enhedsløkke (mål): kun aarch64/Qt 5.6 mål-byg i Sailfish SDK og på enhed kørsel på Jolla Phone 2026 tæller som mål; passerer for mål-afhængige funktioner (f.eks. distributionsartefakt_rpm) sættes først efter målt enhedsløkke.",
     "Spejlingsregel (plan ↔ manifest, PR #46): projektbeskrivelse.adoc og dette manifest må aldrig divergere — ændres det ene artefakt, opdateres det andet af sin ejer i samme PR. Håndhæves automatisk af den parrede kontrol tjek_plan_manifest_spejl.py i væertsløkken (funktion 26); en PR, der kun rører det ene artefakt, fejler kontrollen.",
     "Navngivning (selvdokumenterende, uden undtagelse for nye navne): ethvert navn — funktioner, id'er, nøgler, filer, roller, artefakter, variabler, PR-titler — skal i sig selv fortælle præcist, hvad det er et navn for, på fuldt dansk sammen med ortografi-reglen. Ingen afkortninger eller præfiks-koder: `fragilitet_...` — aldrig `fra-...`; `arkitektur_...` — aldrig `ark-...`; `støj_...` er i orden, fordi \"støj\" er hele ordet. Undtagelse: historiske id'er i lukkede triage-poster (`ark-*`, `fra-*`, `støj-*`, `test-*`) er uforanderlige log og omdøbes ikke; reglen gælder alle nye navne.",
     "Ingen CI-overvågning uden CI: stokastikere tilbyder ikke at overvåge CI, når depotet ikke har CI-arbejdsgange — tjek først, om .github/workflows/ findes (pr. 2026-11-22 findes der ingen, så verifikation sker i værtsløkken: tjek_*.py + QtTest-suiten i tests/, samt mål-byg og kørsel på mål-enheden). Får depotet senere CI-arbejdsgange, gælder tilbud om CI-overvågning først fra det øjeblik, de findes. Den menneskelige orkestrator er det eneste menneske i realiseringsmiljøet; alle øvrige aktører er stokastikere (orkestratorens præcisering 2026-11-22).",
-    "Tilbudsregel (stokastikere tilbyder kun målbart og sporbar): stokastikere stiller kun tilbud eller eskaleringer til den menneskelige orkestrator, når de følges af en måling (gengivelig uddata fra værtsløkken eller enhedsløkken) og et artefakt (git-indskrivning, PR, manifest-post eller vurderings-JSON); tilbud uden måling og artefakt stilles ikke, så orkestratoren ikke belastes med nej-tak (orkestratorens præcisering 2026-11-22). Når måling og artefakt er på plads, leveres tilbuddet direkte som artefakt uden forudgående spørgsmål — spørgsmålet kan udelades, fordi svaret kun kan være ja; orkestratoren handler på artefaktet (integration, beslutning, nyt strategisk ønske) uden først at blive spurgt (præcisering 2026-11-22)."
+    "Tilbudsregel (stokastikere tilbyder kun målbart og sporbar): stokastikere stiller kun tilbud eller eskaleringer til den menneskelige orkestrator, når de følges af en måling (gengivelig uddata fra værtsløkken eller enhedsløkken) og et artefakt (git-indskrivning, PR, manifest-post eller vurderings-JSON); tilbud uden måling og artefakt stilles ikke, så orkestratoren ikke belastes med nej-tak (orkestratorens præcisering 2026-11-22). Når måling og artefakt er på plads, leveres tilbuddet direkte som artefakt uden forudgående spørgsmål — spørgsmålet kan udelades, fordi svaret kun kan være ja; orkestratoren handler på artefaktet (integration, beslutning, nyt strategisk ønske) uden først at blive spurgt (præcisering 2026-11-22).",
+    "Ingen CI-overvågning uden CI: tilbyd ikke CI-overvågning, når depotet ikke har CI-arbejdsgange — tjek først om .github/workflows/ findes (pr. 2026-11-22 findes der ingen; verifikation sker i værtsløkken: tjek_*.py + QtTest-suiten i tests/, samt mål-byg og kørsel på mål-enheden). Får depotet senere CI-arbejdsgange, gælder tilbud om CI-overvågning først fra det øjeblik. Den menneskelige konceptualisator og realiseringsorkestrator er det eneste menneske i realiseringsmiljøet.",
+    "Tilbudsregel: tilbud eller eskalering til den menneskelige realiseringsorkestrator stilles kun sammen med en måling (gengivelig uddata fra værtsløkken eller enhedsløkken) og et artefakt (git-indskrivning, PR, manifest-post eller vurderings-JSON) — ellers stilles de ikke. Når måling og artefakt er på plads, leveres tilbuddet direkte som artefakt uden forudgående spørgsmål (svaret kan kun være ja)."
   ],
   "triage_logik": {
     "input": "vurdering_af_realiseringsartefaktets_arkitektur_fragilitet_og_støjindhold_for_stokastikere.json (faktisk filnavn på main med ø; projektbeskrivelse.adoc refererer stadig med ascii 'stoejindhold' — dokumentationsstøj for Strategistokastikeren)",
@@ -52,7 +56,7 @@
     "ved_arkitektur_brister": "Enten omdefinér funktionerne i dette manifest, eller eskalér til Strategistokastikeren for revision af projektbeskrivelse.adoc; arkitektoniske brister løses ikke lokalt i kildekoden."
   },
   "triage_af_kildesonderingsvurdering": {
-    "input": "vurdering_af_realiseringsartefaktets_arkitektur_fragilitet_og_støjindhold_for_stokastikere.json (PR #8, commit 5db176d, main @ 9732ae9)",
+    "input": "vurdering_af_realiseringsartefaktets_arkitektur_fragilitet_og_støjindhold_for_stokastikere.json (PR #8, indskrivning 5db176d, main @ 9732ae9)",
     "dato": "2026-11-21",
     "fordeling": "6 arkitektur-observationer, 12 fragilitet-observationer, 5 støj-observationer, 4 overfladiske tests, 8 uovervågede områder",
     "bemærkning": "Eksisterende funktionsposter er urørte (redigeringsregel); passerer forbliver sand for de oprindelige verifikations_trin. Nedenstående krav er næste arbejdsgang og hver ordre skal parres med nye testslots i den angivne parrede testfil, før den må markeres gennemført.",
@@ -97,32 +101,214 @@
       }
     ],
     "ordrer_til_realiseringsstokastikeren": [
-      {"id": "støj-1", "type": "støj", "mål_funktion": "alle", "ordre": "Fjern død kode uden kaldere: PermissionModel::clear/isAnswered, SessionStore::clear, AcpClient::resetForTest, AgentProcess::setWorkingDirectory/workingDirectory, ConversationModel::roundFinished.", "parret_test": "alle 13 eksisterende parrede tests grønne efter fjernelsen", "gennemført": true},
-      {"id": "støj-2", "type": "støj", "mål_funktion": "prøvesuite_i_tests", "ordre": "Udtræk kopieret test-boilerplate (initTestCase, QSettings-teststi, jsonObj/idOf/responseJson/readFixture) til fælles tests/testregistrering.h, som allerede ligger i tests.pro.", "parret_test": "tests/tst_proevesuite_i_tests.cpp + ny slot: faelles_hjaelpere_i_testregistrering_h", "gennemført": true},
-      {"id": "støj-3", "type": "støj", "mål_funktion": "værktøjskald_visning", "ordre": "Dedupliker ToolCallModel: toolCalls() og find() bygger hver deres identiske QVariantMap — én projektion.", "parret_test": "tests/tst_vaerktoejskald_visning.cpp + ny slot: enkelt_projektion_i_toolkaldsmodel", "gennemført": true},
-      {"id": "støj-4", "type": "støj", "mål_funktion": "prøvesuite_i_tests", "ordre": "Fjern duplikerede testslots: standard_agentsti_er_vibe_acp og clientCapabilities-tom testes både i tst_agentproces_og_initialisering og tst_konfiguration_af_agent — behold ét sted.", "parret_test": "tests/tst_proevesuite_i_tests.cpp + ny slot: ingen_dublerede_slots_paa_tvaers", "gennemført": true},
-      {"id": "støj-5", "type": "støj", "mål_funktion": "byggesti_og_logfil", "ordre": "Ensret navngivning: src-filnavne skal være engelsk ascii svarende til klassenavne (acpbesked.h → acpmessage.h osv.); JSON-nøgler og dokumentation forbliver danske.", "parret_test": "tests/tst_byggesti_og_logfil.cpp + ny slot: src_filnavne_matcher_klassenavne", "gennemført": true},
-      {"id": "fra-1", "type": "fragilitet", "mål_funktion": "acp_rygrad", "ordre": "Forbind lineDropped og haleReady i produktionskoden (ikke kun i tests) og log dem via LogFile, så droppede/malformerede beskeder ikke tabes stille.", "parret_test": "tests/tst_acp_rygrad.cpp + nye slots: lineDropped_logges_i_produktion, haleReady_logges_i_produktion", "gennemført": true},
-      {"id": "fra-2", "type": "fragilitet", "mål_funktion": "tilladelsesdialog", "ordre": "Signalér fejl på ALLE svar (ikke kun initialize): ukendt svar-id og fejl på session/prompt skal emitte et fejl-signal; forbind agentError og permissionRequested i QML/main, så agentfejl og tilladelsesanmodninger når brugerfladen.", "parret_test": "tests/tst_tilladelsesdialog.cpp + nye slots: fejl_paa_prompt_signaleres, ukendt_svar_id_signaleres, permissionRequested_forbundet_i_qml", "gennemført": true},
-      {"id": "fra-3", "type": "fragilitet", "mål_funktion": "prompt_og_svar", "ordre": "messageSent må kun emitteres når beskeden faktisk blev skrevet til processen; selvtest må ikke tælle en besked som sendt, der aldrig nåede agenten.", "parret_test": "tests/tst_prompt_og_svar.cpp + ny slot: messageSent_kun_ved_faktisk_skrevet", "gennemført": true},
-      {"id": "fra-4", "type": "fragilitet", "mål_funktion": "byggesti_og_logfil", "ordre": "Luk fail-open i main.cpp: manglende QML-fil efter sti-gæt skal give exit != 0 med besked; resultatet af client.startAgent() skal tjekkes, så appen ikke kører videre uden agent.", "parret_test": "tests/tst_byggesti_og_logfil.cpp + nye slots: manglende_qml_giver_ikke_exit_0, startAgent_fejl_signaleres", "gennemført": true},
-      {"id": "fra-5", "type": "fragilitet", "mål_funktion": "selvtest_med_verdict", "ordre": "Tilføj watchdog/timeout omkring selvtest-kæden, så hæng giver verdict fail + exit != 0 i stedet for evig hæng.", "parret_test": "tests/tst_selvtest_med_verdict.cpp + ny slot: watchdog_udloeser_verdict_fail_ved_haeng", "gennemført": true},
-      {"id": "fra-6", "type": "fragilitet", "mål_funktion": "stop_og_afvis", "ordre": "Gør alle fire QML-sider nåbare (initialPage + navigation) og wire stop/afvis i UI: sessionCancel/stopAgent skal kunne kaldes fra QML, så brugeren kan afbryde en runde og se tilladelser/diffs.", "parret_test": "tests/tst_stop_og_afvis.cpp + nye slots: alle_qml_sider_reachable, stopAgent_kaldes_fra_qml", "gennemført": true},
-      {"id": "fra-7", "type": "fragilitet", "mål_funktion": "konfiguration_af_agent", "ordre": "Debounce set_config_option i KonfigurationsSide (onTextChanged må ikke sende pr. tastetryk).", "parret_test": "tests/tst_konfiguration_af_agent.cpp + ny slot: set_config_option_debounced", "gennemført": true},
-      {"id": "fra-8", "type": "fragilitet", "mål_funktion": "tilladelsesdialog", "ordre": "TilladelsesDialog skal tjekke returværdien af answerPermission/declinePermission før accept(), så et mislykket svar ikke lukker dialogen som besvaret.", "parret_test": "tests/tst_tilladelsesdialog.cpp + ny slot: dialog_tjekker_svar_retvaerdi", "gennemført": true},
-      {"id": "fra-9", "type": "fragilitet", "mål_funktion": "oprydning_af_træ", "ordre": "Gør oprydnings-testene miljøuafhængige: git_status-test må kun tælle ikke-indskrevne ændringer i udvalgte sporede filer, og agentproces-test må ikke pgrep'e værtsmiljøet.", "parret_test": "tests/tst_oprydning_af_trae.cpp + nye slots: status_test_er_reproducerbar, ingen_pgrep_mod_vaertsmiljoe", "gennemført": true},
-      {"id": "fra-10", "type": "fragilitet", "mål_funktion": "prøvesuite_i_tests", "ordre": "Fjern rækkefølgeafhængighed fra delte singletoner: LogFile::instance() og global QSettings::setPath i initTestCase skal isoleres pr. testklasse.", "parret_test": "tests/tst_proevesuite_i_tests.cpp + ny slot: ingen_global_settings_mutation_i_tests", "gennemført": true},
-      {"id": "fra-11", "type": "fragilitet", "mål_funktion": "stop_og_afvis", "ordre": "stopAgent() skal tjekke returværdierne på waitForFinished og rapportere en agent der overlever kill().", "parret_test": "tests/tst_stop_og_afvis.cpp + ny slot: stopAgent_rapporterer_overlevende_proces", "gennemført": true},
-      {"id": "fra-12", "type": "fragilitet", "mål_funktion": "acp_rygrad", "ordre": "Log kassér hale ved EOF i klienten i stedet for at kassere stille, når fraJson fejler på afskåret besked.", "parret_test": "tests/tst_acp_rygrad.cpp + ny slot: afskaaren_hale_logges", "gennemført": true},
-      {"id": "test-1", "type": "fragilitet", "mål_funktion": "genoptagelse_af_samtale", "ordre": "Styrk resumeregel-testen: den må køre resume-regelens faktiske kommandoer (pwd/git status/git log) mod et fixture-repo, ikke kun sammenligne to lister i samme manifestfil.", "parret_test": "tests/tst_genoptagelse_af_samtale.cpp + ny slot: resumeregel_koerer_git_kommandoer_mod_fixture", "gennemført": true},
-      {"id": "test-2", "type": "fragilitet", "mål_funktion": "prøvesuite_i_tests", "ordre": "Erstat hårdkodede 13-tal i meta-tests med afledte værdier fra manifestet, så testen fejler når manifestet ændres uden at tests følger med.", "parret_test": "tests/tst_proevesuite_i_tests.cpp + ny slot: meta_test_afledt_af_manifest_ikke_hardkodet", "gennemført": true},
-      {"id": "test-3", "type": "fragilitet", "mål_funktion": "acp_rygrad", "ordre": "Valider besked-klassens id-korrelation mod agentens faktiske wire-format (fixture), ikke kun round-trip gennem egen tilJson/fraJson.", "parret_test": "tests/tst_acp_rygrad.cpp + ny slot: besked_id_korrelation_mod_fixture_wireformat", "gennemført": true},
-      {"id": "test-4", "type": "fragilitet", "mål_funktion": "diff_og_uddata", "ordre": "Fjern den irrelevante påstand conversationStatus == 'klar' fra diff_vises_mens_det_sker.", "parret_test": "tests/tst_diff_og_uddata.cpp + ny slot: diff_test_paastaaer_kun_diff", "gennemført": true},
-      {"id": "ark-2", "type": "arkitektur", "mål_funktion": "prøvesuite_i_tests", "ordre": "Fjern test-kroge fra produktionsklasser (setTestMode/feedBytesForTest/simulateAgentDeathForTest/resetForTest og m_testMode-grenen i write()); test-injektion skal ligge i en separat test-harness.", "parret_test": "tests/tst_proevesuite_i_tests.cpp + ny slot: ingen_testkroge_i_produktionsklasser", "gennemført": true},
-      {"id": "ark-3", "type": "arkitektur", "mål_funktion": "acp_rygrad", "ordre": "Erstat alle inline metode-literaler ('initialize', 'session/load', 'session/new', 'end_turn') med navngivne konstanter, så omdøbning ikke giver stille korrelationsfejl.", "parret_test": "tests/tst_acp_rygrad.cpp + ny slot: alle_metoder_er_konstanter", "gennemført": true},
-      {"id": "ark-4", "type": "arkitektur", "mål_funktion": "diff_og_uddata", "ordre": "Bryd DiffModel → AcpFrameReader-afhængigheden (standardCap flyttes til fælles sted eller parameter); UI-model må ikke afhænge af transport-laget.", "parret_test": "tests/tst_diff_og_uddata.cpp + ny slot: diffmodel_uden_acpframereader_include", "gennemført": true},
-      {"id": "ark-5", "type": "arkitektur", "mål_funktion": "konfiguration_af_agent", "ordre": "Centralisér QSettings-ejerskab (agentsti og session-id i én konfigurationsklasse med change-signaler) i stedet for QSettings-læsning i gettere spredt over klasser.", "parret_test": "tests/tst_konfiguration_af_agent.cpp + ny slot: en_config_ejer_med_signaler", "gennemført": true},
-      {"id": "ark-6", "type": "arkitektur", "mål_funktion": "værktøjskald_visning", "ordre": "Enten fjern de ubrugte QAbstractListModel-roller fra ConversationModel/ToolCallModel/DiffModel, eller skift QML til at bruge model-rollerne — ikke begge dele.", "parret_test": "tests/tst_vaerktoejskald_visning.cpp + ny slot: qml_bruger_en_eneste_model_mekanisme", "gennemført": true}
+      {
+        "id": "støj-1",
+        "type": "støj",
+        "mål_funktion": "alle",
+        "ordre": "Fjern død kode uden kaldere: PermissionModel::clear/isAnswered, SessionStore::clear, AcpClient::resetForTest, AgentProcess::setWorkingDirectory/workingDirectory, ConversationModel::roundFinished.",
+        "parret_test": "alle 13 eksisterende parrede tests grønne efter fjernelsen",
+        "gennemført": true
+      },
+      {
+        "id": "støj-2",
+        "type": "støj",
+        "mål_funktion": "prøvesuite_i_tests",
+        "ordre": "Udtræk kopieret test-boilerplate (initTestCase, QSettings-teststi, jsonObj/idOf/responseJson/readFixture) til fælles tests/testregistrering.h, som allerede ligger i tests.pro.",
+        "parret_test": "tests/tst_proevesuite_i_tests.cpp + ny slot: faelles_hjaelpere_i_testregistrering_h",
+        "gennemført": true
+      },
+      {
+        "id": "støj-3",
+        "type": "støj",
+        "mål_funktion": "værktøjskald_visning",
+        "ordre": "Dedupliker ToolCallModel: toolCalls() og find() bygger hver deres identiske QVariantMap — én projektion.",
+        "parret_test": "tests/tst_vaerktoejskald_visning.cpp + ny slot: enkelt_projektion_i_toolkaldsmodel",
+        "gennemført": true
+      },
+      {
+        "id": "støj-4",
+        "type": "støj",
+        "mål_funktion": "prøvesuite_i_tests",
+        "ordre": "Fjern duplikerede testslots: standard_agentsti_er_vibe_acp og clientCapabilities-tom testes både i tst_agentproces_og_initialisering og tst_konfiguration_af_agent — behold ét sted.",
+        "parret_test": "tests/tst_proevesuite_i_tests.cpp + ny slot: ingen_dublerede_slots_paa_tvaers",
+        "gennemført": true
+      },
+      {
+        "id": "støj-5",
+        "type": "støj",
+        "mål_funktion": "byggesti_og_logfil",
+        "ordre": "Ensret navngivning: src-filnavne skal være engelsk ascii svarende til klassenavne (acpbesked.h → acpmessage.h osv.); JSON-nøgler og dokumentation forbliver danske.",
+        "parret_test": "tests/tst_byggesti_og_logfil.cpp + ny slot: src_filnavne_matcher_klassenavne",
+        "gennemført": true
+      },
+      {
+        "id": "fra-1",
+        "type": "fragilitet",
+        "mål_funktion": "acp_rygrad",
+        "ordre": "Forbind lineDropped og haleReady i produktionskoden (ikke kun i tests) og log dem via LogFile, så droppede/malformerede beskeder ikke tabes stille.",
+        "parret_test": "tests/tst_acp_rygrad.cpp + nye slots: lineDropped_logges_i_produktion, haleReady_logges_i_produktion",
+        "gennemført": true
+      },
+      {
+        "id": "fra-2",
+        "type": "fragilitet",
+        "mål_funktion": "tilladelsesdialog",
+        "ordre": "Signalér fejl på ALLE svar (ikke kun initialize): ukendt svar-id og fejl på session/prompt skal emitte et fejl-signal; forbind agentError og permissionRequested i QML/main, så agentfejl og tilladelsesanmodninger når brugerfladen.",
+        "parret_test": "tests/tst_tilladelsesdialog.cpp + nye slots: fejl_paa_prompt_signaleres, ukendt_svar_id_signaleres, permissionRequested_forbundet_i_qml",
+        "gennemført": true
+      },
+      {
+        "id": "fra-3",
+        "type": "fragilitet",
+        "mål_funktion": "prompt_og_svar",
+        "ordre": "messageSent må kun emitteres når beskeden faktisk blev skrevet til processen; selvtest må ikke tælle en besked som sendt, der aldrig nåede agenten.",
+        "parret_test": "tests/tst_prompt_og_svar.cpp + ny slot: messageSent_kun_ved_faktisk_skrevet",
+        "gennemført": true
+      },
+      {
+        "id": "fra-4",
+        "type": "fragilitet",
+        "mål_funktion": "byggesti_og_logfil",
+        "ordre": "Luk fail-open i main.cpp: manglende QML-fil efter sti-gæt skal give exit != 0 med besked; resultatet af client.startAgent() skal tjekkes, så appen ikke kører videre uden agent.",
+        "parret_test": "tests/tst_byggesti_og_logfil.cpp + nye slots: manglende_qml_giver_ikke_exit_0, startAgent_fejl_signaleres",
+        "gennemført": true
+      },
+      {
+        "id": "fra-5",
+        "type": "fragilitet",
+        "mål_funktion": "selvtest_med_verdict",
+        "ordre": "Tilføj watchdog/timeout omkring selvtest-kæden, så hæng giver verdict fail + exit != 0 i stedet for evig hæng.",
+        "parret_test": "tests/tst_selvtest_med_verdict.cpp + ny slot: watchdog_udloeser_verdict_fail_ved_haeng",
+        "gennemført": true
+      },
+      {
+        "id": "fra-6",
+        "type": "fragilitet",
+        "mål_funktion": "stop_og_afvis",
+        "ordre": "Gør alle fire QML-sider nåbare (initialPage + navigation) og wire stop/afvis i UI: sessionCancel/stopAgent skal kunne kaldes fra QML, så brugeren kan afbryde en runde og se tilladelser/diffs.",
+        "parret_test": "tests/tst_stop_og_afvis.cpp + nye slots: alle_qml_sider_reachable, stopAgent_kaldes_fra_qml",
+        "gennemført": true
+      },
+      {
+        "id": "fra-7",
+        "type": "fragilitet",
+        "mål_funktion": "konfiguration_af_agent",
+        "ordre": "Debounce set_config_option i KonfigurationsSide (onTextChanged må ikke sende pr. tastetryk).",
+        "parret_test": "tests/tst_konfiguration_af_agent.cpp + ny slot: set_config_option_debounced",
+        "gennemført": true
+      },
+      {
+        "id": "fra-8",
+        "type": "fragilitet",
+        "mål_funktion": "tilladelsesdialog",
+        "ordre": "TilladelsesDialog skal tjekke returværdien af answerPermission/declinePermission før accept(), så et mislykket svar ikke lukker dialogen som besvaret.",
+        "parret_test": "tests/tst_tilladelsesdialog.cpp + ny slot: dialog_tjekker_svar_retvaerdi",
+        "gennemført": true
+      },
+      {
+        "id": "fra-9",
+        "type": "fragilitet",
+        "mål_funktion": "oprydning_af_træ",
+        "ordre": "Gør oprydnings-testene miljøuafhængige: git_status-test må kun tælle ikke-indskrevne ændringer i udvalgte sporede filer, og agentproces-test må ikke pgrep'e værtsmiljøet.",
+        "parret_test": "tests/tst_oprydning_af_trae.cpp + nye slots: status_test_er_reproducerbar, ingen_pgrep_mod_vaertsmiljoe",
+        "gennemført": true
+      },
+      {
+        "id": "fra-10",
+        "type": "fragilitet",
+        "mål_funktion": "prøvesuite_i_tests",
+        "ordre": "Fjern rækkefølgeafhængighed fra delte singletoner: LogFile::instance() og global QSettings::setPath i initTestCase skal isoleres pr. testklasse.",
+        "parret_test": "tests/tst_proevesuite_i_tests.cpp + ny slot: ingen_global_settings_mutation_i_tests",
+        "gennemført": true
+      },
+      {
+        "id": "fra-11",
+        "type": "fragilitet",
+        "mål_funktion": "stop_og_afvis",
+        "ordre": "stopAgent() skal tjekke returværdierne på waitForFinished og rapportere en agent der overlever kill().",
+        "parret_test": "tests/tst_stop_og_afvis.cpp + ny slot: stopAgent_rapporterer_overlevende_proces",
+        "gennemført": true
+      },
+      {
+        "id": "fra-12",
+        "type": "fragilitet",
+        "mål_funktion": "acp_rygrad",
+        "ordre": "Log kassér hale ved EOF i klienten i stedet for at kassere stille, når fraJson fejler på afskåret besked.",
+        "parret_test": "tests/tst_acp_rygrad.cpp + ny slot: afskaaren_hale_logges",
+        "gennemført": true
+      },
+      {
+        "id": "test-1",
+        "type": "fragilitet",
+        "mål_funktion": "genoptagelse_af_samtale",
+        "ordre": "Styrk resumeregel-testen: den må køre resume-regelens faktiske kommandoer (pwd/git status/git log) mod et fixture-repo, ikke kun sammenligne to lister i samme manifestfil.",
+        "parret_test": "tests/tst_genoptagelse_af_samtale.cpp + ny slot: resumeregel_koerer_git_kommandoer_mod_fixture",
+        "gennemført": true
+      },
+      {
+        "id": "test-2",
+        "type": "fragilitet",
+        "mål_funktion": "prøvesuite_i_tests",
+        "ordre": "Erstat hårdkodede 13-tal i meta-tests med afledte værdier fra manifestet, så testen fejler når manifestet ændres uden at tests følger med.",
+        "parret_test": "tests/tst_proevesuite_i_tests.cpp + ny slot: meta_test_afledt_af_manifest_ikke_hardkodet",
+        "gennemført": true
+      },
+      {
+        "id": "test-3",
+        "type": "fragilitet",
+        "mål_funktion": "acp_rygrad",
+        "ordre": "Valider besked-klassens id-korrelation mod agentens faktiske wire-format (fixture), ikke kun round-trip gennem egen tilJson/fraJson.",
+        "parret_test": "tests/tst_acp_rygrad.cpp + ny slot: besked_id_korrelation_mod_fixture_wireformat",
+        "gennemført": true
+      },
+      {
+        "id": "test-4",
+        "type": "fragilitet",
+        "mål_funktion": "diff_og_uddata",
+        "ordre": "Fjern den irrelevante påstand conversationStatus == 'klar' fra diff_vises_mens_det_sker.",
+        "parret_test": "tests/tst_diff_og_uddata.cpp + ny slot: diff_test_paastaaer_kun_diff",
+        "gennemført": true
+      },
+      {
+        "id": "ark-2",
+        "type": "arkitektur",
+        "mål_funktion": "prøvesuite_i_tests",
+        "ordre": "Fjern test-kroge fra produktionsklasser (setTestMode/feedBytesForTest/simulateAgentDeathForTest/resetForTest og m_testMode-grenen i write()); test-injektion skal ligge i en separat test-harness.",
+        "parret_test": "tests/tst_proevesuite_i_tests.cpp + ny slot: ingen_testkroge_i_produktionsklasser",
+        "gennemført": true
+      },
+      {
+        "id": "ark-3",
+        "type": "arkitektur",
+        "mål_funktion": "acp_rygrad",
+        "ordre": "Erstat alle inline metode-literaler ('initialize', 'session/load', 'session/new', 'end_turn') med navngivne konstanter, så omdøbning ikke giver stille korrelationsfejl.",
+        "parret_test": "tests/tst_acp_rygrad.cpp + ny slot: alle_metoder_er_konstanter",
+        "gennemført": true
+      },
+      {
+        "id": "ark-4",
+        "type": "arkitektur",
+        "mål_funktion": "diff_og_uddata",
+        "ordre": "Bryd DiffModel → AcpFrameReader-afhængigheden (standardCap flyttes til fælles sted eller parameter); UI-model må ikke afhænge af transport-laget.",
+        "parret_test": "tests/tst_diff_og_uddata.cpp + ny slot: diffmodel_uden_acpframereader_include",
+        "gennemført": true
+      },
+      {
+        "id": "ark-5",
+        "type": "arkitektur",
+        "mål_funktion": "konfiguration_af_agent",
+        "ordre": "Centralisér QSettings-ejerskab (agentsti og session-id i én konfigurationsklasse med change-signaler) i stedet for QSettings-læsning i gettere spredt over klasser.",
+        "parret_test": "tests/tst_konfiguration_af_agent.cpp + ny slot: en_config_ejer_med_signaler",
+        "gennemført": true
+      },
+      {
+        "id": "ark-6",
+        "type": "arkitektur",
+        "mål_funktion": "værktøjskald_visning",
+        "ordre": "Enten fjern de ubrugte QAbstractListModel-roller fra ConversationModel/ToolCallModel/DiffModel, eller skift QML til at bruge model-rollerne — ikke begge dele.",
+        "parret_test": "tests/tst_vaerktoejskald_visning.cpp + ny slot: qml_bruger_en_eneste_model_mekanisme",
+        "gennemført": true
+      }
     ]
   },
   "succeskriterium": "prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0, samtidig med at alle 26 funktioner (13 oprindelige + 3 ark-1-opdelinger fra PR #10 + 5 ark-2..6-trin fra PR #18 + 2 distributionsartefakt-trin + funktion 24 skærmbillede-i-session + funktion 25 terminal-tilladelse på enhed + funktion 26 spejlkontrol) har passerer: sand og alle parrede tests i tests/ er grønne; distributionsartefaktet (.rpm) er desuden bygget som aarch64 mål-byg i Sailfish SDK, installeret på Jolla Phone 2026, og succeskriteriet er målt på enhed med exit 0.",
@@ -231,11 +417,11 @@
           "rygrad_hale_ved_eof",
           "besked_id_korrelation",
           "lineDropped_logges_i_produktion",
-          "haleReady_logges_i_produktion"
-        ,
+          "haleReady_logges_i_produktion",
           "afskaaren_hale_logges",
           "besked_id_korrelation_mod_fixture_wireformat",
-          "alle_metoder_er_konstanter"],
+          "alle_metoder_er_konstanter"
+        ],
         "fixtures": [
           "tests/fixtures/fixture_rygrad.ndjson",
           "tests/fixtures/fixture_rygrad_sammenklæbning.ndjson",
@@ -358,9 +544,9 @@
           "load_med_gemt_session_id",
           "fallback_til_new_ved_load_fejl",
           "hadRestoredHistory_saettes_korrekt",
-          "resumeregel_laeser_manifest_og_finder_foerste_false"
-        ,
-          "resumeregel_koerer_git_kommandoer_mod_fixture"],
+          "resumeregel_laeser_manifest_og_finder_foerste_false",
+          "resumeregel_koerer_git_kommandoer_mod_fixture"
+        ],
         "fixtures": [],
         "bemærkning": "Prøven indskrives før src/sessionlager.cpp; QSettings køres mod en midlertidig lokation i prøven"
       },
@@ -440,9 +626,9 @@
           "ingen_dobbelt_svar",
           "fejl_paa_prompt_signaleres",
           "ukendt_svar_id_signaleres",
-          "permissionRequested_forbundet_i_qml"
-        ,
-          "dialog_tjekker_svar_retvaerdi"],
+          "permissionRequested_forbundet_i_qml",
+          "dialog_tjekker_svar_retvaerdi"
+        ],
         "fixtures": [
           "tests/fixtures/fixture_tilladelse.ndjson"
         ],
@@ -480,11 +666,11 @@
           "afvisning_outcome_cancelled",
           "stopAgent_terminerer_proces",
           "ingen_haengende_proces_efter_stop",
-          "stop_og_afvis_er_obligatorisk_i_raekkefoelge"
-        ,
+          "stop_og_afvis_er_obligatorisk_i_raekkefoelge",
           "alle_qml_sider_reachable",
           "stopAgent_kaldes_fra_qml",
-          "stopAgent_rapporterer_overlevende_proces"],
+          "stopAgent_rapporterer_overlevende_proces"
+        ],
         "fixtures": [],
         "bemærkning": "Prøven indskrives før ændringen i src/agentproces.cpp; 'obligatorisk i rækkefølge' tjekker manifest-ordenen via tjek_manifest_parrede_tests.py"
       },
@@ -525,10 +711,10 @@
           "diff_blok_parses",
           "diff_linjer_cappes",
           "outputs_akkumuleres",
-          "diff_vises_mens_det_sker"
-        ,
+          "diff_vises_mens_det_sker",
           "diff_test_paastaaer_kun_diff",
-          "diffmodel_uden_acpframereader_include"],
+          "diffmodel_uden_acpframereader_include"
+        ],
         "fixtures": [
           "tests/fixtures/fixture_diff.ndjson",
           "tests/fixtures/fixture_uddata.ndjson"
@@ -568,9 +754,9 @@
           "set_config_option_payload",
           "agentsti_override_fra_settings",
           "standard_agentsti_er_vibe_acp",
-          "clientCapabilities_fortsat_tom"
-        ,
-          "set_config_option_debounced"],
+          "clientCapabilities_fortsat_tom",
+          "set_config_option_debounced"
+        ],
         "fixtures": [
           "tests/fixtures/fixture_initialize_config.ndjson"
         ],
@@ -610,9 +796,9 @@
           "ingen_dobbelt_verdict",
           "verdict_ved_agentdoed",
           "verdict_ved_startfejl",
-          "verdict_fil_skrives_og_laeses_tilbage"
-        ,
-          "watchdog_udloeser_verdict_fail_ved_haeng"],
+          "verdict_fil_skrives_og_laeses_tilbage",
+          "watchdog_udloeser_verdict_fail_ved_haeng"
+        ],
         "fixtures": [
           "tests/fixtures/fixture_end_turn.ndjson",
           "tests/fixtures/fixture_tilladelse_og_svar.ndjson"
@@ -649,10 +835,10 @@
           "alle_manifest_testfiler_er_i_tests_pro",
           "ingen_silica_afhaengighed_i_tests_pro",
           "suite_omfatter_alle_13_testklasser",
-          "manifest_har_13_parrede_tests"
-        ,
+          "manifest_har_13_parrede_tests",
           "ingen_global_settings_mutation_i_tests",
-          "meta_test_afledt_af_manifest_ikke_hardkodet"],
+          "meta_test_afledt_af_manifest_ikke_hardkodet"
+        ],
         "fixtures": [],
         "bemærkning": "Meta-prøve: læser manifestet og tests.pro og tjekker parringen 1:1"
       },
@@ -687,10 +873,10 @@
           "ingen_hemmeligheder_i_trae",
           "ingen_build_artefakter_i_trae",
           "agentproces_ikke_haengende",
-          "logfil_uden_transskripter"
-        ,
+          "logfil_uden_transskripter",
           "status_test_er_reproducerbar",
-          "ingen_pgrep_mod_vaertsmiljoe"],
+          "ingen_pgrep_mod_vaertsmiljoe"
+        ],
         "fixtures": [],
         "bemærkning": "Prøven kører git/git-grep mod repo-roden fra tests/ (..); prøven indskrives før .gitignore-ændringen"
       },
