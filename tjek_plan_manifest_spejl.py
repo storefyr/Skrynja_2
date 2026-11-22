@@ -7,7 +7,7 @@ Tjekker at projektbeskrivelse.adoc og realiseringsmanifestet aldrig diverger:
 - planens funktionsrækkefølge (afsnittet "Strategisk rækkefølge") skal svare til
   manifestets strategisk_rækkefølge i samme rækkefølge,
 - nøglereglerne (ortografi-maksimum, leveringskæde via GitHub Release,
-  værtsløkke/enhedsløkke, spejlingsregel) skal findes i begge artefakter.
+  værtsløkke/enhedsløkke, spejlingsregel, navngivning) skal findes i begge artefakter.
 
 En PR, der kun rører det ene artefakt, fejler denne kontrol (exit != 0).
 
@@ -30,6 +30,8 @@ NOEGLEREGLER = [
     "Værtsløkke",
     "Enhedsløkke",
     "Spejlingsregel",
+    "Navngivning",
+    "selvdokumenterende",
 ]
 
 LISTE_RE = re.compile(r"^\.\s+`([^`]+)`\s*$")

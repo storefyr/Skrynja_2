@@ -25,6 +25,7 @@ private slots:
     void meta_test_afledt_af_manifest_ikke_hardkodet();
     void ingen_testkroge_i_produktionsklasser();
     void plan_og_manifest_spejler_hinanden();
+    void spejlkontrol_daekker_navngivningsregel();
 private:
     QJsonObject readManifest();
     QString readTestsPro();
@@ -255,6 +256,47 @@ void TestProevesuiteITests::plan_og_manifest_spejler_hinanden()
     QVERIFY(negativ.exitCode() != 0);
     QString negativUd = QString::fromUtf8(negativ.readAllStandardOutput()) + QString::fromUtf8(negativ.readAllStandardError());
     QVERIFY2(negativUd.contains("FEJL"), qPrintable(negativUd));
+    QFile::remove(tempSti);
+}
+
+void TestProevesuiteITests::spejlkontrol_daekker_navngivningsregel()
+{
+    QString script = testRepoRoot() + "/tjek_plan_manifest_spejl.py";
+    QVERIFY2(QFileInfo::exists(script), "tjek_plan_manifest_spejl.py mangler");
+    QFile scriptFil(script);
+    QVERIFY2(scriptFil.open(QIODevice::ReadOnly), "kan ikke læse tjek_plan_manifest_spejl.py");
+    QString scriptTekst = QString::fromUtf8(scriptFil.readAll());
+    scriptFil.close();
+    QVERIFY2(scriptTekst.contains("Navngivning"), "NOEGLEREGLER i tjek_plan_manifest_spejl.py dækker ikke navngivningsreglen");
+
+    QJsonObject manifest = readManifest();
+    QVERIFY(!manifest.isEmpty());
+    QJsonArray arbejdsregler = manifest.value("arbejdsregler").toArray();
+    QJsonArray udenNavngivning;
+    bool harNavngivning = false;
+    for (int i = 0; i < arbejdsregler.size(); ++i) {
+        QString regel = arbejdsregler.at(i).toString();
+        if (regel.contains("Navngivning"))
+            harNavngivning = true;
+        else
+            udenNavngivning.append(regel);
+    }
+    QVERIFY2(harNavngivning, "manifestets arbejdsregler mangler navngivningsreglen");
+    manifest.insert("arbejdsregler", udenNavngivning);
+
+    QString tempSti = QDir::tempPath() + "/skrynja-tst-spejl-uden-navngivning.json";
+    QFile temp(tempSti);
+    QVERIFY(temp.open(QIODevice::WriteOnly));
+    temp.write(QJsonDocument(manifest).toJson());
+    temp.close();
+
+    QProcess negativ;
+    negativ.setWorkingDirectory(testRepoRoot());
+    negativ.start("python3", QStringList() << script << "--manifest" << tempSti);
+    QVERIFY(negativ.waitForFinished(30000));
+    QVERIFY(negativ.exitCode() != 0);
+    QString negativUd = QString::fromUtf8(negativ.readAllStandardOutput()) + QString::fromUtf8(negativ.readAllStandardError());
+    QVERIFY2(negativUd.contains("Navngivning"), qPrintable(negativUd));
     QFile::remove(tempSti);
 }
 
