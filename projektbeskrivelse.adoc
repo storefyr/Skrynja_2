@@ -194,7 +194,7 @@ Denne plan fastlægger 25 funktioner i følgende rækkefølge (svarende til mani
 . `distributionsartefakt_ikoner`
 . `distributionsartefakt_rpm`
 . `skærmbillede_i_session`
-. `terminal_tilladelse_paa_enhed`
+. `terminal_tilladelse_på_enhed`
 
 == Arkitektur-eskaleringer (besvaret af Strategistokastikeren)
 
@@ -311,7 +311,7 @@ Strategi godkendt af orkestratoren (2026-11-21): slutbruger-vurderingerne venter
 
 Når stokastiker-sessioner kører i Skrynja_2 direkte på Jolla Phone 2026, giver terminal-adgang på enheden nye muligheder: git og gh direkte fra telefonen, pkcon, og mål-byg samt kørsel helt på enheden. Det kræver en bevidst revision af rammen — ikke et uheld:
 
-* `terminal_tilladelse_paa_enhed` (funktion 25) — på enheden udvides `clientCapabilities`, så agenten må kalde `terminal/*` og `fs/*`, MEN:
+* `terminal_tilladelse_på_enhed` (funktion 25) — på enheden udvides `clientCapabilities`, så agenten må kalde `terminal/*` og `fs/*`, MEN:
   . hver kommando går gennem tilladelsesdialogen (`session/request_permission`) og besvares med et tryk;
   . allowlist: læsninger, git status/log, gh-læsning, qmake/make, `pkcon install-local`; skrivende/destruktive kommandoer (rm, `pkcon remove`, git push) kun med eksplicit og tydelig godkendelse;
   . trinvis åbning: først read-only (fil-læsning, git status/log, gh read); først når det er målt grønt, åbnes skrive-kommandoer;
