@@ -273,7 +273,7 @@ Strategisk begrundelse (spørgsmål fra orkestratoren, besvaret 2026-11-21): Ja,
 * `distributionsartefakt_ikoner` (funktion 22) — app-ikoner i hicolor-stier, wired i `.pro`, spec, yaml og `.desktop`.
 * `distributionsartefakt_rpm` (funktion 23, `passerer: false` indtil mål-byg køres) — leveringskæden i den virkelige verden (verdensbillede fra orkestratoren 2026-11-21: mål-enheden er din eneste enhed, Jolla Phone 2026; du skriver via Vibe-appen; stokastikerne kører i hver deres sandkasse):
   . Mål-byg i en stokastiker-sandkasse med Sailfish SDK: aarch64/Qt 5.6 via `sfdk`/mb2 (`harbour-skrynja-2.yaml`) eller `rpmbuild` med `rpm/harbour-skrynja-2.spec` → `harbour-skrynja-2-1.0.0-1.aarch64.rpm`.
-  . Udgiv .rpm som **GitHub Release**-asset på `storefyr/Skrynja_2` — som i tidligere Skrynja-forsøg anskaffes .rpm fra kildekodelageret på github.com. Release-assets ligger uden for git-træet, så reglen `ingen_rpm_eller_log_i_depotet` (ingen `*.rpm`/`*.log` i depotet) stadig overholdes.
+  . Udgiv .rpm som **GitHub Release**-asset på `storefyr/Skrynja_2` — som i tidligere Skrynja-forsøg anskaffes .rpm fra kildekodelageret på github.com. Udgivelsesfiler ligger uden for git-træet, så reglen `ingen_rpm_eller_log_i_depotet` (ingen `*.rpm`/`*.log` i depotet) stadig overholdes.
   . Hent .rpm på Jolla Phone 2026 fra github.com → `rpm -qpl`-tjek (binær, `.desktop`, QML, 4 ikoner) → `pkcon install-local` på telefonen.
   . Succeskriterium på enheden efter install: prompt → tilladelse → besvaret → fil skrevet → end_turn → exit 0. Resultatet er det målbare grundlag for slutbruger-vurderings-JSON'erne.
 
@@ -307,7 +307,7 @@ Strategi godkendt af orkestratoren (2026-11-21): slutbruger-vurderingerne venter
 
 *Afprøvning:* Slutbrugeranvendelighedssonderingsstokastikeren kører en session inde i Skrynja_2 på telefonen, afprøver opgaver (prompt → tilladelse → fil skrevet → end_turn) og måler med skærmbilleder samt appens eget `--selvtest` (resultats-JSON). Vurderingen formuleres i sessionen på enheden; vurderings-JSON'erne (`vurdering_af_programmelets_ansvarlighed_for_slutbrugeren.json`, `vurdering_af_programmelets_intuitivitet_og_kohærens_for_slutbrugeren.json`) føres hjem via chatten og committes i depotet via PR fra en sandkasse — agenten på telefonen må ikke selv skrive filer.
 
-*Uafhængig fallback:* afprøvning via Vibe-chat med orkestratoren beholdes som supplement, så de to målinger kan sammenlignes (en stokastiker, der kører inden i appen, kan påvirkes af appens egne fejl).
+*Uafhængig reserve:* afprøvning via Vibe-chat med orkestratoren beholdes som supplement, så de to målinger kan sammenlignes (en stokastiker, der kører inden i appen, kan påvirkes af appens egne fejl).
 
 == Terminal-tilladelse på enheden (funktion 25)
 
