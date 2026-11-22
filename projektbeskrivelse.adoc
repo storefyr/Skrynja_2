@@ -36,7 +36,7 @@ Menneskelig konceptualisator og realiseringsorkestrator
 
 == Projektet
 
-*Skrynja_2* er kontrolcenteret for realiseringsøkosystemet: en applikation til Jolla Phone 2026, der på en overskuelig, intuitiv og kohærent måde administrerer flowet mellem vision, plan, manifest og artefakter — med `vibe-acp` som backend.
+*Skrynja_2* er kontrolcenteret for realiseringsøkosystemet: en applikation til Jolla Phone 2026, der på en overskuelig, intuitiv og kohærent måde administrerer flowet mellem vision, plan, manifest og artefakter — med `vibe-acp` som bagvedliggende system.
 
 Appen er en ACP-klient til Sailfish OS. Den starter agenten (`vibe-acp`) som underordnet proces over stdio (ACP, protocolVersion 1) og lægger agentens arbejde ind i en grænseflade: værktøjskald, filændringer, tilladelser og tilstande vises, mens de sker, og brugeren svarer med et tryk i stedet for en kommando i en tekststrøm.
 
@@ -123,11 +123,12 @@ Rammen er ikke-forhandlingsbar og arves fra forgængerprojekterne og fra license
 * Ingen SailJail: `Sandboxing=Disabled` i `.desktop`-filen fra første indskrivning, ellers er agentstien ikke nåbar.
 * Agentsti: `/home/defaultuser/.local/bin/vibe-acp`.
 * Sprog: kode og kommentarer er engelske; dokumentation, brugerflade og indskrivninger er danske. Alle stokastikere — også nystartede — kommunikerer desuden udelukkende på dansk med hinanden og med den menneskelige realiseringsorkestrator; intet andet sprog i nogen samtale (den menneskelige realiseringsorkestrators ønske 2026-11-22).
-* Ortografi (hele realiseringsøkosystemet, uden undtagelse i prosa): alle artefakter og alle stokastikere skriver ortografisk dansk (æ, ø, å) — denne plan, manifestet, vurderings-JSON'erne, dokumentation, JSON-nøgler, funktions-id'er, indskrivningsbeskeder og PR-titler. Ingen ascii-udvanding (aa/ae/oe) af dansk noget sted: hver forekomst i prosa, nøgle, id eller navn er en fejl og rettes ved næste berøring af artefaktet. Fysisk tvangne undtagelser minimeres og dokumenteres hver gang: C++-identifikatorer, kildefilnavne og test-slot-navne (moc håndterer ikke æøå), ACP-protokolstrenge på wire-format, `harbour-`-appnavnet.
+* Ortografi (hele realiseringsøkosystemet, uden undtagelse i prosa): alle artefakter og alle stokastikere skriver ortografisk dansk (æ, ø, å) — denne plan, manifestet, vurderings-JSON'erne, dokumentation, JSON-nøgler, funktions-id'er, indskrivningsbeskeder og PR-titler. Ingen ascii-udvanding (aa/ae/oe) af dansk noget sted: hver forekomst i prosa, nøgle, id eller navn er en fejl og rettes ved næste berøring af artefaktet. Fysisk tvangne undtagelser minimeres og dokumenteres hver gang: C++-identifikatorer, kildefilnavne og test-slot-navne (moc håndterer ikke æøå), ACP-protokolstrenge på ledningsformat, `harbour-`-appnavnet.
+* Terminologi (dansk frem for engelsk fagsprog i prosa): hvor et præcist dansk alternativ findes, bruges det — specifikt `merge` erstattes med `integration` (substantiv) eller `integreres`/`integreret` (verbum), `draft` med kladde, `commit` med indskrivning, `backend` med bagvedliggende system, `branch` med gren, `token` med adgangstoken. Egennavne, protokol-/platformtermer samt kommandoer og API-stier i backticks (GitHub, PR, ACP, CI, `git push`, `merge` som API-sti) undtages; i historiske logposter (triage-poster, eskaleringslog) bevares id'er, hashes og citeret tekst, men terminologien i denne regel gælder også dér (orkestratorens krav 2026-11-22).
 * Navngivning (selvdokumenterende, uden undtagelse for nye navne): ethvert navn — funktioner, id'er, nøgler, filer, roller, artefakter, variabler, PR-titler — skal i sig selv fortælle præcist, hvad det er et navn for, på fuldt dansk sammen med ortografi-reglen. Ingen afkortninger eller præfiks-koder: `fragilitet_...` — aldrig `fra-...`; `arkitektur_...` — aldrig `ark-...`; `støj_...` er i orden, fordi "støj" er hele ordet. Undtagelse: historiske id'er i lukkede triage-poster (`ark-*`, `fra-*`, `støj-*`, `test-*`) er uforanderlige log og omdøbes ikke; reglen gælder alle nye navne.
 * Prøver: QtTest i `tests/` uden Silica-afhængighed; prøven indskrives før den kilde, den afprøver.
 * Filer: nye kildefiler registreres i `.pro`-filen; nye QML-filer registreres til installation.
-* Hemmeligheder: ingen nøgler, tokens eller samtale-transskripter må nogensinde ind i depotet.
+* Hemmeligheder: ingen nøgler, adgangstokens eller samtale-transskripter må nogensinde ind i depotet.
 * Licens: GPL-3.0.
 
 == Artefaktkontrakter
@@ -289,13 +290,13 @@ Strategisk begrundelse (spørgsmål fra orkestratoren, besvaret 2026-11-21): Ja,
 
 *Verifikation:* `python3 tjek_manifest_parrede_tests.py` exit 0; vært `ALL TESTS PASSED`; mål-byg rc=0 med 0 fejl; `rpm -qpl` viser forventet indhold; exit 0 på enheden.
 
-*Automatiseret udgivelse (GitHub Release) trods begrænsningen i denne sandkasse:* mistralai-app-installationen har `contents: write` (verificeret via API 2026-11-22), men sandkassens API-mellemlag blokerer `POST /releases` (og `merge`-/`gists`-/`refs`-kald) før kaldet når GitHub — kun git-push virker. Derfor publiceres udgivelsen via GitHub Actions: Realiseringsstokastikeren lægger `.github/workflows/release.yml` i depotet og pusher den byggede .rpm til en særskilt git-referanse (ikke `main` — depot-reglen `ingen_rpm_eller_log_i_depotet` gælder stadig), og arbejdsgangen kører på GitHubs servere med `GITHUB_TOKEN` (contents: write pr. standard) og opretter udgivelsen med rpm-filen vedhæftet — samme mønster som `storefyr/Skrynja` v0.9.x. Selve arbejdsgangsfilen er Realiseringsstokastikerens leverance; denne plan fastlægger mekanismen.
+*Automatiseret udgivelse (GitHub Release) trods begrænsningen i denne sandkasse:* mistralai-app-installationen har `contents: write` (verificeret via API 2026-11-22), men sandkassens API-mellemlag blokerer `POST /releases` (og `merge`-/`gists`-/`refs`-kald) før kaldet når GitHub — kun `git push` virker. Derfor publiceres udgivelsen via GitHub Actions: Realiseringsstokastikeren lægger `.github/workflows/release.yml` i depotet og overfører den byggede .rpm til en særskilt git-referanse (ikke `main` — depot-reglen `ingen_rpm_eller_log_i_depotet` gælder stadig), og arbejdsgangen kører på GitHubs servere med `GITHUB_TOKEN` (contents: write pr. standard) og opretter udgivelsen med rpm-filen vedhæftet — samme mønster som `storefyr/Skrynja` v0.9.x. Selve arbejdsgangsfilen er Realiseringsstokastikerens leverance; denne plan fastlægger mekanismen.
 
 == Udviklingsløkke og hastighed (værtsløkke vs. enhedsløkke)
 
 Verdensbillede (orkestratoren 2026-11-21): mål-enheden er Jolla Phone 2026 (Sailfish OS), brugeren skriver via Vibe-appen, og hver stokastiker arbejder i sin egen sandkasse. Udviklingshastigheden højnes ved at køre to adskilte løkker i stedet for én lang kæde pr. ændring:
 
-*Værtsløkke (hurtig, pr. ændring, i sandkassen med værktøjskæden):* rediger kildekode → værtsbyg (`qmake && make`) → QtTest i `tests/` → qemu-aarch64 kørsel af tests (vist virker, jf. commit `b163e78`) → `python3 tjek_manifest_parrede_tests.py` → Projektstokastikeren flipper `passerer` efter måling. Hele løkken tager minutter og fanger de fleste fejl, før telefonen ser koden.
+*Værtsløkke (hurtig, pr. ændring, i sandkassen med værktøjskæden):* rediger kildekode → værtsbyg (`qmake && make`) → QtTest i `tests/` → qemu-aarch64 kørsel af tests (vist virker, jf. indskrivning `b163e78`) → `python3 tjek_manifest_parrede_tests.py` → Projektstokastikeren sætter `passerer` efter måling. Hele løkken tager minutter og fanger de fleste fejl, før telefonen ser koden.
 
 *Enhedsløkke (langsom, kun som udgivelsesport ved milepæle):* mål-byg aarch64/Qt 5.6 i sandkasse med Sailfish SDK → `.rpm` → GitHub Release på `storefyr/Skrynja_2` → hentning på Jolla Phone 2026 → `rpm -qpl`-tjek → `pkcon install-local` → verifikation på enheden. Funktionen 23's enheds-del er denne udgivelsesport, ikke en del af hver udviklingscyklus.
 
@@ -321,11 +322,11 @@ Når stokastiker-sessioner kører i Skrynja_2 direkte på Jolla Phone 2026, give
 
 * `terminal_tilladelse_på_enhed` (funktion 25) — på enheden udvides `clientCapabilities`, så agenten må kalde `terminal/*` og `fs/*`, MEN:
   . hver kommando går gennem tilladelsesdialogen (`session/request_permission`) og besvares med et tryk;
-  . allowlist: læsninger, git status/log, gh-læsning, qmake/make, `pkcon install-local`; skrivende/destruktive kommandoer (rm, `pkcon remove`, git push) kun med eksplicit og tydelig godkendelse;
+  . tilladelsesliste: læsninger, `git status`/`git log`, gh-læsning, qmake/make, `pkcon install-local`; skrivende/destruktive kommandoer (rm, `pkcon remove`, `git push`) kun med eksplicit og tydelig godkendelse;
   . trinvis åbning: først read-only (fil-læsning, git status/log, gh read); først når det er målt grønt, åbnes skrive-kommandoer;
-  . hemmelighedsfilter i loggen: tokens og nøgler logges aldrig og committes aldrig (gh-token ligger i telefonens nøglering, ikke i filer); ingen samtale-transskripter i log eller depot;
+  . hemmelighedsfilter i loggen: adgangstokens og nøgler skrives aldrig i loggen og indskrives aldrig (gh-token ligger i telefonens nøglering, ikke i filer); ingen samtale-transskripter i log eller depot;
   . `--selvtest` før og efter hver session med terminal-adgang.
-* Parret test: nye slots i `tests/` — clientCapabilities på enheden er ikke tom; terminal-kald uden godkendt tilladelse afvises; hemmelighedsfilter fanger token-lignende strenge i log.
+* Parret test: nye slots i `tests/` — clientCapabilities på enheden er ikke tom; terminal-kald uden godkendt tilladelse afvises; hemmelighedsfilter fanger adgangstoken-lignende strenge i log.
 * Risiko: telefonen er orkestratorens eneste enhed — terminal-adgang kan i værste fald ødelægge systemet; derfor godkendelse pr. kommando og trinvis åbning.
 * Projektstokastikeren spejler funktion 25 og den reviderede clientCapabilities-regel i manifestet.
 
