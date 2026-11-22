@@ -271,10 +271,10 @@ Denne plan fastlægger 26 funktioner i følgende rækkefølge (svarende til mani
 
 == Distributionsartefakt — mål-byg, .rpm og succeskriterium på enheden (funktion 22–23)
 
-Strategisk begrundelse (spørgsmål fra orkestratoren, besvaret 2026-11-21): Ja, der skal være et bygget .rpm. Distributionsartefaktet (RPM) er en del af visionen — det er Realiseringsstokastikerens artefakt — og Slutbrugeranvendelighedssonderingsstokastikeren kan kun vurdere overskuelighed, intuitivitet, kohærens og ansvarlighed på den kørende app på mål-enheden, ikke på værtstest eller ved kodelæsning. Projektstokastikeren har registreret det som funktion 22–23 i manifestet (PR #28).
+Strategisk begrundelse (spørgsmål fra projektorkestatoren, besvaret 2026-11-21): Ja, der skal være et bygget .rpm. Distributionsartefaktet (RPM) er en del af visionen — det er Realiseringsstokastikerens artefakt — og Slutbrugeranvendelighedssonderingsstokastikeren kan kun vurdere overskuelighed, intuitivitet, kohærens og ansvarlighed på den kørende app på mål-enheden, ikke på værtstest eller ved kodelæsning. Projektstokastikeren har registreret det som funktion 22–23 i manifestet (PR #28).
 
 * `distributionsartefakt_ikoner` (funktion 22) — app-ikoner i hicolor-stier, wired i `.pro`, spec, yaml og `.desktop`.
-* `distributionsartefakt_rpm` (funktion 23, `passerer: false` indtil mål-byg køres) — leveringskæden i den virkelige verden (verdensbillede fra orkestratoren 2026-11-21: mål-enheden er din eneste enhed, Jolla Phone 2026; du skriver via Vibe-appen; stokastikerne kører i hver deres sandkasse):
+* `distributionsartefakt_rpm` (funktion 23, `passerer: false` indtil mål-byg køres) — leveringskæden i den virkelige verden (verdensbillede fra projektorkestatoren 2026-11-21: mål-enheden er din eneste enhed, Jolla Phone 2026; du skriver via Vibe-appen; stokastikerne kører i hver deres sandkasse):
   . Mål-byg i en stokastiker-sandkasse med Sailfish SDK: aarch64/Qt 5.6 via `sfdk`/mb2 (`harbour-skrynja-2.yaml`) eller `rpmbuild` med `rpm/harbour-skrynja-2.spec` → `harbour-skrynja-2-1.0.0-1.aarch64.rpm`.
   . Udgiv .rpm som vedhæftet fil på en **GitHub Release** på `storefyr/Skrynja_2` — som i tidligere Skrynja-forsøg anskaffes .rpm fra kildekodelageret på github.com. Udgivelsesfiler ligger uden for git-træet, så reglen `ingen_rpm_eller_log_i_depotet` (ingen `*.rpm`/`*.log` i depotet) stadig overholdes.
   . Hent .rpm på Jolla Phone 2026 fra github.com → `rpm -qpl`-tjek (binær, `.desktop`, QML, 4 ikoner) → `pkcon install-local` på telefonen.
@@ -290,7 +290,7 @@ Strategisk begrundelse (spørgsmål fra orkestratoren, besvaret 2026-11-21): Ja,
 
 == Udviklingsløkke og hastighed (værtsløkke vs. enhedsløkke)
 
-Verdensbillede (orkestratoren 2026-11-21): mål-enheden er Jolla Phone 2026 (Sailfish OS), brugeren skriver via Vibe-appen, og hver stokastiker arbejder i sin egen sandkasse. Udviklingshastigheden højnes ved at køre to adskilte løkker i stedet for én lang kæde pr. ændring:
+Verdensbillede (projektorkestatoren 2026-11-21): mål-enheden er Jolla Phone 2026 (Sailfish OS), brugeren skriver via Vibe-appen, og hver stokastiker arbejder i sin egen sandkasse. Udviklingshastigheden højnes ved at køre to adskilte løkker i stedet for én lang kæde pr. ændring:
 
 *Værtsløkke (hurtig, pr. ændring, i sandkassen med værktøjskæden):* rediger kildekode → værtsbyg (`qmake && make`) → QtTest i `tests/` → qemu-aarch64 kørsel af tests (vist virker, jf. commit `b163e78`) → `python3 tjek_manifest_parrede_tests.py` → Projektstokastikeren flipper `passerer` efter måling. Hele løkken tager minutter og fanger de fleste fejl, før telefonen ser koden.
 
@@ -304,13 +304,13 @@ Verdensbillede (orkestratoren 2026-11-21): mål-enheden er Jolla Phone 2026 (Sai
 
 == Slutbruger-sondering på enheden (funktion 24)
 
-Strategi godkendt af orkestratoren (2026-11-21): slutbruger-vurderingerne venter, til en stokastiker-session kan køre i selve Skrynja_2 på Jolla Phone 2026. Forudsætning: funktion 23 er grøn — .rpm bygget som aarch64 mål-byg, udgivet som GitHub Release, installeret og kørt igennem på enheden.
+Strategi godkendt af projektorkestatoren (2026-11-21): slutbruger-vurderingerne venter, til en stokastiker-session kan køre i selve Skrynja_2 på Jolla Phone 2026. Forudsætning: funktion 23 er grøn — .rpm bygget som aarch64 mål-byg, udgivet som GitHub Release, installeret og kørt igennem på enheden.
 
 * `skærmbillede_i_session` (funktion 24) — klienten (Skrynja_2) sender et skærmbillede af brugerfladen som billed-indhold i ACP-sessionen. Agenten må ikke selv tage skærmbilleder: manifestet kræver tom `clientCapabilities`, så agenten må ikke kalde `fs/*` eller `terminal/*` — skærmbilleder kommer altid fra klienten. Parret test: ny slot i `tests/` (skærmbillede når agenten som billed-blok i session/prompt).
 
 *Afprøvning:* Slutbrugeranvendelighedssonderingsstokastikeren kører en session inde i Skrynja_2 på telefonen, afprøver opgaver (prompt → tilladelse → fil skrevet → end_turn) og måler med skærmbilleder samt appens eget `--selvtest` (resultats-JSON). Vurderingen formuleres i sessionen på enheden; vurderings-JSON'erne (`vurdering_af_programmelets_ansvarlighed_for_slutbrugeren.json`, `vurdering_af_programmelets_intuitivitet_og_kohærens_for_slutbrugeren.json`) føres hjem via chatten og committes i depotet via PR fra en sandkasse — agenten på telefonen må ikke selv skrive filer.
 
-*Uafhængig reserve:* afprøvning via Vibe-chat med orkestratoren beholdes som supplement, så de to målinger kan sammenlignes (en stokastiker, der kører inden i appen, kan påvirkes af appens egne fejl).
+*Uafhængig reserve:* afprøvning via Vibe-chat med projektorkestatoren beholdes som supplement, så de to målinger kan sammenlignes (en stokastiker, der kører inden i appen, kan påvirkes af appens egne fejl).
 
 == Terminal-tilladelse på enheden (funktion 25)
 
@@ -323,7 +323,7 @@ Når stokastiker-sessioner kører i Skrynja_2 direkte på Jolla Phone 2026, give
   . hemmelighedsfilter i loggen: tokens og nøgler logges aldrig og committes aldrig (gh-token ligger i telefonens nøglering, ikke i filer); ingen samtale-transskripter i log eller depot;
   . `--selvtest` før og efter hver session med terminal-adgang.
 * Parret test: nye slots i `tests/` — clientCapabilities på enheden er ikke tom; terminal-kald uden godkendt tilladelse afvises; hemmelighedsfilter fanger token-lignende strenge i log.
-* Risiko: telefonen er orkestratorens eneste enhed — terminal-adgang kan i værste fald ødelægge systemet; derfor godkendelse pr. kommando og trinvis åbning.
+* Risiko: telefonen er projektorkestatorens eneste enhed — terminal-adgang kan i værste fald ødelægge systemet; derfor godkendelse pr. kommando og trinvis åbning.
 * Projektstokastikeren spejler funktion 25 og den reviderede clientCapabilities-regel i manifestet.
 
 == Succeskriterium for økosystemet
