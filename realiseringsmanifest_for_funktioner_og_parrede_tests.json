@@ -24,7 +24,7 @@
     "acp": "ACP over stdio, protocolVersion 1, tom clientCapabilities ved initialize — agenten må ikke kalde fs/* eller terminal/*",
     "prøver": "QtTest i tests/ uden Silica-afhængighed (QT += core testlib); prøven indskrives før kilden; nye kildefiler registreres i harbour-skrynja-2.pro; nye QML-filer registreres til installation",
     "sprog": "Kode og kommentarer er engelske; dokumentation, brugerflade og indskrivningsbeskeder er danske — ændret 2026-11-20 på den menneskelige orkestrators ønske, som eneste kilde til strategiske ønsker; JSON-nøgler er dansk snake_case med ægte æøå; C++-identifikatorer (testklasser og testslots) er ascii, fordi moc ikke håndterer æøå. Ortografi-reglen: udvanding ae/oe/aa tæller som fejl i nøgler, filnavne og dansk prosa — ægte lånord undtages kun med begrundelse; ascii-udvanding er kun tilladt i C++-identifikatorer",
-    "sprog_eskalering": "besvaret af Strategistokastikeren 2026-11-20 via PR #5 (draft, commit 10396c3, branch vibe/sprog-eskalering-df693a): sprog-linjen i projektbeskrivelse.adoc revideret til 'kode og kommentarer er engelske; dokumentation, brugerflade og commits er danske' — plan og manifest er kohærente, når PR #5 merges til main",
+    "sprog_eskalering": "besvaret af Strategistokastikeren 2026-11-20 via PR #5 (kladde, indskrivning 10396c3, gren vibe/sprog-eskalering-df693a): sprog-linjen i projektbeskrivelse.adoc revideret til 'kode og kommentarer er engelske; dokumentation, brugerflade og commits er danske' — plan og manifest er kohærente, når PR #5 integreres i main",
     "hemmeligheder": "Ingen nøgler, tokens eller samtale-transskripter må nogensinde ind i depotet"
   },
   "arbejdsregler": [
@@ -59,38 +59,38 @@
         "alvorlighed": "høj",
         "titel": "AcpClient er et god-objekt med hård kobling (ejer AgentProcess, AcpFrameReader og fem modeller; 10 Q_PROPERTYs; protokol-dispatch + id-bogføring + signal-videresendelse i én klasse)",
         "beslutning": "Eskaleret til Strategistokastikeren jf. triage_logik: enten accepteres ark-1 med sporbar begrundelse i projektbeskrivelse.adoc, eller planen tilføjer et arkitektur-opdelings-trin (protokol-dispatch, session-håndtering og UI-modeller i hver sin klasse).",
-        "besvarelse": "Besvaret af Strategistokastikeren via PR #10 (draft, commit bac0603, branch vibe/ark-1-opdeling-df693a): plan-revision — ark-1 accepteres ikke. Tre opdelings-trin er registreret i dette manifest som funktion 14-16 (arkitektur_opdeling_protokol, arkitektur_opdeling_session, arkitektur_opdeling_ui_modeller). ark-1 lukkes, når PR #10 er merged, og de tre funktioner har passerer: sand.",
+        "besvarelse": "Besvaret af Strategistokastikeren via PR #10 (kladde, indskrivning bac0603, gren vibe/ark-1-opdeling-df693a): plan-revision — ark-1 accepteres ikke. Tre opdelings-trin er registreret i dette manifest som funktion 14-16 (arkitektur_opdeling_protokol, arkitektur_opdeling_session, arkitektur_opdeling_ui_modeller). ark-1 lukkes, når PR #10 er integreret, og de tre funktioner har passerer: sand.",
         "status": "LUKKET — gennemført som funktion 14-16 via PR #12-14; på main @ 64b3d8e er alle 16 funktioner passerer: sand (PR #18 markerer ark-1 LUKKET i projektbeskrivelse.adoc)"
       },
       {
         "id": "ark-2",
         "alvorlighed": "medium",
         "titel": "Test-kroge i produktionsklasser (setTestMode/feedBytesForTest/simulateAgentDeathForTest og m_testMode-grenen i AcpClient::write); test-injektion bør ligge i en separat test-harness",
-        "status": "besvaret af Strategistokastikeren via PR #18 (draft, commit 82100be): plan-revision — accepteres ikke; registreret i dette manifest som ny funktion i 17-21 (se strategisk_rækkefølge); lukkes når PR #18 er merged og den tilhørende funktion har passerer: sand"
+        "status": "besvaret af Strategistokastikeren via PR #18 (kladde, indskrivning 82100be): plan-revision — accepteres ikke; registreret i dette manifest som ny funktion i 17-21 (se strategisk_rækkefølge); lukkes når PR #18 er integreret og den tilhørende funktion har passerer: sand"
       },
       {
         "id": "ark-3",
         "alvorlighed": "medium",
         "titel": "Inline metode-literaler ('initialize', 'session/load', 'session/new', 'end_turn') i stedet for navngivne konstanter",
-        "status": "besvaret af Strategistokastikeren via PR #18 (draft, commit 82100be): plan-revision — accepteres ikke; registreret i dette manifest som ny funktion i 17-21 (se strategisk_rækkefølge); lukkes når PR #18 er merged og den tilhørende funktion har passerer: sand"
+        "status": "besvaret af Strategistokastikeren via PR #18 (kladde, indskrivning 82100be): plan-revision — accepteres ikke; registreret i dette manifest som ny funktion i 17-21 (se strategisk_rækkefølge); lukkes når PR #18 er integreret og den tilhørende funktion har passerer: sand"
       },
       {
         "id": "ark-4",
         "alvorlighed": "medium",
         "titel": "DiffModel afhænger af transport-laget (AcpFrameReader::standardCap)",
-        "status": "besvaret af Strategistokastikeren via PR #18 (draft, commit 82100be): plan-revision — accepteres ikke; registreret i dette manifest som ny funktion i 17-21 (se strategisk_rækkefølge); lukkes når PR #18 er merged og den tilhørende funktion har passerer: sand"
+        "status": "besvaret af Strategistokastikeren via PR #18 (kladde, indskrivning 82100be): plan-revision — accepteres ikke; registreret i dette manifest som ny funktion i 17-21 (se strategisk_rækkefølge); lukkes når PR #18 er integreret og den tilhørende funktion har passerer: sand"
       },
       {
         "id": "ark-5",
         "alvorlighed": "medium",
         "titel": "QSettings-læsning spredt over gettere (agentsti, session-id) i stedet for én konfigurationsklasse med change-signaler",
-        "status": "besvaret af Strategistokastikeren via PR #18 (draft, commit 82100be): plan-revision — accepteres ikke; registreret i dette manifest som ny funktion i 17-21 (se strategisk_rækkefølge); lukkes når PR #18 er merged og den tilhørende funktion har passerer: sand"
+        "status": "besvaret af Strategistokastikeren via PR #18 (kladde, indskrivning 82100be): plan-revision — accepteres ikke; registreret i dette manifest som ny funktion i 17-21 (se strategisk_rækkefølge); lukkes når PR #18 er integreret og den tilhørende funktion har passerer: sand"
       },
       {
         "id": "ark-6",
         "alvorlighed": "medium",
         "titel": "Ubrugte QAbstractListModel-roller i ConversationModel/ToolCallModel/DiffModel samtidig med QML-brug af list-properties",
-        "status": "besvaret af Strategistokastikeren via PR #18 (draft, commit 82100be): plan-revision — accepteres ikke; registreret i dette manifest som ny funktion i 17-21 (se strategisk_rækkefølge); lukkes når PR #18 er merged og den tilhørende funktion har passerer: sand"
+        "status": "besvaret af Strategistokastikeren via PR #18 (kladde, indskrivning 82100be): plan-revision — accepteres ikke; registreret i dette manifest som ny funktion i 17-21 (se strategisk_rækkefølge); lukkes når PR #18 er integreret og den tilhørende funktion har passerer: sand"
       }
     ],
     "ordrer_til_realiseringsstokastikeren": [
