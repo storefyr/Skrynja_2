@@ -36,7 +36,7 @@
     "Nye kildefiler registreres i harbour-skrynja-2.pro; nye QML-filer registreres til installation.",
     "Efter hver arbejdsgang indskrives ændringerne med en beskrivende besked, så næste samtale kan læse fremdriften i git-historikken.",
     "Ingen nøgler, tokens eller samtale-transskripter ind i depotet.",
-    "Værtsløkke (host/CI): qmake + make + hele QtTest-suiten i tests/ kører på host og dækker kodekvalitet — host-resultater tæller ikke som mål.",
+    "Værtsløkke (vært/CI): qmake + make + hele QtTest-suiten i tests/ kører på værten og dækker kodekvalitet — værtsløkkens resultater tæller ikke som mål.",
     "Enhedsløkke (mål): kun aarch64/Qt 5.6 mål-byg i Sailfish SDK og på enhed kørsel på Jolla Phone 2026 tæller som mål; passerer for mål-afhængige funktioner (f.eks. distributionsartefakt_rpm) sættes først efter målt enhedsløkke."
   ],
   "triage_logik": {
@@ -1107,8 +1107,8 @@
     {
       "id": "distributionsartefakt_rpm",
       "navn": "Distributionsartefakt: mål-byg, .rpm og på enhed succeskriterium",
-      "beskrivelse": "Byg distributionsartefaktet som mål-byg: aarch64/Qt 5.6 i Sailfish SDK (sfdk/mb2 med harbour-skrynja-2.yaml, eller rpmbuild med rpm/harbour-skrynja-2.spec + Source0-tarball) → harbour-skrynja-2-<version>.aarch64.rpm; installér på Jolla Phone 2026; kør succeskriteriet på enhed (prompt sendt → tilladelse spurgt → besvaret → fil skrevet → end_turn → exit 0). Resultatet er det målbare grundlag for Slutbrugeranvendelighedssonderingsstokastikerens vurderings-JSON'er. Kan ikke bygges i sandbox (ingen sfdk/rpmbuild/qmake, host x86_64) — mål-byg hører til SDK mål-miljøet. Strategisk begrundelse: anbefalet af Strategistokastikeren 2026-11-21 (plan-revision af projektbeskrivelse.adoc ligger hos Strategistokastikeren).",
-      "release_leverance": "Release/udgivelse: kun aarch64-RPM'en (harbour-skrynja-2-<version>-<release>.aarch64.rpm) leveres ud — til Harbour/store eller direkte til mål-enheden, efter mål-byg rc=0 og på enhed exit 0; host-byg (x86_64/Qt 5.15) må aldrig udgives.",
+      "beskrivelse": "Byg distributionsartefaktet som mål-byg: aarch64/Qt 5.6 i Sailfish SDK (sfdk/mb2 med harbour-skrynja-2.yaml, eller rpmbuild med rpm/harbour-skrynja-2.spec + Source0-tarball) → harbour-skrynja-2-<version>.aarch64.rpm; installér på Jolla Phone 2026; kør succeskriteriet på enhed (prompt sendt → tilladelse spurgt → besvaret → fil skrevet → end_turn → exit 0). Resultatet er det målbare grundlag for Slutbrugeranvendelighedssonderingsstokastikerens vurderings-JSON'er. Kan ikke bygges i sandbox (ingen sfdk/rpmbuild/qmake, vært x86_64) — mål-byg hører til SDK mål-miljøet. Strategisk begrundelse: anbefalet af Strategistokastikeren 2026-11-21 (plan-revision af projektbeskrivelse.adoc ligger hos Strategistokastikeren).",
+      "udgivelses_leverance": "Udgivelse (Release): kun aarch64-RPM'en (harbour-skrynja-2-<version>-<release>.aarch64.rpm) leveres ud — til Harbour/store eller direkte til mål-enheden, efter mål-byg rc=0 og på enhed exit 0; værtsbyg (x86_64/Qt 5.15) må aldrig udgives.",
       "filer": [
         "rpm/harbour-skrynja-2.spec",
         "harbour-skrynja-2.yaml",
@@ -1123,7 +1123,7 @@
           "ingen_rpm_eller_log_i_depotet"
         ],
         "fixtures": [],
-        "bemærkning": "Nye host-slots i den eksisterende parrede testfil (prøve før kilde); mål-byg/på enhed trin dækkes af verifikations_trin i SDK-miljøet"
+        "bemærkning": "Nye værts-slots i den eksisterende parrede testfil (prøve før kilde); mål-byg/på enhed trin dækkes af verifikations_trin i SDK-miljøet"
       },
       "verifikations_trin": [
         {
