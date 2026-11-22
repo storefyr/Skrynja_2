@@ -212,7 +212,7 @@ Denne plan fastlægger 25 funktioner i følgende rækkefølge (svarende til mani
 
 *Verifikation af hvert trin:* `python3 tjek_manifest_parrede_tests.py` grøn før og efter, samt aarch64/Qt 5.6 mål-byg med 0 fejl.
 
-*Status:* LUKKET — besvaret via PR #10; opdelings-trinnene gennemført som funktion 14–16 via PR #12–14. På `main` @ `64b3d8e` er manifestet 16/16 `passerer: sand`, host-test kører 136 PASS / 0 FAIL, og `tjek_manifest_parrede_tests.py` giver exit 0.
+*Status:* LUKKET — besvaret via PR #10; opdelings-trinnene gennemført som funktion 14–16 via PR #12–14. På `main` @ `64b3d8e` er manifestet 16/16 `passerer: sand`, værtstest kører 136 PASS / 0 FAIL, og `tjek_manifest_parrede_tests.py` giver exit 0.
 
 === ark-2 — Test-kroge indlejret i produktionsklasserne (alvorlighed: middel)
 
@@ -264,7 +264,7 @@ Denne plan fastlægger 25 funktioner i følgende rækkefølge (svarende til mani
 
 *Status:* LUKKET — gennemført som funktion 21 (`arkitektur_fjern_ubrugte_roller`), `passerer: sand` på `main` @ `45e339e`.
 
-*Verifikation af ark-2..6-trinnene:* hvert trin uden ny funktionalitet; `python3 tjek_manifest_parrede_tests.py` grøn før og efter (senest på `main` @ `45e339e`: exit 0, 23/23 parrede tests), host-test grøn, aarch64/Qt 5.6 mål-byg med 0 fejl. Trinnene er registreret i manifestet som funktion 17–21 — eksisterende verifikations_trin blev ikke fjernet jf. redigeringsreglen.
+*Verifikation af ark-2..6-trinnene:* hvert trin uden ny funktionalitet; `python3 tjek_manifest_parrede_tests.py` grøn før og efter (senest på `main` @ `45e339e`: exit 0, 23/23 parrede tests), værtstest grøn, aarch64/Qt 5.6 mål-byg med 0 fejl. Trinnene er registreret i manifestet som funktion 17–21 — eksisterende verifikations_trin blev ikke fjernet jf. redigeringsreglen.
 
 == Distributionsartefakt — mål-byg, .rpm og succeskriterium på enheden (funktion 22–23)
 
@@ -279,7 +279,7 @@ Strategisk begrundelse (spørgsmål fra orkestratoren, besvaret 2026-11-21): Ja,
 
 *Begrænsning:* denne sandkasse kan ikke bygge RPM (ingen sfdk/rpmbuild/qmake, vært x86_64) — mål-bygget kører i en sandkasse med Sailfish SDK, ikke hos dig og ikke i dette miljø; værtssuiten (QtTest) dækker fortsat kodekvalitet her.
 
-*Parret test:* nye host-slots `spec_og_yaml_er_konsistente_med_pro` og `ingen_rpm_eller_log_i_depotet` i `tests/tst_byggesti_og_logfil.cpp` (prøve før kilde; ingen .rpm eller logfil må nogensinde ligge i depotet).
+*Parret test:* nye væverts-slots `spec_og_yaml_er_konsistente_med_pro` og `ingen_rpm_eller_log_i_depotet` i `tests/tst_byggesti_og_logfil.cpp` (prøve før kilde; ingen .rpm eller logfil må nogensinde ligge i depotet).
 
 *Verifikation:* `python3 tjek_manifest_parrede_tests.py` exit 0; vært `ALL TESTS PASSED`; mål-byg rc=0 med 0 fejl; `rpm -qpl` viser forventet indhold; exit 0 på enheden.
 
