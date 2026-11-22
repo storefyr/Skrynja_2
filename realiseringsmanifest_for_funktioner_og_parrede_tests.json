@@ -119,7 +119,7 @@
       {"id": "ark-6", "type": "arkitektur", "mål_funktion": "værktøjskald_visning", "ordre": "Enten fjern de ubrugte QAbstractListModel-roller fra ConversationModel/ToolCallModel/DiffModel, eller skift QML til at bruge model-rollerne — ikke begge dele.", "parret_test": "tests/tst_vaerktoejskald_visning.cpp + ny slot: qml_bruger_en_eneste_model_mekanisme", "gennemfoert": true}
     ]
   },
-  "succeskriterium": "prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0, samtidig med at alle 23 funktioner (13 oprindelige + 3 ark-1-opdelinger fra PR #10 + 5 ark-2..6-trin fra PR #18 + 2 distributionsartefakt-trin) har passerer: sand og alle parrede tests i tests/ er grønne; distributionsartefaktet (.rpm) er desuden bygget som aarch64 mål-byg i Sailfish SDK, installeret på Jolla Phone 2026, og succeskriteriet er målt on-device med exit 0.",
+  "succeskriterium": "prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0, samtidig med at alle 25 funktioner (13 oprindelige + 3 ark-1-opdelinger fra PR #10 + 5 ark-2..6-trin fra PR #18 + 2 distributionsartefakt-trin + funktion 24 skærmbillede-i-session + funktion 25 terminal-tilladelse på enhed) har passerer: sand og alle parrede tests i tests/ er grønne; distributionsartefaktet (.rpm) er desuden bygget som aarch64 mål-byg i Sailfish SDK, installeret på Jolla Phone 2026, og succeskriteriet er målt on-device med exit 0.",
   "strategisk_rækkefølge": [
     "byggesti_og_logfil",
     "acp_rygrad",
@@ -143,7 +143,9 @@
     "arkitektur_en_config_ejer",
     "arkitektur_fjern_ubrugte_roller",
     "distributionsartefakt_ikoner",
-    "distributionsartefakt_rpm"
+    "distributionsartefakt_rpm",
+    "skærmbillede_i_session",
+    "terminal_tilladelse_paa_enhed"
   ],
   "funktioner": [
     {
@@ -1153,6 +1155,97 @@
           "trin": "Succeskriterium målt on-device",
           "kommando": "kør appen på enheden med --selvtest (prompt → tilladelse spurgt → besvaret → fil skrevet → end_turn); echo $?",
           "forventet_uddata": "exit=0; verdict {\"resultat\":\"pass\"}; ingen hemmeligheder eller transskripter i rpm eller logfil"
+        }
+      ],
+      "passerer": false
+    },
+    {
+      "id": "skærmbillede_i_session",
+      "navn": "Skærmbillede i session (slutbruger-sondering på enhed)",
+      "beskrivelse": "Klienten (Skrynja_2) sender et skærmbillede af brugerfladen som billed-indhold i ACP-sessionen. Agenten må ikke selv tage skærmbilleder: indtil funktion 25 gælder tom clientCapabilities, så agenten ikke må kalde fs/* eller terminal/* — skærmbilleder kommer altid fra klienten. Forudsætning: funktion 23 grøn (.rpm mål-byg, GitHub Release, installeret og kørt igennem på Jolla Phone 2026). Slutbrugeranvendelighedssonderingsstokastikeren kører derefter en session inde i Skrynja_2 på enheden og måler med skærmbilleder + --selvtest; vurderings-JSON'erne føres hjem via chatten og committes via PR fra en sandkasse — agenten på telefonen må ikke selv skrive filer. Trin fra plan-revision PR #36.",
+      "filer": [
+        "src/acpclient.h",
+        "src/acpclient.cpp",
+        "src/acpsession.cpp",
+        "src/samtalemodel.h",
+        "qml/harbour-skrynja-2.qml",
+        "qml/pages/StartSide.qml",
+        "tests/tst_prompt_og_svar.cpp"
+      ],
+      "parret_test": {
+        "testfil": "tests/tst_prompt_og_svar.cpp",
+        "testklasse": "TestPromptOgSvar",
+        "testslots": [
+          "skraerbillede_sendes_som_billedblok_i_session_prompt",
+          "clientCapabilities_stadig_tom_indtil_funktion_25"
+        ],
+        "fixtures": [
+          "tests/fixtures/fixture_prompt_svar.ndjson"
+        ],
+        "bemærkning": "Nye slots i den eksisterende parrede testfil; prøven opdateres før kilden"
+      },
+      "verifikations_trin": [
+        {
+          "trin": "Host-suite grøn med nye slots",
+          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "forventet_uddata": "ALL TESTS PASSED (inkl. TestPromptOgSvar nye slots)"
+        },
+        {
+          "trin": "Manifest-tjek grøn",
+          "kommando": "python3 tjek_manifest_parrede_tests.py",
+          "forventet_uddata": "rækkefølge ok; exit 0"
+        },
+        {
+          "trin": "Enhedsløkke: slutbruger-sondering i session på Jolla Phone 2026 (efter funktion 23 er grøn)",
+          "kommando": "kør en stokastiker-session inde i Skrynja_2 på enheden med skærmbilleder; mål opgaver (prompt → tilladelse → fil skrevet → end_turn) + --selvtest",
+          "forventet_uddata": "session kører med skærmbilleder; --selvtest exit=0; vurderings-JSON'er ført hjem og committet via PR"
+        }
+      ],
+      "passerer": false
+    },
+    {
+      "id": "terminal_tilladelse_paa_enhed",
+      "navn": "Terminal-tilladelse på enheden",
+      "beskrivelse": "På enheden udvides clientCapabilities, så agenten må kalde terminal/* og fs/* — MEN kun med sikkerhedsrammerne: hver kommando gennem tilladelsesdialogen (session/request_permission) besvaret med et tryk; allowlist (læsninger, git status/log, gh-læsning, qmake/make, pkcon install-local — skrivende/destruktive kommandoer som rm, pkcon remove, git push kun med eksplicit godkendelse); trinvis åbning (read-only først, først når målt grønt åbnes skrive-kommandoer); hemmelighedsfilter i loggen (tokens/nøgler logges og committes aldrig; gh-token ligger i telefonens nøglering, ikke i filer); --selvtest før og efter hver session med terminal-adgang. Bemærk: dette reviderer teknisk_ramme.acp (tom clientCapabilities) — kun på enheden; i værtsløkke/sandbox forbliver clientCapabilities tom indtil dette trin. Trin fra plan-revision PR #37.",
+      "filer": [
+        "src/acpclient.h",
+        "src/acpclient.cpp",
+        "src/acpprotokol.cpp",
+        "src/tilladelsesmodel.h",
+        "src/tilladelsesmodel.cpp",
+        "src/konfiguration.h",
+        "src/konfiguration.cpp",
+        "src/logfil.cpp",
+        "tests/tst_tilladelsesdialog.cpp"
+      ],
+      "parret_test": {
+        "testfil": "tests/tst_tilladelsesdialog.cpp",
+        "testklasse": "TestTilladelsesdialog",
+        "testslots": [
+          "clientCapabilities_paa_enhed_ikke_tom",
+          "terminal_kald_uden_godkendt_tilladelse_afvises",
+          "hemmelighedsfilter_fanger_token_lignende_strenge_i_log"
+        ],
+        "fixtures": [
+          "tests/fixtures/fixture_tilladelse.ndjson"
+        ],
+        "bemærkning": "Nye slots i den eksisterende parrede testfil; prøven opdateres før kilden"
+      },
+      "verifikations_trin": [
+        {
+          "trin": "Host-suite grøn med nye slots (clientCapabilities forbliver tom i værtsløkke)",
+          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "forventet_uddata": "ALL TESTS PASSED (inkl. TestTilladelsesdialog nye slots)"
+        },
+        {
+          "trin": "Manifest-tjek grøn",
+          "kommando": "python3 tjek_manifest_parrede_tests.py",
+          "forventet_uddata": "rækkefølge ok; exit 0"
+        },
+        {
+          "trin": "Enhedsløkke: terminal-adgang på Jolla Phone 2026 med sikkerhedsrammer (efter funktion 23 er grøn)",
+          "kommando": "på enheden: kør session med terminal/* aktiveret; verificer at kald uden godkendt tilladelse afvises, allowlist håndhæves, hemmelighedsfilter fanger token-lignende strenge; --selvtest før og efter",
+          "forventet_uddata": "uautoriserede kald afvises; --selvtest exit=0 før og efter; ingen tokens/nøgler i log eller depot"
         }
       ],
       "passerer": false
