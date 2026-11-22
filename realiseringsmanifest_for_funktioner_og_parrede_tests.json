@@ -1108,11 +1108,12 @@
       "id": "distributionsartefakt_rpm",
       "navn": "Distributionsartefakt: mål-byg, .rpm og på enhed succeskriterium",
       "beskrivelse": "Byg distributionsartefaktet som mål-byg: aarch64/Qt 5.6 i Sailfish SDK (sfdk/mb2 med harbour-skrynja-2.yaml, eller rpmbuild med rpm/harbour-skrynja-2.spec + Source0-tarball) → harbour-skrynja-2-<version>.aarch64.rpm; installér på Jolla Phone 2026; kør succeskriteriet på enhed (prompt sendt → tilladelse spurgt → besvaret → fil skrevet → end_turn → exit 0). Resultatet er det målbare grundlag for Slutbrugeranvendelighedssonderingsstokastikerens vurderings-JSON'er. Kan ikke bygges i sandbox (ingen sfdk/rpmbuild/qmake, vært x86_64) — mål-byg hører til SDK mål-miljøet. Strategisk begrundelse: anbefalet af Strategistokastikeren 2026-11-21 (plan-revision af projektbeskrivelse.adoc ligger hos Strategistokastikeren).",
-      "udgivelses_leverance": "Udgivelse (Release): kun aarch64-RPM'en (harbour-skrynja-2-<version>-<release>.aarch64.rpm) leveres ud — til Harbour/store eller direkte til mål-enheden, efter mål-byg rc=0 og på enhed exit 0; værtsbyg (x86_64/Qt 5.15) må aldrig udgives.",
+      "udgivelses_leverance": "Udgivelse (Release): kun aarch64-RPM'en (harbour-skrynja-2-<version>-<release>.aarch64.rpm) leveres ud — efter mål-byg rc=0 og på enhed exit 0. Da sandkassens API-mellemlag blokerer POST /releases (kun git-push virker), publiceres udgivelsen via GitHub Actions-arbejdsgang (planen, PR #44): Realiseringsstokastikeren lægger .github/workflows/release.yml i depotet og pusher den byggede .rpm til en særskilt git-reference (ikke main — ingen_rpm_eller_log_i_depotet gælder stadig); arbejdsgangen kører på GitHubs servere med GITHUB_TOKEN (contents: write) og opretter GitHub Release med rpm-filen vedhæftet. Derefter hentes pakken på Jolla Phone 2026 (pkcon install-local) eller leveres til Harbour/store; værtsbyg (x86_64/Qt 5.15) må aldrig udgives.",
       "filer": [
         "rpm/harbour-skrynja-2.spec",
         "harbour-skrynja-2.yaml",
         "harbour-skrynja-2.pro",
+        ".github/workflows/release.yml",
         "tests/tst_byggesti_og_logfil.cpp"
       ],
       "parret_test": {
@@ -1155,6 +1156,11 @@
           "trin": "Succeskriterium målt på enhed",
           "kommando": "kør appen på enheden med --selvtest (prompt → tilladelse spurgt → besvaret → fil skrevet → end_turn); echo $?",
           "forventet_uddata": "exit=0; verdict {\"resultat\":\"pass\"}; ingen hemmeligheder eller transskripter i rpm eller logfil"
+        },
+        {
+          "trin": "GitHub Release oprettes via Actions-arbejdsgang (spejl af PR #44; sandkassens API-mellemlag blokerer POST /releases)",
+          "kommando": "push .github/workflows/release.yml + rpm til særskilt git-reference; lad arbejdsgangen køre på GitHubs servere; tjek via API at Release findes med vedhæftet rpm",
+          "forventet_uddata": "GitHub Release på storefyr/Skrynja_2 med harbour-skrynja-2-<version>-<release>.aarch64.rpm som vedhæftet fil; ingen .rpm i main-træet"
         }
       ],
       "passerer": false
