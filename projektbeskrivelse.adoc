@@ -168,7 +168,7 @@ Rammen er ikke-forhandlingsbar og arves fra forgængerprojekterne og fra license
 
 == Strategisk rækkefølge
 
-Denne plan fastlægger 23 funktioner i følgende rækkefølge (svarende til manifestets `strategisk_rækkefølge`); Projektstokastikeren registrerer dem i realiseringsmanifestet — strategien er at gennemføre dem én ad gangen uden at springe trin over (særligt `stop_og_afvis` må ikke springes over). Funktion 14–21 er arkitektur-opdelings-trinnene fra eskaleringerne ark-1..6 (se afsnittet *Arkitektur-eskaleringer* nedenfor); funktion 22–23 er distributionsartefakt-trinnene (se næste afsnit):
+Denne plan fastlægger 24 funktioner i følgende rækkefølge (svarende til manifestets `strategisk_rækkefølge`); Projektstokastikeren registrerer dem i realiseringsmanifestet — strategien er at gennemføre dem én ad gangen uden at springe trin over (særligt `stop_og_afvis` må ikke springes over). Funktion 14–21 er arkitektur-opdelings-trinnene fra eskaleringerne ark-1..6 (se afsnittet *Arkitektur-eskaleringer* nedenfor); funktion 22–23 er distributionsartefakt-trinnene; funktion 24 er skærmbillede-i-session til slutbruger-sondering på enheden (se sidste afsnit):
 
 . `byggesti_og_logfil`
 . `acp_rygrad`
@@ -193,6 +193,7 @@ Denne plan fastlægger 23 funktioner i følgende rækkefølge (svarende til mani
 . `arkitektur_fjern_ubrugte_roller`
 . `distributionsartefakt_ikoner`
 . `distributionsartefakt_rpm`
+. `skærmbillede_i_session`
 
 == Arkitektur-eskaleringer (besvaret af Strategistokastikeren)
 
@@ -295,6 +296,16 @@ Verdensbillede (orkestratoren 2026-11-21): mål-enheden er Jolla Phone 2026 (Sai
 
 *Begrænsning:* denne sandkasse har ingen Qt/Sailfish-værktøjskæde (ingen qmake/sfdk/rpmbuild, x86_64) — værtsløkken kræver sandkassen med værktøjskæden; her kan kun dokumentation, manifest-checks og audit køres.
 
+== Slutbruger-sondering på enheden (funktion 24)
+
+Strategi godkendt af orkestratoren (2026-11-21): slutbruger-vurderingerne venter, til en stokastiker-session kan køre i selve Skrynja_2 på Jolla Phone 2026. Forudsætning: funktion 23 er grøn — .rpm bygget som aarch64 mål-byg, udgivet som GitHub Release, installeret og kørt igennem på enheden.
+
+* `skærmbillede_i_session` (funktion 24) — klienten (Skrynja_2) sender et skærmbillede af brugerfladen som billed-indhold i ACP-sessionen. Agenten må ikke selv tage skærmbilleder: manifestet kræver tom `clientCapabilities`, så agenten må ikke kalde `fs/*` eller `terminal/*` — skærmbilleder kommer altid fra klienten. Parret test: ny slot i `tests/` (skærmbillede når agenten som billed-blok i session/prompt).
+
+*Afprøvning:* Slutbrugeranvendelighedssonderingsstokastikeren kører en session inde i Skrynja_2 på telefonen, afprøver opgaver (prompt → tilladelse → fil skrevet → end_turn) og måler med skærmbilleder samt appens eget `--selvtest` (resultats-JSON). Vurderingen formuleres i sessionen på enheden; vurderings-JSON'erne (`vurdering_af_programmelets_ansvarlighed_for_slutbrugeren.json`, `vurdering_af_programmelets_intuitivitet_og_kohærens_for_slutbrugeren.json`) føres hjem via chatten og committes i depotet via PR fra en sandkasse — agenten på telefonen må ikke selv skrive filer.
+
+*Uafhængig fallback:* afprøvning via Vibe-chat med orkestratoren beholdes som supplement, så de to målinger kan sammenlignes (en stokastiker, der kører inden i appen, kan påvirkes af appens egne fejl).
+
 == Succeskriterium for økosystemet
 
-Økosystemet betragtes som realiseret, når kæden kører end-to-end på mål-enheden: prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0, samtidig med at alle stokastiker-artefakter (denne beskrivelse, manifestet med alle 23 funktioner `passerer: sand`, de parrede tests og vurderings-JSON'erne) ligger sporbare i kildekodelageret, og distributionsartefaktet (.rpm) desuden er bygget som aarch64 mål-byg i en sandkasse med Sailfish SDK, udgivet som GitHub Release på kildekodelageret, hentet og installeret på Jolla Phone 2026 og kørt igennem på enheden med exit 0.
+Økosystemet betragtes som realiseret, når kæden kører end-to-end på mål-enheden: prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0, samtidig med at alle stokastiker-artefakter (denne beskrivelse, manifestet med alle 24 funktioner `passerer: sand`, de parrede tests og vurderings-JSON'erne) ligger sporbare i kildekodelageret, og distributionsartefaktet (.rpm) desuden er bygget som aarch64 mål-byg i en sandkasse med Sailfish SDK, udgivet som GitHub Release på kildekodelageret, hentet og installeret på Jolla Phone 2026 og kørt igennem på enheden med exit 0.
