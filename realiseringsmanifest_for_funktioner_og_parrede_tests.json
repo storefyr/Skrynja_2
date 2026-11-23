@@ -241,8 +241,8 @@
         "id": "test-1",
         "type": "fragilitet",
         "mål_funktion": "genoptagelse_af_samtale",
-        "ordre": "Styrk resumeregel-testen: den må køre resume-regelens faktiske kommandoer (pwd/git status/git log) mod et fixture-repo, ikke kun sammenligne to lister i samme manifestfil.",
-        "parret_test": "tests/tst_genoptagelse_af_samtale.cpp + ny slot: resumeregel_koerer_git_kommandoer_mod_fixture",
+        "ordre": "Styrk genoptagelsesregel-testen: den må køre genoptagelses-regelens faktiske kommandoer (pwd/git status/git log) mod et fixture-repo, ikke kun sammenligne to lister i samme manifestfil.",
+        "parret_test": "tests/tst_genoptagelse_af_samtale.cpp + ny slot: genoptagelsesregel_koerer_git_kommandoer_mod_fixture",
         "gennemført": true
       },
       {
@@ -529,7 +529,7 @@
     {
       "id": "genoptagelse_af_samtale",
       "navn": "Genoptagelse af samtale",
-      "beskrivelse": "SessionId gemmes i QSettings efter session/new; ved app-start forsøges session/load med det gemte id (genoptag), ved fejl falder der tilbage til session/new; om samtalen blev genoptaget eksponeres (hadRestoredHistory) til UI. Ved genoptagelse af en arbejdsgang følges projektbeskrivelsens resume-regel: pwd, git status, git log --oneline -20, læs manifestet, vælg første funktion med passerer: false.",
+      "beskrivelse": "SessionId gemmes i QSettings efter session/new; ved app-start forsøges session/load med det gemte id (genoptag), ved fejl falder der tilbage til session/new; om samtalen blev genoptaget eksponeres (hadRestoredHistory) til UI. Ved genoptagelse af en arbejdsgang følges projektbeskrivelsens genoptagelses-regel: pwd, git status, git log --oneline -20, læs manifestet, vælg første funktion med passerer: false.",
       "filer": [
         "src/acpclient.h",
         "src/acpclient.cpp",
@@ -544,8 +544,8 @@
           "load_med_gemt_session_id",
           "fallback_til_new_ved_load_fejl",
           "hadRestoredHistory_saettes_korrekt",
-          "resumeregel_laeser_manifest_og_finder_foerste_false",
-          "resumeregel_koerer_git_kommandoer_mod_fixture"
+          "genoptagelsesregel_laeser_manifest_og_finder_foerste_false",
+          "genoptagelsesregel_koerer_git_kommandoer_mod_fixture"
         ],
         "fixtures": [],
         "bemærkning": "Prøven indskrives før src/sessionlager.cpp; QSettings køres mod en midlertidig lokation i prøven"

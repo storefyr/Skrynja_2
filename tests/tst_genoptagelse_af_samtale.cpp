@@ -23,8 +23,8 @@ private slots:
     void load_med_gemt_session_id();
     void fallback_til_new_ved_load_fejl();
     void hadRestoredHistory_saettes_korrekt();
-    void resumeregel_laeser_manifest_og_finder_foerste_false();
-    void resumeregel_koerer_git_kommandoer_mod_fixture();
+    void genoptagelsesregel_laeser_manifest_og_finder_foerste_false();
+    void genoptagelsesregel_koerer_git_kommandoer_mod_fixture();
 private:
 };
 
@@ -103,7 +103,7 @@ void TestGenoptagelseAfSamtale::hadRestoredHistory_saettes_korrekt()
     QCOMPARE(client.sessionId(), QString("sess-gammel"));
 }
 
-void TestGenoptagelseAfSamtale::resumeregel_laeser_manifest_og_finder_foerste_false()
+void TestGenoptagelseAfSamtale::genoptagelsesregel_laeser_manifest_og_finder_foerste_false()
 {
     QString path = QCoreApplication::applicationDirPath()
                   + "/../realiseringsmanifest_for_funktioner_og_parrede_tests.json";
@@ -140,7 +140,7 @@ void TestGenoptagelseAfSamtale::resumeregel_laeser_manifest_og_finder_foerste_fa
     QCOMPARE(firstInOrder, firstInFunctions);
 }
 
-void TestGenoptagelseAfSamtale::resumeregel_koerer_git_kommandoer_mod_fixture()
+void TestGenoptagelseAfSamtale::genoptagelsesregel_koerer_git_kommandoer_mod_fixture()
 {
     QString repo = QDir::tempPath() + "/skrynja-tst-fixture-repo";
     QDir(repo).removeRecursively();
