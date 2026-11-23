@@ -24,7 +24,7 @@ Menneskelig konceptualisator og realiseringsorkestrator
   Realiseringsstokastiker ─► realiseringsartefaktet (kildekode)
             │                el. distributionsartefaktet (RPM)
             ├──► Slutbrugeranvendelighedssonderingsstokastiker
-            │      vurdering_af_programmelets_ansvarlighed_for_slutbrugeren.json
+            │      vurdering_af_programmelets_anskuelighed_for_slutbrugeren.json
             │      vurdering_af_programmelets_intuitivitet_og_kohærens_for_slutbrugeren.json
             └──► Kildesondringsstokastiker (hovedstokastiker /
                    informationsstokastiker)
@@ -54,7 +54,7 @@ Flowet, som appen administrerer, svarer til økosystemets artefakter:
 | Artefakter | Realiseringsartefakt (kildekode), distributionsartefakt (RPM), vurderings-JSON'er | Værktøjskald, filændringer og diffs, mens de sker; tilladelser besvares med et tryk
 |===
 
-De tre egenskaber — overskuelig, intuitiv og kohærent — er præcis dem, som Slutbrugeranvendelighedssonderingsstokastikeren vurderer i `vurdering_af_programmelets_intuitivitet_og_kohærens_for_slutbrugeren.json` og `vurdering_af_programmelets_ansvarlighed_for_slutbrugeren.json`.
+De tre egenskaber — overskuelig, intuitiv og kohærent — er præcis dem, som Slutbrugeranvendelighedssonderingsstokastikeren vurderer i `vurdering_af_programmelets_intuitivitet_og_kohærens_for_slutbrugeren.json` og `vurdering_af_programmelets_anskuelighed_for_slutbrugeren.json`.
 
 * Mål-enhed: Jolla Phone (2026) med Sailfish OS — kun aarch64 bygges, måles og udgives.
 * Succeskriterium: prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med kode 0.
@@ -86,8 +86,8 @@ De tre egenskaber — overskuelig, intuitiv og kohærent — er præcis dem, som
 | Implementerer én funktion ad gangen og kører de parrede tests, før `passerer` sættes til sand.
 
 | Slutbrugeranvendelighedssonderingsstokastiker
-| `vurdering_af_programmelets_ansvarlighed_for_slutbrugeren.json` og `vurdering_af_programmelets_intuitivitet_og_kohærens_for_slutbrugeren.json`
-| Sonderer, om programmet opleves ansvarligt, intuitivt og kohærent for slutbrugeren, og leverer vurderingen tilbage i kæden.
+| `vurdering_af_programmelets_anskuelighed_for_slutbrugeren.json` og `vurdering_af_programmelets_intuitivitet_og_kohærens_for_slutbrugeren.json`
+| Sonderer, om programmet opleves anskueligt, intuitivt og kohærent for slutbrugeren, og leverer vurderingen tilbage i kæden.
 
 | Kildesondringsstokastiker (hovedstokastiker / informationsstokastiker)
 | `vurdering_af_realiseringsartefaktets_arkitektur_fragilitet_og_støjindhold_for_stokastikere.json`
@@ -148,7 +148,7 @@ Rammen er ikke-forhandlingsbar og arves fra forgængerprojekterne og fra license
 | QtTest
 | Realiseringsstokastiker → Projektstokastiker
 
-| `vurdering_af_programmelets_ansvarlighed_for_slutbrugeren.json`, `vurdering_af_programmelets_intuitivitet_og_kohærens_for_slutbrugeren.json`
+| `vurdering_af_programmelets_anskuelighed_for_slutbrugeren.json`, `vurdering_af_programmelets_intuitivitet_og_kohærens_for_slutbrugeren.json`
 | JSON
 | Slutbrugeranvendelighedssonderingsstokastiker → Strategistokastiker
 
@@ -275,7 +275,7 @@ Denne plan fastlægger 26 funktioner i følgende rækkefølge (svarende til mani
 
 == Distributionsartefakt — mål-byg, .rpm og succeskriterium på enheden (funktion 22–23)
 
-Strategisk begrundelse (spørgsmål fra orkestratoren, besvaret 2026-11-21): Ja, der skal være et bygget .rpm. Distributionsartefaktet (RPM) er en del af visionen — det er Realiseringsstokastikerens artefakt — og Slutbrugeranvendelighedssonderingsstokastikeren kan kun vurdere overskuelighed, intuitivitet, kohærens og ansvarlighed på den kørende app på mål-enheden, ikke på værtstest eller ved kodelæsning. Projektstokastikeren har registreret det som funktion 22–23 i manifestet (PR #28).
+Strategisk begrundelse (spørgsmål fra orkestratoren, besvaret 2026-11-21): Ja, der skal være et bygget .rpm. Distributionsartefaktet (RPM) er en del af visionen — det er Realiseringsstokastikerens artefakt — og Slutbrugeranvendelighedssonderingsstokastikeren kan kun vurdere overskuelighed, intuitivitet, kohærens og anskuelighed på den kørende app på mål-enheden, ikke på værtstest eller ved kodelæsning. Projektstokastikeren har registreret det som funktion 22–23 i manifestet (PR #28).
 
 * `distributionsartefakt_ikoner` (funktion 22) — app-ikoner i hicolor-stier, wired i `.pro`, spec, yaml og `.desktop`.
 * `distributionsartefakt_rpm` (funktion 23, `passerer: false` indtil mål-byg køres) — leveringskæden i den virkelige verden (verdensbillede fra orkestratoren 2026-11-21: mål-enheden er orkestratorens eneste enhed, Jolla Phone 2026; orkestratoren skriver via Vibe-appen; stokastikerne kører i hver deres sandkasse):
@@ -312,7 +312,7 @@ Strategi godkendt af orkestratoren (2026-11-21): slutbruger-vurderingerne venter
 
 * `skærmbillede_i_session` (funktion 24) — klienten (Skrynja_2) sender et skærmbillede af brugerfladen som billed-indhold i ACP-sessionen. Agenten må ikke selv tage skærmbilleder: manifestet kræver tom `clientCapabilities`, så agenten må ikke kalde `fs/*` eller `terminal/*` — skærmbilleder kommer altid fra klienten. Parret test: ny slot i `tests/` (skærmbillede når agenten som billed-blok i session/prompt).
 
-*Afprøvning:* Slutbrugeranvendelighedssonderingsstokastikeren kører en session inde i Skrynja_2 på telefonen, afprøver opgaver (prompt → tilladelse → fil skrevet → end_turn) og måler med skærmbilleder samt appens eget `--selvtest` (resultats-JSON). Vurderingen formuleres i sessionen på enheden; vurderings-JSON'erne (`vurdering_af_programmelets_ansvarlighed_for_slutbrugeren.json`, `vurdering_af_programmelets_intuitivitet_og_kohærens_for_slutbrugeren.json`) føres hjem via chatten og committes i depotet via PR fra en sandkasse — agenten på telefonen må ikke selv skrive filer.
+*Afprøvning:* Slutbrugeranvendelighedssonderingsstokastikeren kører en session inde i Skrynja_2 på telefonen, afprøver opgaver (prompt → tilladelse → fil skrevet → end_turn) og måler med skærmbilleder samt appens eget `--selvtest` (resultats-JSON). Vurderingen formuleres i sessionen på enheden; vurderings-JSON'erne (`vurdering_af_programmelets_anskuelighed_for_slutbrugeren.json`, `vurdering_af_programmelets_intuitivitet_og_kohærens_for_slutbrugeren.json`) føres hjem via chatten og committes i depotet via PR fra en sandkasse — agenten på telefonen må ikke selv skrive filer.
 
 *Uafhængig reserve:* afprøvning via Vibe-chat med orkestratoren beholdes som supplement, så de to målinger kan sammenlignes (en stokastiker, der kører inden i appen, kan påvirkes af appens egne fejl).
 
