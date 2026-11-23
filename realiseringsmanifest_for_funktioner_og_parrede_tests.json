@@ -1315,7 +1315,8 @@
         "testslots": [
           "spec_og_yaml_er_konsistente_med_pro",
           "ingen_rpm_eller_log_i_depotet"
-        ],
+        ,
+          "release_workflow_bygger_og_udgiver_rpm"],
         "fixtures": [],
         "bemærkning": "Nye værts-slots i den eksisterende parrede testfil (prøve før kilde); mål-byg/på enhed trin dækkes af verifikations_trin i SDK-miljøet"
       },

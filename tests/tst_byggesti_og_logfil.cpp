@@ -25,6 +25,7 @@ private slots:
     void ikoner_wired_i_pro_spec_og_yaml();
     void spec_og_yaml_er_konsistente_med_pro();
     void ingen_rpm_eller_log_i_depotet();
+    void release_workflow_bygger_og_udgiver_rpm();
 private:
     QString readLines(int& count);
     QString m_path;
@@ -254,6 +255,22 @@ void TestByggestiOgLogfil::ingen_rpm_eller_log_i_depotet()
         forbudte.append(path);
     }
     QVERIFY2(forbudte.isEmpty(), qPrintable("build-artefakter i depotet: " + forbudte.join(", ")));
+}
+
+void TestByggestiOgLogfil::release_workflow_bygger_og_udgiver_rpm()
+{
+    QString wf = testReadSource(".github/workflows/release.yml");
+    QVERIFY2(!wf.isEmpty(), ".github/workflows/release.yml mangler");
+    QVERIFY2(wf.contains("sailfish-build-rpm"), "workflow skal bygge mål-byg i Sailfish SDK (sailfish-build-rpm)");
+    QVERIFY2(wf.contains("aarch64"), "workflow skal bygge aarch64");
+    QVERIFY2(wf.contains("v*.*.*"), "workflow skal trigge på tags v*.*.*");
+    QVERIFY2(wf.contains("workflow_dispatch"), "workflow skal kunne køres manuelt");
+    QVERIFY2(wf.contains("tst_skrynja_2"), "workflow skal køre værtssuiten før release");
+    QVERIFY2(wf.contains("tjek_plan_manifest_spejl.py"), "workflow skal køre spejlkontrollen");
+    QVERIFY2(wf.contains("contents: write"), "release-job skal have contents: write (GITHUB_TOKEN)");
+    QVERIFY2(wf.contains("action-gh-release") || wf.contains("gh release create"), "workflow skal oprette GitHub Release");
+    QVERIFY2(wf.contains("*.rpm"), "release skal vedhæfte rpm-filen");
+    QVERIFY2(!wf.contains("git add"), "workflow må ikke commite rpm ind i depotet");
 }
 
 #include "tst_byggesti_og_logfil.moc"
