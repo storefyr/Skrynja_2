@@ -27,7 +27,7 @@
     "terminologi": "Dansk frem for engelsk fagsprog i prosa: merge→integration/integreres/integreret, draft→kladde, commit→indskrivning, backend→bagvedliggende system, branch→gren, token→adgangstoken. Egennavne, protokol-/platformtermer samt kommandoer og API-stier i backticks (GitHub, PR, ACP, CI, `git push`, `merge` som API-sti) undtages; i historiske logposter bevares id'er, hashes og citeret tekst, men terminologien gælder også dér (orkestratorens krav 2026-11-22).",
     "sprog_eskalering": "besvaret af Strategistokastikeren 2026-11-20 via PR #5 (kladde, indskrivning 10396c3, gren vibe/sprog-eskalering-df693a): sprog-linjen i projektbeskrivelse.adoc revideret til 'kode og kommentarer er engelske; dokumentation, brugerflade og commits er danske' — plan og manifest er kohærente, når PR #5 integreres i main",
     "sprog_eskalering_2026_11_22": "besvaret af Strategistokastikeren 2026-11-22 på den menneskelige orkestrators ønske: sprog-reglen udvidet, så alle nystartede stokastikere kommunikerer udelukkende på dansk; projektbeskrivelse.adoc og dette manifest revideret i samme PR jf. spejlingsreglen",
-    "hemmeligheder": "Ingen nøgler, tokens eller samtale-transskripter må nogensinde ind i depotet",
+    "hemmeligheder": "Ingen nøgler, adgangstokens eller samtale-transskripter må nogensinde ind i depotet",
     "harbour": "Appnavnet beholder `harbour-`-præfikset; kun tilladte importer.",
     "navngivning": "Selvdokumenterende navne uden afkortninger eller præfiks-koder: fragilitet_... — aldrig fra-...; arkitektur_... — aldrig ark-...; støj-... er i orden, fordi støj er hele ordet. Undtagelse: historiske id'er i lukkede triage-poster (ark-*, fra-*, støj-*, test-*) er uforanderlige log og omdøbes ikke; reglen gælder alle nye navne."
   },
@@ -859,7 +859,7 @@
     {
       "id": "oprydning_af_træ",
       "navn": "Oprydning af træ",
-      "beskrivelse": "Efter hver arbejdsgang er depotet rent: ingen build-artefakter, midlertidige filer, logfiler eller hemmeligheder (nøgler, tokens, transskripter) i træet; .gitignore dækker build-mapper; agenten er stoppet; alle ændringer er indskrevet med beskrivende besked.",
+      "beskrivelse": "Efter hver arbejdsgang er depotet rent: ingen build-artefakter, midlertidige filer, logfiler eller hemmeligheder (nøgler, adgangstokens, transskripter) i træet; .gitignore dækker build-mapper; agenten er stoppet; alle ændringer er indskrevet med beskrivende besked.",
       "filer": [
         ".gitignore",
         "src/agentproces.cpp",
@@ -1406,7 +1406,7 @@
     {
       "id": "terminal_tilladelse_på_enhed",
       "navn": "Terminal-tilladelse på enheden",
-      "beskrivelse": "På enheden udvides clientCapabilities, så agenten må kalde terminal/* og fs/* — MEN kun med sikkerhedsrammerne: hver kommando gennem tilladelsesdialogen (session/request_permission) besvaret med et tryk; allowlist (læsninger, git status/log, gh-læsning, qmake/make, pkcon install-local — skrivende/destruktive kommandoer som rm, pkcon remove, git push kun med eksplicit godkendelse); trinvis åbning (read-only først, først når målt grønt åbnes skrive-kommandoer); hemmelighedsfilter i loggen (tokens/nøgler logges og committes aldrig; gh-token ligger i telefonens nøglering, ikke i filer); --selvtest før og efter hver session med terminal-adgang. Bemærk: dette reviderer teknisk_ramme.acp (tom clientCapabilities) — kun på enheden; i værtsløkke/sandbox forbliver clientCapabilities tom indtil dette trin. Trin fra plan-revision PR #37.",
+      "beskrivelse": "På enheden udvides clientCapabilities, så agenten må kalde terminal/* og fs/* — MEN kun med sikkerhedsrammerne: hver kommando gennem tilladelsesdialogen (session/request_permission) besvaret med et tryk; allowlist (læsninger, git status/log, gh-læsning, qmake/make, pkcon install-local — skrivende/destruktive kommandoer som rm, pkcon remove, git push kun med eksplicit godkendelse); trinvis åbning (read-only først, først når målt grønt åbnes skrive-kommandoer); hemmelighedsfilter i loggen (adgangstokens/nøgler logges og committes aldrig; gh-token ligger i telefonens nøglering, ikke i filer); --selvtest før og efter hver session med terminal-adgang. Bemærk: dette reviderer teknisk_ramme.acp (tom clientCapabilities) — kun på enheden; i værtsløkke/sandbox forbliver clientCapabilities tom indtil dette trin. Trin fra plan-revision PR #37.",
       "filer": [
         "src/acpclient.h",
         "src/acpclient.cpp",
@@ -1444,8 +1444,8 @@
         },
         {
           "trin": "Enhedsløkke: terminal-adgang på Jolla Phone 2026 med sikkerhedsrammer (efter funktion 23 er grøn)",
-          "kommando": "på enheden: kør session med terminal/* aktiveret; verificer at kald uden godkendt tilladelse afvises, allowlist håndhæves, hemmelighedsfilter fanger token-lignende strenge; --selvtest før og efter",
-          "forventet_uddata": "uautoriserede kald afvises; --selvtest exit=0 før og efter; ingen tokens/nøgler i log eller depot"
+          "kommando": "på enheden: kør session med terminal/* aktiveret; verificer at kald uden godkendt tilladelse afvises, allowlist håndhæves, hemmelighedsfilter fanger adgangstoken-lignende strenge; --selvtest før og efter",
+          "forventet_uddata": "uautoriserede kald afvises; --selvtest exit=0 før og efter; ingen adgangstokens/nøgler i log eller depot"
         }
       ],
       "passerer": false

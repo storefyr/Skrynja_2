@@ -302,7 +302,7 @@ Verdensbillede (orkestratoren 2026-11-21): mål-enheden er Jolla Phone 2026 (Sai
 
 *Automatisering af enhedsløkken:* på enheden køres succeskriteriet via appens eget `--selvtest` (funktion 11, resultats-JSON + exit-kode) i stedet for manuel gennemkørsel; mål-byg og `gh release create` (som også lægger .rpm op) køres i samme automatiserede kørsel, så intet manuelt trin står mellem byg og hentning.
 
-*Process:* saml relaterede triage-ordrer (støj/fragilitet) i én PR med flere parrede test-slots; kildesondrings-audit kører pr. milepæl, ikke pr. PR; dokumentationsændringer samles i samlede PRs.
+*Proces:* saml relaterede triage-ordrer (støj/fragilitet) i én PR med flere parrede test-slots; kildesondrings-audit kører pr. milepæl, ikke pr. PR; dokumentationsændringer samles i samlede PRs.
 
 *Begrænsning:* denne sandkasse har ingen Qt/Sailfish-værktøjskæde (ingen qmake/sfdk/rpmbuild, x86_64) — værtsløkken kræver sandkassen med værktøjskæden; her kan kun dokumentation, manifest-checks og audit køres.
 
