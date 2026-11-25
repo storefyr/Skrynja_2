@@ -6,6 +6,9 @@
 #                                   release.yml: mål-byg aarch64 + GitHub Release) og venter
 #                                   på det nye release, så intet manuelt trin står mellem
 #                                   byg og hentning (planen: automatisering af enhedsløkke)
+# Kun github.com bruges direkte: seneste tag løses via redirect fra releases/latest
+# (url_effective), asset hentes via download-URL releases/download/<tag>/<fil>.
+# GitHubs API-endepunkt giver 403 på enheden (målt 2026-11-25, ordre fra-13) og bruges ikke.
 # Derefter i samme kørsel: hent asset → rpm -qpl-tjek (12 forventede stier) →
 # pkcon install-local → appens --selvtest (verdict-JSON + exit-kode).
 # Udgangskode 0 = succeskriterium målt på enhed.
@@ -24,7 +27,20 @@ trap 'rm -rf "$TMP"' EXIT
 TRIN=0
 trin() { TRIN=$((TRIN + 1)); echo; echo "== trin $TRIN: $1 =="; }
 
-ASSET_URL=""
+# Løser et release-tag via github.com-redirect (uden API):
+#   curl -sIL -o /dev/null -w '%{url_effective}' https://github.com/<repo>/releases/latest
+#   → https://github.com/<repo>/releases/tag/<tag>
+tag_via_redirect() {
+    curl -sIL -o /dev/null -w '%{url_effective}' "https://github.com/${REPO}/releases/$1" \
+        | sed -E 's#.*/releases/tag/##'
+}
+
+# Finder aarch64.rpm-asset-navnet på release-siden for et tag (direkte HTML, uden API)
+asset_navn_for_tag() {
+    curl -fsSL "https://github.com/${REPO}/releases/tag/$1" \
+        | grep -oE "${APP}-[0-9][^\"']*\.aarch64\.rpm" | head -1 || true
+}
+
 if [ -n "$TAG" ]; then
     trin "udløser mål-byg og udgivelse ved tag-push ($TAG → release.yml)"
     if command -v gh >/dev/null 2>&1; then
@@ -37,33 +53,38 @@ if [ -n "$TAG" ]; then
 
     trin "venter på release for tag $TAG (intet manuelt trin mellem byg og hentning)"
     VENT=0
+    ASSET_NAVN=""
     while [ "$VENT" -lt 90 ]; do
-        ASSET_URL="$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/tags/${TAG}" 2>/dev/null \
-            | grep -oE "\"browser_download_url\": *\"[^\"]*${APP}-[0-9][^\"]*\.aarch64\.rpm\"" \
-            | head -1 | sed -E 's/.*"([^"]+)"$/\1/')" || ASSET_URL=""
-        if [ -n "$ASSET_URL" ]; then
+        ASSET_NAVN="$(asset_navn_for_tag "$TAG")"
+        if [ -n "$ASSET_NAVN" ]; then
             break
         fi
         VENT=$((VENT + 1))
         sleep 30
     done
-    if [ -z "$ASSET_URL" ]; then
+    if [ -z "$ASSET_NAVN" ]; then
         echo "FEJL: intet ${APP}-*.aarch64.rpm-asset i release for tag $TAG efter 45 min ventetid"
         exit 1
     fi
+    TAG_OP="$TAG"
 else
-    trin "henter seneste GitHub Release-asset (aarch64.rpm)"
-    ASSET_URL="$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" \
-        | grep -oE "\"browser_download_url\": *\"[^\"]*${APP}-[0-9][^\"]*\.aarch64\.rpm\"" \
-        | head -1 | sed -E 's/.*"([^"]+)"$/\1/')"
-fi
-if [ -z "$ASSET_URL" ]; then
-    echo "FEJL: fandt intet ${APP}-*.aarch64.rpm-asset i seneste release"
-    exit 1
+    trin "løser seneste tag via github.com-redirect (releases/latest)"
+    TAG_OP="$(tag_via_redirect latest)"
+    if ! [[ "$TAG_OP" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        echo "FEJL: kunne ikke løse seneste tag via redirect, fik: $TAG_OP"
+        exit 1
+    fi
+    echo "seneste tag: $TAG_OP"
+    ASSET_NAVN="$(asset_navn_for_tag "$TAG_OP")"
+    if [ -z "$ASSET_NAVN" ]; then
+        echo "FEJL: fandt intet ${APP}-*.aarch64.rpm-asset i release $TAG_OP"
+        exit 1
+    fi
 fi
 
-trin "henter asset ($(basename "$ASSET_URL"))"
-RPM="${TMP}/$(basename "$ASSET_URL")"
+ASSET_URL="https://github.com/${REPO}/releases/download/${TAG_OP}/${ASSET_NAVN}"
+trin "henter asset via direkte download-URL (${TAG_OP}/${ASSET_NAVN})"
+RPM="${TMP}/${ASSET_NAVN}"
 curl -fsSL "$ASSET_URL" -o "$RPM"
 echo "hentet: $RPM ($(stat -c%s "$RPM") bytes)"
 
