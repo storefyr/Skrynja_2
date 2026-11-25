@@ -161,7 +161,8 @@ void TestTilladelsesdialog::dialog_tjekker_svar_retvaerdi()
 void TestTilladelsesdialog::clientCapabilities_paa_enhed_ikke_tom()
 {
     QString sessionSrc = testReadSource("kilder/acpsession.cpp");
-    QVERIFY2(sessionSrc.contains("terminal/aktiv"), "acpsession.cpp skal gate terminal-capabilities på enhedsindstillingen terminal/aktiv");
+    QVERIFY2(sessionSrc.contains("terminalAktivPaaEnhed"), "acpsession.cpp skal gate clientCapabilities på terminalAktivPaaEnhed");
+    QVERIFY2(testReadSource("kilder/konfiguration.cpp").contains("terminal/aktiv"), "konfiguration.cpp skal eje enhedsindstillingen terminal/aktiv");
 
     QSettings s;
     s.remove("terminal/aktiv");

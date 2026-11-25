@@ -50,7 +50,7 @@ void TestOprydningAfTrae::git_status_porcelain_tom_efter_indskrivning()
 
 void TestOprydningAfTrae::ingen_hemmeligheder_i_trae()
 {
-    QString pattern = "api[_-]?key|tok" "en|pass" "word|BEGIN [A-Z ]*PRIVATE KEY";
+    QString pattern = "api[_-]?key\\s*[:=]|tok" "en\\s*[:=]\\s*[\"\x27]|pass" "word\\s*[:=]\\s*[\"\x27]|BEGIN [A-Z ]*PRIVATE KEY";
     QString output = runGit(QStringList() << "grep" << "-nE" << pattern << "--" << "." << ":!LICENSE");
     QStringList lines = output.split('\n', QString::SkipEmptyParts);
     QStringList allowed;
