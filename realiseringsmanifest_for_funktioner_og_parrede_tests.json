@@ -344,7 +344,8 @@
         "mål_funktion": "byggesti_og_logfil",
         "ordre": "Omdøb mappen vaerktoejler/ → værktøjer/ (ægte ø). Målt på main @ 016537a: vaerktoejler forekommer i selve mappen + 3 sti-referencer i tests/proeve_byggesti_og_logfil.cpp:285-287 (slot verificeringsskript_paa_enhed_findes_og_bestaaer_bash_n); manifestets måling-tekst er historisk log og bevares. Begrundelse: ortografi-maksimum forbyder ascii-udvanding (oe) i navne; ascii-undtagelsen gælder kun kildefilnavne/C++-identifikatorer/test-slots (moc), wire-strenge og harbour-navnet — et mappenavn er intet af det, så det skal være ægte dansk værktøjer. Ordren automatisk-1 foreskrev allerede værktøjer/.",
         "parret_test": "samme slot verificeringsskript_paa_enhed_findes_og_bestaaer_bash_n i tests/proeve_byggesti_og_logfil.cpp med opdateret sti værktøjer/verificer_paa_enhed.sh; efter omdøbning må git grep vaerktoejler i live kode give 0 (kun den historiske måling i manifestet må blive stående)",
-        "gennemført": false
+        "måling": "PR #88 merged 2026-11-25T19:14:01Z (merge 10b8183, CI success kørsel 45682017064 19:07:23); målt på main @ 10b8183: værktøjer/verificer_paa_enhed.sh findes (bash -n exit 0), vaerktoejler/ væk, git grep vaerktoejler i live kode = 0 hits (kun historiske forekomster i manifestet står tilbage); tjek_manifest_parrede_tests.py og tjek_plan_manifest_spejl.py exit 0",
+        "gennemført": true
       }
     ]
   },
