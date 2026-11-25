@@ -291,6 +291,7 @@ void TestByggestiOgLogfil::verificeringsskript_paa_enhed_findes_og_bestaaer_bash
     QVERIFY2(indhold.contains("rpm -qpl"), "skript skal køre rpm -qpl og tjekke indhold");
     QVERIFY2(indhold.contains("pkcon install-local"), "skript skal køre pkcon install-local");
     QVERIFY2(indhold.contains("--selvtest"), "skript skal køre appens --selvtest");
+    QVERIFY2(indhold.contains("selvtest-verdict.json"), "skript skal udskrive verdict-JSON (og log-tail) efter --selvtest, så fejlsøgning på enheden ikke kræver manuel cat");
     QVERIFY2(indhold.contains("/usr/bin/harbour-skrynja-2"), "skript skal tjekke binær-stien");
     QVERIFY2(indhold.contains("icons/hicolor"), "skript skal tjekke ikon-stierne");
     QVERIFY2(indhold.contains("git push origin"), "skript skal udløse mål-byg og udgivelse via tag-push (git push origin vX.Y.Z) i samme kørsel");

@@ -137,6 +137,15 @@ set +e
 "$APP" --selvtest
 KODE=$?
 set -e
+VERDICTSTI="$HOME/.local/share/harbour/harbour-skrynja-2/selvtest-verdict.json"
+if [ -f "$VERDICTSTI" ]; then
+    echo "verdict: $(cat "$VERDICTSTI")"
+fi
+LOGSTI="$HOME/.local/share/harbour/harbour-skrynja-2/skrynja-2.log"
+if [ -f "$LOGSTI" ]; then
+    echo "log (sidste 10 linjer):"
+    tail -n 10 "$LOGSTI"
+fi
 echo "exit-kode: $KODE"
 if [ "$KODE" -ne 0 ]; then
     echo "FEJL: --selvtest gav exit $KODE (forventet 0)"
