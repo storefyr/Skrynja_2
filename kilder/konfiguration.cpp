@@ -53,3 +53,9 @@ bool Konfiguration::hasSessionId() const
     QSettings settings;
     return settings.contains("session/id");
 }
+
+bool Konfiguration::terminalAktivPaaEnhed() const
+{
+    QSettings settings;
+    return settings.value("terminal/aktiv", false).toBool();
+}

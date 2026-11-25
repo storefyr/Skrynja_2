@@ -17,6 +17,8 @@ public:
     void setSessionId(const QString& id);
     bool hasSessionId() const;
 
+    bool terminalAktivPaaEnhed() const;
+
 signals:
     void agentPathChanged();
     void sessionIdChanged();

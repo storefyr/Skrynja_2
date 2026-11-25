@@ -51,6 +51,11 @@ bool PermissionModel::isPending() const
     return m_isPending && !m_answered;
 }
 
+QString PermissionModel::pendingKind() const
+{
+    return m_pending.value("toolCall").toMap().value("kind").toString();
+}
+
 int PermissionModel::requests() const
 {
     return m_count;

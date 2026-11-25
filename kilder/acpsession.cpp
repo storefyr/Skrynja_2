@@ -5,6 +5,7 @@
 #include <QJsonObject>
 
 #include "acpprotokol.h"
+#include "konfiguration.h"
 #include "sessionstore.h"
 
 AcpSession::AcpSession(AcpProtokol* protokol, QObject* parent)
@@ -37,7 +38,16 @@ void AcpSession::initialize()
 {
     QJsonObject params;
     params.insert("protocolVersion", 1);
-    params.insert("clientCapabilities", QJsonObject());
+    QJsonObject capabilities;
+    if (Konfiguration::instance()->terminalAktivPaaEnhed()) {
+        QJsonObject terminal;
+        terminal.insert("available", true);
+        capabilities.insert("terminal", terminal);
+        QJsonObject fs;
+        fs.insert("available", true);
+        capabilities.insert("fs", fs);
+    }
+    params.insert("clientCapabilities", capabilities);
     QJsonObject clientInfo;
     clientInfo.insert("name", "harbour-skrynja-2");
     clientInfo.insert("version", "1.0.0");

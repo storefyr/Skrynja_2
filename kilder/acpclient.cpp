@@ -9,6 +9,7 @@
 
 #include "acpframereader.h"
 #include "acpprotokol.h"
+#include "konfiguration.h"
 #include "acpsession.h"
 #include "agentprocess.h"
 #include "diffmodel.h"
@@ -184,6 +185,10 @@ void AcpClient::acknowledgeToolCall(const QString& toolCallId)
 bool AcpClient::answerPermission(const QString& optionId)
 {
     if (!m_permissionModel || !m_permissionModel->isPending())
+        return false;
+    QString kind = m_permissionModel->pendingKind();
+    if ((kind.startsWith("terminal/") || kind.startsWith("fs/"))
+        && !Konfiguration::instance()->terminalAktivPaaEnhed())
         return false;
     QJsonObject outcome;
     outcome.insert("outcome", "selected");

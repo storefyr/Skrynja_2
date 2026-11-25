@@ -18,6 +18,7 @@ public:
     QVariantMap pendingPermission() const;
     qint64 requestId() const;
     bool isPending() const;
+    QString pendingKind() const;
     int requests() const;
 
 signals:
