@@ -1385,7 +1385,7 @@
         "testfil": "tests/proeve_prompt_og_svar.cpp",
         "testklasse": "TestPromptOgSvar",
         "testslots": [
-          "skraerbillede_sendes_som_billedblok_i_session_prompt",
+          "skaerbillede_sendes_som_billedblok_i_session_prompt",
           "clientCapabilities_stadig_tom_indtil_funktion_25"
         ],
         "fixtures": [
