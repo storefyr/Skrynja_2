@@ -334,7 +334,8 @@
         "mål_funktion": "distributionsartefakt_rpm",
         "ordre": "Tilføj værktøjer/verificer_paa_enhed.sh (fuldt dansk navn, ascii), der på Jolla Phone 2026 i én kommando: henter seneste GitHub Release-asset (harbour-skrynja-2-*.aarch64.rpm), kører rpm -qpl og tjekker de 12 forventede filer, kører pkcon install-local, kører appens --selvtest og udskriver verdict-JSON + exit-kode. Så bliver enhedsløkken for funktion 23 én kommando for orkestratoren. release.yml udløses allerede automatisk ved tag-push v*.*.* (verificeret med v1.0.2), så byg+udgivelse kræver kun git push origin <tag>.",
         "parret_test": "tests/proeve_byggesti_og_logfil.cpp + ny slot: verificeringsskript_paa_enhed_findes_og_bestaaer_bash_n (tjekker at værktøjer/verificer_paa_enhed.sh findes og består bash -n)",
-        "gennemført": false
+        "måling": "PR #82 merged 2026-11-25T17:24:50Z (vaerktoejler/verificer_paa_enhed.sh + parret slot verificeringsskript_paa_enhed_findes_og_bestaaer_bash_n i tests/proeve_byggesti_og_logfil.cpp, prøve før kilde: 5b4f4dd før cd93f96); målt på main @ cf2f967: vaerktoejler/verificer_paa_enhed.sh findes, er eksekverbar og består bash -n; slot deklareret og implementeret i proeve_byggesti_og_logfil.cpp; CI success 2026-11-25T17:23:50 (PR-kørsel 45664310723) og Værtsløkke QtTest-suite + kontroller success på main @ cf2f967; tjek_manifest_parrede_tests.py og tjek_plan_manifest_spejl.py exit 0",
+        "gennemført": true
       }
     ]
   },
