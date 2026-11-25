@@ -8,6 +8,7 @@
 
 #include "logfile.h"
 #include "testregistrering.h"
+#include <QProcess>
 
 class TestByggestiOgLogfil : public QObject
 {
@@ -26,6 +27,7 @@ private slots:
     void spec_og_yaml_er_konsistente_med_pro();
     void ingen_rpm_eller_log_i_depotet();
     void release_workflow_bygger_og_udgiver_rpm();
+    void verificeringsskript_paa_enhed_findes_og_bestaaer_bash_n();
 private:
     QString readLines(int& count);
     QString m_path;
@@ -276,6 +278,27 @@ void TestByggestiOgLogfil::release_workflow_bygger_og_udgiver_rpm()
     QVERIFY2(wf.contains("action-gh-release") || wf.contains("gh release create"), "workflow skal oprette GitHub Release");
     QVERIFY2(wf.contains("*.rpm"), "release skal vedhæfte rpm-filen");
     QVERIFY2(!wf.contains("git add"), "workflow må ikke commite rpm ind i depotet");
+}
+
+void TestByggestiOgLogfil::verificeringsskript_paa_enhed_findes_og_bestaaer_bash_n()
+{
+    QString sti = testRepoRoot() + "/vaerktoejler/verificer_paa_enhed.sh";
+    QVERIFY2(QFileInfo::exists(sti), "vaerktoejler/verificer_paa_enhed.sh mangler");
+    QString indhold = testReadSource("vaerktoejler/verificer_paa_enhed.sh");
+    QVERIFY2(indhold.startsWith("#!"), "skript skal starte med shebang");
+    QVERIFY2(indhold.contains("releases/latest"), "skript skal hente seneste GitHub Release");
+    QVERIFY2(indhold.contains("aarch64.rpm"), "skript skal hente aarch64-rpm-asset");
+    QVERIFY2(indhold.contains("rpm -qpl"), "skript skal køre rpm -qpl og tjekke indhold");
+    QVERIFY2(indhold.contains("pkcon install-local"), "skript skal køre pkcon install-local");
+    QVERIFY2(indhold.contains("--selvtest"), "skript skal køre appens --selvtest");
+    QVERIFY2(indhold.contains("/usr/bin/harbour-skrynja-2"), "skript skal tjekke binær-stien");
+    QVERIFY2(indhold.contains("icons/hicolor"), "skript skal tjekke ikon-stierne");
+
+    QProcess bash;
+    bash.setWorkingDirectory(testRepoRoot());
+    bash.start("bash", QStringList() << "-n" << sti);
+    QVERIFY2(bash.waitForFinished(15000), "bash -n hang");
+    QCOMPARE(bash.exitCode(), 0);
 }
 
 #include "proeve_byggesti_og_logfil.moc"
