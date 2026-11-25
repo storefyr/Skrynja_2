@@ -13,6 +13,7 @@ on:
   push:
     tags:
       - 'v*.*.*'
+  pull_request:
   workflow_dispatch:
 
 env:
@@ -22,6 +23,7 @@ jobs:
   maalbyg-rpm:
     name: "Mål-byg aarch64 RPM i Sailfish SDK"
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
