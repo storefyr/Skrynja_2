@@ -69,8 +69,30 @@ def main():
         manifest = json.load(f)
     with open(args.plan, encoding="utf-8") as f:
         plan_tekst = f.read()
-    with open(args.manifest, encoding="utf-8") as f:
-        manifest_tekst = f.read()
+    # manifest-siden tjekkes på regel-afsnittene (arbejdsregler, teknisk_ramme,
+    # mandat, kommandokæde) plus funktionernes beskrivelse/leverance/verifikation —
+    # IKKE triage-prosa (historiske ordrer citerer regelnavne) og ikke parret_test
+    # (slot-navne kan indeholde regelnavne); der matches case-insensitive
+    def blade(o):
+        if isinstance(o, dict):
+            for v in o.values():
+                for x in blade(v):
+                    yield x
+        elif isinstance(o, list):
+            for v in o:
+                for x in blade(v):
+                    yield x
+        else:
+            yield str(o)
+    dele = {k: manifest[k] for k in ("arbejdsregler", "mandat", "kommandokæde") if k in manifest}
+    # teknisk_ramme bidrages kun som tekst-blade (ikke nøgler — nøglen "navngivning"
+    # der ville få en fjernet regel til stadig at "findes")
+    dele["teknisk_ramme"] = list(blade(manifest.get("teknisk_ramme", {})))
+    fns = []
+    for fn in manifest.get("funktioner", []):
+        fns.append({k: fn[k] for k in ("id", "beskrivelse", "udgivelses_leverance", "verifikations_trin") if k in fn})
+    dele["funktioner"] = fns
+    manifest_regel_tekst = json.dumps(dele, ensure_ascii=False)
 
     fejl = []
 
@@ -86,8 +108,8 @@ def main():
                 break
 
     for regel in NOEGLEREGLER:
-        i_plan = regel in plan_tekst
-        i_manifest = regel in manifest_tekst
+        i_plan = regel.lower() in plan_tekst.lower()
+        i_manifest = regel.lower() in manifest_regel_tekst.lower()
         if not (i_plan and i_manifest):
             fejl.append("nøgleregel mangler: %s (plan=%s, manifest=%s)" % (regel, i_plan, i_manifest))
 
