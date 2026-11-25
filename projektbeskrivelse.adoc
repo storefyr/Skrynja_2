@@ -105,6 +105,13 @@ Kæden er lukket og sporbar i begge retninger:
 * Alle artefakter gøres persistente af Suffløren i kildekodelageret.
 * Stedordsregel: i artefakter og relæer mellem stokastikere bruges aldrig "jeg/du/dig/mig" — brug rollens navn (orkestratoren, strategistokastikeren, projektstokastikeren, ...), så det altid er entydigt, hvem der menes. I direkte dialog mellem to parter er stedordene entydige og tilladt.
 
+=== Triage-logik (spejlet fra manifestet)
+
+* *Input:* `vurdering_af_realiseringsartefaktets_arkitektur_fragilitet_og_støjindhold_for_stokastikere.json` fra Kildesondringsstokastikeren.
+* *Ved støj:* Projektstokastikeren udsteder direkte rengøringsordrer til Realiseringsstokastikeren — støj fjernes fra realiseringsartefaktet uden ny funktionalitet, og rengøringen dækkes af den eksisterende parrede test.
+* *Ved fragilitet:* manifestet opdateres med krav om nye parrede tests eller specifik fejlhåndtering i den berørte funktion — nye verifikations_trin og testslots tilføjes, eksisterende må ikke fjernes.
+* *Ved arkitektur-brister:* enten omdefineres funktionerne i manifestet, eller også eskaleres der til Strategistokastikeren for revision af denne plan; arkitektoniske brister løses ikke lokalt i kildekoden.
+
 == Strategistokastikerens mandat
 
 . Eje projektets overordnede plan og være garant for visionens integritet: ingen ændring af retning uden sporbar begrundelse i visionen.
@@ -164,6 +171,7 @@ Rammen er ikke-forhandlingsbar og arves fra forgængerprojekterne og fra license
 == Arbejdsform, måling og genoptagelse
 
 . Én funktion ad gangen i manifestets rækkefølge: implementer funktionen, kør dens verifikations_trin, og sæt først `passerer` til sand, når hvert trin er målt med en udskrift, der kan gengives. Ingen påstand om et udfald uden en måling.
+. Intet implementeres uden den parrede test: `tests/tst_*.cpp` indskrives før den kilde, den afprøver, og registreres i `tests/tests.pro`.
 . Redigeringsregel for manifestet: en post må kun ændres ved at sætte `passerer` fra `false` til sand efter målte trin — beskrivelser og verifikations_trin må ikke fjernes eller omskrives.
 . Ved genoptagelse af en arbejdsgang: kør `pwd` og `git status`, kør `git log --oneline -20`, læs realiseringsmanifestet (`realiseringsmanifest_for_funktioner_og_parrede_tests.json`), og vælg den første funktion i rækkefølgen med `passerer: false`.
 . Efter hver arbejdsgang indskrives ændringerne med beskrivende besked, så næste samtale kan læse fremdriften i git-historikken.
