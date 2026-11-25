@@ -290,6 +290,7 @@ void TestByggestiOgLogfil::verificeringsskript_paa_enhed_findes_og_bestaaer_bash
     QVERIFY2(indhold.contains("aarch64.rpm"), "skript skal hente aarch64-rpm-asset");
     QVERIFY2(indhold.contains("rpm -qpl"), "skript skal køre rpm -qpl og tjekke indhold");
     QVERIFY2(indhold.contains("pkcon install-local"), "skript skal køre pkcon install-local");
+    QVERIFY2(indhold.contains("/dev/tty"), "skript skal læse root-koden fra /dev/tty, så devel-su også virker når scriptet pipes (curl|bash) — koden må ikke logges");
     QVERIFY2(indhold.contains("--selvtest"), "skript skal køre appens --selvtest");
     QVERIFY2(indhold.contains("selvtest-verdict.json"), "skript skal udskrive verdict-JSON (og log-tail) efter --selvtest, så fejlsøgning på enheden ikke kræver manuel cat");
     QVERIFY2(indhold.contains("/usr/bin/harbour-skrynja-2"), "skript skal tjekke binær-stien");

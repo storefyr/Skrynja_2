@@ -130,7 +130,23 @@ fi
 echo "rpm -qpl ok: $ANTAL sti-linjer verificeret (binær, desktop, qml, 4 ikoner)"
 
 trin "pkcon install-local"
-devel-su pkcon install-local -y "$RPM"
+ROOTKODE=""
+if [ -r /dev/tty ]; then
+    echo -n "Root-kode (til devel-su, vises ikke, logges ikke): " >&2
+    read -s ROOTKODE < /dev/tty || true
+    echo >&2
+fi
+INSTALL_FEJL=0
+if [ -n "$ROOTKODE" ]; then
+    printf '%s\n' "$ROOTKODE" | devel-su pkcon install-local -y "$RPM" || INSTALL_FEJL=1
+else
+    devel-su pkcon install-local -y "$RPM" || INSTALL_FEJL=1
+fi
+unset ROOTKODE
+if [ "$INSTALL_FEJL" = "1" ]; then
+    echo "FEJL: pkcon install-local fejlede — er root-koden sat i Udviklertilstand (Indstillinger → System → Udviklertilstand)?"
+    exit 1
+fi
 
 trin "kører ${APP} --selvtest"
 set +e
