@@ -294,13 +294,89 @@ void TestByggestiOgLogfil::verificeringsskript_paa_enhed_findes_og_bestaaer_bash
     QVERIFY2(indhold.contains("/usr/bin/harbour-skrynja-2"), "skript skal tjekke binær-stien");
     QVERIFY2(indhold.contains("icons/hicolor"), "skript skal tjekke ikon-stierne");
     QVERIFY2(indhold.contains("git push origin"), "skript skal udløse mål-byg og udgivelse via tag-push (git push origin vX.Y.Z) i samme kørsel");
-    QVERIFY2(indhold.contains("releases/tags/"), "skript skal vente på release for det nye tag før hentning, så intet manuelt trin står mellem byg og hentning");
+    QVERIFY2(indhold.contains("releases/tag/"), "skript skal vente på release-siden for det nye tag før hentning, så intet manuelt trin står mellem byg og hentning");
+    QVERIFY2(!indhold.contains("api.github.com"), "skript må ikke kalde api.github.com på enheden (403 målt 2026-11-25, ordre fra-13)");
+    QVERIFY2(indhold.contains("url_effective"), "skript skal løse seneste tag via github.com-redirect (url_effective på releases/latest)");
+    QVERIFY2(indhold.contains("releases/download/"), "skript skal hente asset via direkte download-URL (releases/download/<tag>/<fil>)");
 
     QProcess bash;
     bash.setWorkingDirectory(testRepoRoot());
     bash.start("bash", QStringList() << "-n" << sti);
     QVERIFY2(bash.waitForFinished(15000), "bash -n hang");
     QCOMPARE(bash.exitCode(), 0);
+
+    QString simDir = QDir::tempPath() + "/skrynja-tst-simuleret-hent";
+    QDir().mkpath(simDir + "/bin");
+    QString logSti = simDir + "/kald.log";
+    QString curlStub = R"STUB(#!/bin/bash
+echo "$*" >> "$STUB_LOG"
+url=""; fmt=""; out=""; prev=""
+for a in "$@"; do
+    case "$prev" in -o) out="$a";; -w) fmt="$a";; esac
+    case "$a" in http*) url="$a";; esac
+    prev="$a"
+done
+case "$url" in
+    */releases/latest)
+        if [ "$fmt" = "%{url_effective}" ]; then echo "https://github.com/storefyr/Skrynja_2/releases/tag/v1.0.2"; fi ;;
+    */releases/tag/*)
+        if [ "$fmt" = "%{http_code}" ]; then echo "200"; else
+            echo '<a href="/storefyr/Skrynja_2/releases/download/v1.0.2/harbour-skrynja-2-1.0.2-1.aarch64.rpm">rpm</a>'
+        fi ;;
+    */releases/download/*)
+        if [ "$fmt" = "%{http_code}" ]; then echo "200"; else printf 'FAKE-RPM\n' > "$out"; fi ;;
+    *) echo "stub: ukendt url: $url" >&2; exit 1 ;;
+esac
+exit 0
+)STUB";
+    QString rpmStub = R"STUB(#!/bin/bash
+if [ "$1" = "-qpl" ]; then
+cat <<'STIER'
+/usr/bin/harbour-skrynja-2
+/usr/share/applications/harbour-skrynja-2.desktop
+/usr/share/harbour-skrynja-2/qml
+/usr/share/harbour-skrynja-2/qml/harbour-skrynja-2.qml
+/usr/share/harbour-skrynja-2/qml/pages
+/usr/share/harbour-skrynja-2/qml/pages/DiffVisning.qml
+/usr/share/harbour-skrynja-2/qml/pages/KonfigurationsSide.qml
+/usr/share/harbour-skrynja-2/qml/pages/StartSide.qml
+/usr/share/harbour-skrynja-2/qml/pages/TilladelsesDialog.qml
+/usr/share/icons/hicolor/86x86/apps/harbour-skrynja-2.png
+/usr/share/icons/hicolor/108x108/apps/harbour-skrynja-2.png
+/usr/share/icons/hicolor/128x128/apps/harbour-skrynja-2.png
+/usr/share/icons/hicolor/172x172/apps/harbour-skrynja-2.png
+STIER
+fi
+exit 0
+)STUB";
+    QList<QPair<QString, QString> > stubs;
+    stubs << qMakePair(QString("curl"), curlStub)
+          << qMakePair(QString("rpm"), rpmStub)
+          << qMakePair(QString("devel-su"), QString("#!/bin/bash\nexit 0\n"))
+          << qMakePair(QString("harbour-skrynja-2"), QString("#!/bin/bash\necho '{\"resultat\":\"pass\"}'\nexit 0\n"));
+    for (int i = 0; i < stubs.size(); ++i) {
+        QFile f(simDir + "/bin/" + stubs.at(i).first);
+        QVERIFY2(f.open(QIODevice::WriteOnly | QIODevice::Truncate), qPrintable("kan ikke skrive stub " + stubs.at(i).first));
+        f.write(stubs.at(i).second.toUtf8());
+        f.close();
+        QVERIFY2(f.setPermissions(QFileDevice::ExeOwner | QFileDevice::ReadOwner | QFileDevice::WriteOwner), "kan ikke gøre stub eksekverbar");
+    }
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    env.insert("PATH", simDir + "/bin:" + env.value("PATH"));
+    env.insert("STUB_LOG", logSti);
+    QProcess sim;
+    sim.setWorkingDirectory(simDir);
+    sim.setProcessEnvironment(env);
+    sim.start("bash", QStringList() << sti);
+    QVERIFY2(sim.waitForFinished(30000), "simuleret kørsel hang");
+    QCOMPARE(sim.exitCode(), 0);
+    QFile logFil(logSti);
+    QVERIFY2(logFil.open(QIODevice::ReadOnly), "kald-log mangler — skriptet kaldte ikke curl");
+    QString kald = QString::fromUtf8(logFil.readAll());
+    logFil.close();
+    QVERIFY2(!kald.contains("api.github.com"), qPrintable("simuleret kørsel ramte api.github.com: " + kald));
+    QVERIFY2(kald.contains("releases/latest"), qPrintable("seneste tag skal løses via releases/latest-redirect: " + kald));
+    QVERIFY2(kald.contains("releases/download/v1.0.2/harbour-skrynja-2-1.0.2-1.aarch64.rpm"), qPrintable("asset skal hentes via direkte download-URL: " + kald));
 }
 
 #include "proeve_byggesti_og_logfil.moc"

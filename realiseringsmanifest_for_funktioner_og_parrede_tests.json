@@ -346,6 +346,14 @@
         "parret_test": "samme slot verificeringsskript_paa_enhed_findes_og_bestaaer_bash_n i tests/proeve_byggesti_og_logfil.cpp med opdateret sti værktøjer/verificer_paa_enhed.sh; efter omdøbning må git grep vaerktoejler i live kode give 0 (kun den historiske måling i manifestet må blive stående)",
         "måling": "PR #88 merged 2026-11-25T19:14:01Z (merge 10b8183, CI success kørsel 45682017064 19:07:23); målt på main @ 10b8183: værktøjer/verificer_paa_enhed.sh findes (bash -n exit 0), vaerktoejler/ væk, git grep vaerktoejler i live kode = 0 hits (kun historiske forekomster i manifestet står tilbage); tjek_manifest_parrede_tests.py og tjek_plan_manifest_spejl.py exit 0",
         "gennemført": true
+      },
+      {
+        "id": "fra-13",
+        "type": "fragilitet",
+        "mål_funktion": "distributionsartefakt_rpm",
+        "ordre": "værktøjer/verificer_paa_enhed.sh må ikke kalde api.github.com på enheden — målt 2026-11-25 på Jolla Phone 2026: curl mod api.github.com/.../releases/latest giver 403 (mellemlaget blokerer API-kald, samme klasse som POST /releases). Løs i stedet seneste tag via redirect fra github.com (curl -sIL -o /dev/null -w '%{url_effective}' https://github.com/storefyr/Skrynja_2/releases/latest → .../releases/tag/vX.Y.Z) og hent asset via direkte download-URL https://github.com/storefyr/Skrynja_2/releases/download/<tag>/<assetnavn>; tag-tilstand bygger download-URL'en direkte uden API. Intil rettelsen: manuel vej på enheden = hent rpm i browser eller curl direkte download-URL, så rpm -qpl, devel-su pkcon install-local, --selvtest.",
+        "parret_test": "slot verificeringsskript_paa_enhed_findes_og_bestaaer_bash_n udvides: git grep api.github.com i værktøjer/verificer_paa_enhed.sh = 0, bash -n ok, og simuleret hent via github.com redirect virker",
+        "gennemført": false
       }
     ]
   },
