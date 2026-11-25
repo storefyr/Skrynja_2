@@ -69,12 +69,24 @@ void AcpSession::sendSessionLoad(const QString& sessionId)
 
 void AcpSession::sendSessionPrompt(const QString& prompt)
 {
+    sendSessionPrompt(prompt, QByteArray());
+}
+
+void AcpSession::sendSessionPrompt(const QString& prompt, const QByteArray& billedePng)
+{
     emit promptStarted();
-    QJsonObject blok;
-    blok.insert("type", "text");
-    blok.insert("text", prompt);
     QJsonArray blokke;
-    blokke.append(blok);
+    QJsonObject tekstBlok;
+    tekstBlok.insert("type", "text");
+    tekstBlok.insert("text", prompt);
+    blokke.append(tekstBlok);
+    if (!billedePng.isEmpty()) {
+        QJsonObject billedeBlok;
+        billedeBlok.insert("type", "image");
+        billedeBlok.insert("mimeType", "image/png");
+        billedeBlok.insert("data", QString::fromLatin1(billedePng.toBase64()));
+        blokke.append(billedeBlok);
+    }
     QJsonObject params;
     params.insert("sessionId", m_sessionId);
     params.insert("prompt", blokke);

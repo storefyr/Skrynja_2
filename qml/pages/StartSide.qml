@@ -34,11 +34,24 @@ Page {
                 EnterKey.onClicked: acp.sendSessionPrompt(text)
             }
 
-            Button {
+            Row {
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: "Send"
-                enabled: promptFelt.text.length > 0
-                onClicked: acp.sendSessionPrompt(promptFelt.text)
+                spacing: Theme.paddingMedium
+
+                Button {
+                    text: "Send"
+                    enabled: promptFelt.text.length > 0
+                    onClicked: acp.sendSessionPrompt(promptFelt.text)
+                }
+                Button {
+                    text: "Sk\u00e6rmbillede"
+                    enabled: promptFelt.text.length > 0
+                    onClicked: side.grabToImage(function(resultat) {
+                        var sti = "/tmp/skrynja-2-skaermbillede.png"
+                        resultat.saveToFile(sti)
+                        acp.sendSessionPromptMedBilledeFraFil(promptFelt.text, sti)
+                    })
+                }
             }
 
             Row {

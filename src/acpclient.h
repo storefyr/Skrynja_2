@@ -52,6 +52,8 @@ public:
     Q_INVOKABLE void startSession();
     Q_INVOKABLE void sendSessionNew(const QString& cwd);
     Q_INVOKABLE void sendSessionPrompt(const QString& prompt);
+    Q_INVOKABLE void sendSessionPromptMedBillede(const QString& prompt, const QByteArray& billedePng);
+    Q_INVOKABLE void sendSessionPromptMedBilledeFraFil(const QString& prompt, const QString& billedeFil);
     ConversationModel* conversationModel() const;
     ToolCallModel* toolCallModel() const;
     QVariantList toolCalls() const;

@@ -2,6 +2,7 @@
 #define ACPSESSION_H
 
 #include <QJsonObject>
+#include <QByteArray>
 #include <QObject>
 #include <QString>
 
@@ -25,6 +26,7 @@ public:
     void sendSessionNew(const QString& cwd);
     void sendSessionLoad(const QString& sessionId);
     void sendSessionPrompt(const QString& prompt);
+    void sendSessionPrompt(const QString& prompt, const QByteArray& billedePng);
     void sessionCancel();
 
 signals:

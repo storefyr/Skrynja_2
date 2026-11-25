@@ -1,5 +1,7 @@
 #include "acpclient.h"
 
+#include <QFile>
+
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -126,6 +128,21 @@ void AcpClient::sendSessionNew(const QString& cwd)
 void AcpClient::sendSessionPrompt(const QString& prompt)
 {
     m_session->sendSessionPrompt(prompt);
+}
+
+void AcpClient::sendSessionPromptMedBillede(const QString& prompt, const QByteArray& billedePng)
+{
+    m_session->sendSessionPrompt(prompt, billedePng);
+}
+
+void AcpClient::sendSessionPromptMedBilledeFraFil(const QString& prompt, const QString& billedeFil)
+{
+    QFile f(billedeFil);
+    if (!f.open(QIODevice::ReadOnly)) {
+        m_session->sendSessionPrompt(prompt);
+        return;
+    }
+    m_session->sendSessionPrompt(prompt, f.readAll());
 }
 
 ConversationModel* AcpClient::conversationModel() const
