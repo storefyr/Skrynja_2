@@ -19,7 +19,7 @@ env:
   SAILFISH_RELEASE: '4.5.0.18'
 
 jobs:
-  målbyg-rpm:
+  maalbyg-rpm:
     name: "Mål-byg aarch64 RPM i Sailfish SDK"
     runs-on: ubuntu-latest
     steps:
@@ -60,7 +60,7 @@ jobs:
           name: rpm-aarch64
           path: RPMS/*.rpm
 
-  værtsløkke:
+  vaertsloekke:
     name: "Værtsløkke: QtTest-suite + kontroller"
     runs-on: ubuntu-22.04
     steps:
@@ -87,7 +87,7 @@ jobs:
 
   udgiv-release:
     name: "Opret GitHub Release med .rpm vedhæftet"
-    needs: [målbyg-rpm, værtsløkke]
+    needs: [maalbyg-rpm, vaertsloekke]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     permissions:
