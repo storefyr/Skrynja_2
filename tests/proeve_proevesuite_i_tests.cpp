@@ -215,11 +215,11 @@ void TestProevesuiteITests::meta_test_afledt_af_manifest_ikke_hardkodet()
 
 void TestProevesuiteITests::ingen_testkroge_i_produktionsklasser()
 {
-    QDir dir(testRepoRoot() + "/src");
+    QDir dir(testRepoRoot() + "/kilder");
     QStringList filer = dir.entryList(QStringList() << "*.h" << "*.cpp", QDir::Files);
     QVERIFY(filer.size() >= 15);
     for (int i = 0; i < filer.size(); ++i) {
-        QString src = testReadSource("src/" + filer.at(i));
+        QString src = testReadSource("kilder/" + filer.at(i));
         QVERIFY2(!src.contains("ForTest"), qPrintable("ForTest-krog i " + filer.at(i)));
         QVERIFY2(!src.contains("m_testMode"), qPrintable("m_testMode i " + filer.at(i)));
     }

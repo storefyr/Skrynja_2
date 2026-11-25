@@ -149,8 +149,8 @@ void TestArkitekturOpdelingProtokol::request_id_bogfoering_i_acp_protokol()
 
 void TestArkitekturOpdelingProtokol::acpclient_har_ingen_dispatch()
 {
-    QString header = testReadSource("src/acpclient.h");
-    QString kilde = testReadSource("src/acpclient.cpp");
+    QString header = testReadSource("kilder/acpclient.h");
+    QString kilde = testReadSource("kilder/acpclient.cpp");
     QVERIFY(!header.isEmpty());
     QVERIFY(!kilde.isEmpty());
     QVERIFY(!header.contains("m_pendingRequests"));
@@ -161,8 +161,8 @@ void TestArkitekturOpdelingProtokol::acpclient_har_ingen_dispatch()
     QVERIFY(!kilde.contains("AcpClient::handleNotification"));
     QVERIFY(!kilde.contains("m_pendingRequests"));
 
-    QString protokolKilde = testReadSource("src/acpprotokol.cpp");
-    QString sessionKilde = testReadSource("src/acpsession.cpp");
+    QString protokolKilde = testReadSource("kilder/acpprotokol.cpp");
+    QString sessionKilde = testReadSource("kilder/acpsession.cpp");
     QCOMPARE(kilde.count("session/prompt"), 0);
     QCOMPARE(kilde.count("session/cancel"), 0);
     QCOMPARE(protokolKilde.count("session/prompt"), 1);

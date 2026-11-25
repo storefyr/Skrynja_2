@@ -138,7 +138,7 @@ void TestPromptOgSvar::messageSent_kun_ved_faktisk_skrevet()
 
 void TestPromptOgSvar::skraerbillede_sendes_som_billedblok_i_session_prompt()
 {
-    QString sessionSrc = testReadSource("src/acpsession.cpp");
+    QString sessionSrc = testReadSource("kilder/acpsession.cpp");
     QVERIFY2(sessionSrc.contains("\"image\""), "acpsession.cpp bygger ikke et image-blok i prompt-payloaden");
     QVERIFY2(sessionSrc.contains("mimeType") && sessionSrc.contains("image/png"), "image-blok mangler mimeType image/png");
     QVERIFY2(sessionSrc.contains("toBase64"), "image-blok skal sendes base64-kodet");

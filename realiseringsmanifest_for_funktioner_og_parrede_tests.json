@@ -366,9 +366,9 @@
         "harbour-skrynja-2.desktop",
         "harbour-skrynja-2.yaml",
         "rpm/harbour-skrynja-2.spec",
-        "src/main.cpp",
-        "src/logfil.h",
-        "src/logfil.cpp",
+        "kilder/main.cpp",
+        "kilder/logfil.h",
+        "kilder/logfil.cpp",
         "tests/tests.pro"
       ],
       "parret_test": {
@@ -414,10 +414,10 @@
       "navn": "ACP-rygrad",
       "beskrivelse": "ACP-rygraden over stdio: newline-delimiteret JSON (som forgængerens AcpFrameReader) — split på 0x0A, hver linje valideres før levering, flere objekter på én linje håndteres, linjer over cap droppes ved ankomst, ikke-tom hale ved EOF leveres via haleReady. AcpBesked kapsler beskederne med id-korrelation (request/response/notification) og protocolVersion 1.",
       "filer": [
-        "src/acpframereader.h",
-        "src/acpframereader.cpp",
-        "src/acpbesked.h",
-        "src/acpbesked.cpp"
+        "kilder/acpframereader.h",
+        "kilder/acpframereader.cpp",
+        "kilder/acpbesked.h",
+        "kilder/acpbesked.cpp"
       ],
       "parret_test": {
         "testfil": "tests/proeve_acp_rygrad.cpp",
@@ -465,10 +465,10 @@
       "navn": "Agentproces og initialisering",
       "beskrivelse": "Agentproces og initialisering: QProcess starter agenten på agentstien /home/defaultuser/.local/bin/vibe-acp (standardsti, overskrivelig via QSettings) med arbejdsmappe; der sendes initialize med protocolVersion 1 og tom clientCapabilities (agenten må ikke kalde fs/* eller terminal/*); initialize-svaret parses og configOptions uddrages; startfejl (agent findes ikke) sættes i lastError uden at hænge.",
       "filer": [
-        "src/agentproces.h",
-        "src/agentproces.cpp",
-        "src/acpclient.h",
-        "src/acpclient.cpp"
+        "kilder/agentproces.h",
+        "kilder/agentproces.cpp",
+        "kilder/acpclient.h",
+        "kilder/acpclient.cpp"
       ],
       "parret_test": {
         "testfil": "tests/proeve_agentproces_og_initialisering.cpp",
@@ -507,10 +507,10 @@
       "navn": "Prompt og svar",
       "beskrivelse": "Efter initialize sendes session/new med cwd, derefter session/prompt med prompten som content-blokke; agentens session/update med agent_message_chunk akkumuleres løbende til lastText; svar korreleres på request-id; end_turn-notifikationen afslutter runden. Samtalemodellen eksponerer tekst, runde og status til QML.",
       "filer": [
-        "src/acpclient.h",
-        "src/acpclient.cpp",
-        "src/samtalemodel.h",
-        "src/samtalemodel.cpp"
+        "kilder/acpclient.h",
+        "kilder/acpclient.cpp",
+        "kilder/samtalemodel.h",
+        "kilder/samtalemodel.cpp"
       ],
       "parret_test": {
         "testfil": "tests/proeve_prompt_og_svar.cpp",
@@ -547,10 +547,10 @@
       "navn": "Genoptagelse af samtale",
       "beskrivelse": "SessionId gemmes i QSettings efter session/new; ved app-start forsøges session/load med det gemte id (genoptag), ved fejl falder der tilbage til session/new; om samtalen blev genoptaget eksponeres (hadRestoredHistory) til UI. Ved genoptagelse af en arbejdsgang følges projektbeskrivelsens genoptagelsesregel: pwd, git status, git log --oneline -20, læs manifestet, vælg første funktion med passerer: false.",
       "filer": [
-        "src/acpclient.h",
-        "src/acpclient.cpp",
-        "src/sessionlager.h",
-        "src/sessionlager.cpp"
+        "kilder/acpclient.h",
+        "kilder/acpclient.cpp",
+        "kilder/sessionlager.h",
+        "kilder/sessionlager.cpp"
       ],
       "parret_test": {
         "testfil": "tests/proeve_genoptagelse_af_samtale.cpp",
@@ -585,10 +585,10 @@
       "navn": "Værktøjskald-visning",
       "beskrivelse": "Værktøjskald vises i UI mens de sker: session/update med tool_call og tool_call_update parses til en toolCalls-liste (toolCallId, titel, status); UI kvitterer sete kald; listen eksponeres som Q_PROPERTY til QML og opdateres løbende. QML-filerne registreres til installation i .pro.",
       "filer": [
-        "src/acpclient.h",
-        "src/acpclient.cpp",
-        "src/vaerktoejskaldsmodel.h",
-        "src/vaerktoejskaldsmodel.cpp",
+        "kilder/acpclient.h",
+        "kilder/acpclient.cpp",
+        "kilder/vaerktoejskaldsmodel.h",
+        "kilder/vaerktoejskaldsmodel.cpp",
         "qml/harbour-skrynja-2.qml",
         "qml/pages/StartSide.qml"
       ],
@@ -625,10 +625,10 @@
       "navn": "Tilladelsesdialog",
       "beskrivelse": "Session/request_permission parses til pendingPermission (toolCall-metadata plus options med optionId); UI viser dialogen og brugeren svarer med ét tryk via answerPermission(optionId), som sender svaret med outcome selected og det valgte optionId; afvisning svarer outcome cancelled; der må ikke svares to gange på samme anmodning; antal anmodninger tælles.",
       "filer": [
-        "src/acpclient.h",
-        "src/acpclient.cpp",
-        "src/tilladelsesmodel.h",
-        "src/tilladelsesmodel.cpp",
+        "kilder/acpclient.h",
+        "kilder/acpclient.cpp",
+        "kilder/tilladelsesmodel.h",
+        "kilder/tilladelsesmodel.cpp",
         "qml/pages/TilladelsesDialog.qml"
       ],
       "parret_test": {
@@ -669,10 +669,10 @@
       "navn": "Stop og afvis",
       "beskrivelse": "Stop og afvis — dette trin må ikke springes over: session/cancel sendes som notifikation for at stoppe agentens igangværende runde; afvisning af en tilladelse svarer outcome cancelled; stopAgent() terminerer QProcess (kill hvis nødvendigt), så ingen agent hænger efter app-afslutning.",
       "filer": [
-        "src/acpclient.h",
-        "src/acpclient.cpp",
-        "src/agentproces.h",
-        "src/agentproces.cpp"
+        "kilder/acpclient.h",
+        "kilder/acpclient.cpp",
+        "kilder/agentproces.h",
+        "kilder/agentproces.cpp"
       ],
       "parret_test": {
         "testfil": "tests/proeve_stop_og_afvis.cpp",
@@ -714,10 +714,10 @@
       "navn": "Diff og uddata",
       "beskrivelse": "Filændringer fra tool_call/tool_call_update content (diff-blokke) samles i diffs-listen, og øvrig uddata (f.eks. kommando-output) i outputs-listen — vist i UI mens det sker; lange diff-linjer cappes som i rygraden; diff vises som diff, ikke som rå transskript.",
       "filer": [
-        "src/acpclient.h",
-        "src/acpclient.cpp",
-        "src/diffmodel.h",
-        "src/diffmodel.cpp",
+        "kilder/acpclient.h",
+        "kilder/acpclient.cpp",
+        "kilder/diffmodel.h",
+        "kilder/diffmodel.cpp",
         "qml/pages/DiffVisning.qml"
       ],
       "parret_test": {
@@ -756,10 +756,10 @@
       "navn": "Konfiguration af agent",
       "beskrivelse": "ConfigOptions uddrages af initialize-svaret og eksponeres til UI; set_config_option sendes med configId og værdi; agentstien kan overskrives via QSettings (standard /home/defaultuser/.local/bin/vibe-acp); clientCapabilities forbliver tom ved initialize.",
       "filer": [
-        "src/acpclient.h",
-        "src/acpclient.cpp",
-        "src/konfigurationsmodel.h",
-        "src/konfigurationsmodel.cpp",
+        "kilder/acpclient.h",
+        "kilder/acpclient.cpp",
+        "kilder/konfigurationsmodel.h",
+        "kilder/konfigurationsmodel.cpp",
         "qml/pages/KonfigurationsSide.qml"
       ],
       "parret_test": {
@@ -797,11 +797,11 @@
       "navn": "Selvtest med verdict",
       "beskrivelse": "--selvtest kører kæden end-to-end mod agenten: prompt sendt → tilladelse spurgt → tilladelse besvaret → fil skrevet → end_turn → appen afslutter med exit-kode 0; verdict (pass/fail med årsag) skrives til en verdict-fil (JSON), der kan læses tilbage; der skrives aldrig to verdicts; verdict skrives også ved agentdød og startfejl.",
       "filer": [
-        "src/main.cpp",
-        "src/acpclient.h",
-        "src/acpclient.cpp",
-        "src/selvtest.h",
-        "src/selvtest.cpp"
+        "kilder/main.cpp",
+        "kilder/acpclient.h",
+        "kilder/acpclient.cpp",
+        "kilder/selvtest.h",
+        "kilder/selvtest.cpp"
       ],
       "parret_test": {
         "testfil": "tests/proeve_selvtest_med_verdict.cpp",
@@ -879,8 +879,8 @@
       "beskrivelse": "Efter hver arbejdsgang er depotet rent: ingen build-artefakter, midlertidige filer, logfiler eller hemmeligheder (nøgler, adgangstokens, transskripter) i træet; .gitignore dækker build-mapper; agenten er stoppet; alle ændringer er indskrevet med beskrivende besked.",
       "filer": [
         ".gitignore",
-        "src/agentproces.cpp",
-        "src/acpclient.cpp"
+        "kilder/agentproces.cpp",
+        "kilder/acpclient.cpp"
       ],
       "parret_test": {
         "testfil": "tests/proeve_oprydning_af_trae.cpp",
@@ -921,10 +921,10 @@
       "navn": "Arkitektur-opdeling: protokol",
       "beskrivelse": "Udtræk protokol-dispatch og request-id-bogføring (handleMessage/handleSessionUpdate) fra AcpClient til en ny klasse AcpProtokol; AcpClient videresender kun. Ingen ny funktionalitet — trin fra plan-revisionen i PR #10 (svar på ark-1).",
       "filer": [
-        "src/acpprotokol.h",
-        "src/acpprotokol.cpp",
-        "src/acpclient.h",
-        "src/acpclient.cpp",
+        "kilder/acpprotokol.h",
+        "kilder/acpprotokol.cpp",
+        "kilder/acpclient.h",
+        "kilder/acpclient.cpp",
         "tests/tst_arkitektur_opdeling_protokol.cpp"
       ],
       "parret_test": {
@@ -965,12 +965,12 @@
       "navn": "Arkitektur-opdeling: session",
       "beskrivelse": "Udtræk session-håndtering (initialize, session/new, session/load, session/prompt, session/cancel samt sessionId-lagring via SessionLager) fra AcpClient til en ny klasse AcpSession. Ingen ny funktionalitet — trin fra plan-revisionen i PR #10 (svar på ark-1).",
       "filer": [
-        "src/acpsession.h",
-        "src/acpsession.cpp",
-        "src/acpclient.h",
-        "src/acpclient.cpp",
-        "src/sessionlager.h",
-        "src/sessionlager.cpp",
+        "kilder/acpsession.h",
+        "kilder/acpsession.cpp",
+        "kilder/acpclient.h",
+        "kilder/acpclient.cpp",
+        "kilder/sessionlager.h",
+        "kilder/sessionlager.cpp",
         "tests/tst_arkitektur_opdeling_session.cpp"
       ],
       "parret_test": {
@@ -1012,13 +1012,13 @@
       "navn": "Arkitektur-opdeling: UI-modeller",
       "beskrivelse": "Frigør de fem modeller (samtale, værktøjskald, tilladelse, diff, konfiguration) fra AcpClient-ejerskab; AcpClient reduceres til en tynd façade, der kun udstiller Q_PROPERTYs og videresender signaler til QML. Ingen ny funktionalitet — trin fra plan-revisionen i PR #10 (svar på ark-1).",
       "filer": [
-        "src/acpclient.h",
-        "src/acpclient.cpp",
-        "src/samtalemodel.h",
-        "src/vaerktoejskaldsmodel.h",
-        "src/tilladelsesmodel.h",
-        "src/diffmodel.h",
-        "src/konfigurationsmodel.h",
+        "kilder/acpclient.h",
+        "kilder/acpclient.cpp",
+        "kilder/samtalemodel.h",
+        "kilder/vaerktoejskaldsmodel.h",
+        "kilder/tilladelsesmodel.h",
+        "kilder/diffmodel.h",
+        "kilder/konfigurationsmodel.h",
         "tests/tst_arkitektur_opdeling_ui_modeller.cpp"
       ],
       "parret_test": {
@@ -1057,14 +1057,14 @@
       "navn": "Arkitektur: fjern test-kroge fra produktion",
       "beskrivelse": "Flyt alle *ForTest-metoder og m_testMode-grenen i write() ud af acpclient, acpframereader, agentprocess og logfile og ind i en separat test-harness under tests/. Ingen ny funktionalitet — trin fra PR #18 (svar på ark-2).",
       "filer": [
-        "src/acpclient.h",
-        "src/acpclient.cpp",
-        "src/acpframereader.h",
-        "src/acpframereader.cpp",
-        "src/agentproces.h",
-        "src/agentproces.cpp",
-        "src/logfil.h",
-        "src/logfil.cpp",
+        "kilder/acpclient.h",
+        "kilder/acpclient.cpp",
+        "kilder/acpframereader.h",
+        "kilder/acpframereader.cpp",
+        "kilder/agentproces.h",
+        "kilder/agentproces.cpp",
+        "kilder/logfil.h",
+        "kilder/logfil.cpp",
         "tests/testregistrering.h",
         "tests/tst_proevesuite_i_tests.cpp"
       ],
@@ -1101,9 +1101,9 @@
       "navn": "Arkitektur: alle ACP-metoder som konstanter",
       "beskrivelse": "Flyt resterende lokale metode-literaler (f.eks. kSessionCancel i acpsession.cpp:10) ind i AcpProtokol's konstantsæt, så en omdøbning ét sted ikke kan give stille korrelationsfejl. Ingen ny funktionalitet — trin fra PR #18 (svar på ark-3).",
       "filer": [
-        "src/acpprotokol.h",
-        "src/acpprotokol.cpp",
-        "src/acpsession.cpp",
+        "kilder/acpprotokol.h",
+        "kilder/acpprotokol.cpp",
+        "kilder/acpsession.cpp",
         "tests/tst_acp_rygrad.cpp"
       ],
       "parret_test": {
@@ -1141,9 +1141,9 @@
       "navn": "Arkitektur: DiffModel uden transport-afhængighed",
       "beskrivelse": "Fjern #include \"acpframereader.h\" fra diffmodel.cpp:3; flyt cap-konstanten til et fælles konstant-header (eller giv den som parameter), så UI-laget ikke kender transport-laget. Ingen ny funktionalitet — trin fra PR #18 (svar på ark-4).",
       "filer": [
-        "src/diffmodel.h",
-        "src/diffmodel.cpp",
-        "src/acpprotokol.h",
+        "kilder/diffmodel.h",
+        "kilder/diffmodel.cpp",
+        "kilder/acpprotokol.h",
         "tests/tst_diff_og_uddata.cpp"
       ],
       "parret_test": {
@@ -1181,12 +1181,12 @@
       "navn": "Arkitektur: én config-ejer med change-signaler",
       "beskrivelse": "Centralisér agentsti og session-id i én konfigurationsklasse med change-signaler; fjern QSettings-læsninger fra spredte gettere (agentproces.cpp, sessionlager). Ingen ny funktionalitet — trin fra PR #18 (svar på ark-5).",
       "filer": [
-        "src/konfiguration.h",
-        "src/konfiguration.cpp",
-        "src/agentproces.h",
-        "src/agentproces.cpp",
-        "src/sessionlager.h",
-        "src/sessionlager.cpp",
+        "kilder/konfiguration.h",
+        "kilder/konfiguration.cpp",
+        "kilder/agentproces.h",
+        "kilder/agentproces.cpp",
+        "kilder/sessionlager.h",
+        "kilder/sessionlager.cpp",
         "tests/tst_konfiguration_af_agent.cpp"
       ],
       "parret_test": {
@@ -1224,12 +1224,12 @@
       "navn": "Arkitektur: fjern ubrugte model-roller",
       "beskrivelse": "Fjern det ubrugte QAbstractListModel-lag fra samtalemodel, vaerktoejskaldsmodel og diffmodel (rene data-holdere); QML fortsætter uændret med QVariantList-properties. Ingen ny funktionalitet — trin fra PR #18 (svar på ark-6).",
       "filer": [
-        "src/samtalemodel.h",
-        "src/samtalemodel.cpp",
-        "src/vaerktoejskaldsmodel.h",
-        "src/vaerktoejskaldsmodel.cpp",
-        "src/diffmodel.h",
-        "src/diffmodel.cpp",
+        "kilder/samtalemodel.h",
+        "kilder/samtalemodel.cpp",
+        "kilder/vaerktoejskaldsmodel.h",
+        "kilder/vaerktoejskaldsmodel.cpp",
+        "kilder/diffmodel.h",
+        "kilder/diffmodel.cpp",
         "tests/tst_vaerktoejskald_visning.cpp"
       ],
       "parret_test": {
@@ -1381,10 +1381,10 @@
       "navn": "Skærmbillede i session (slutbruger-sondering på enhed)",
       "beskrivelse": "Klienten (Skrynja_2) sender et skærmbillede af brugerfladen som billed-indhold i ACP-sessionen. Agenten må ikke selv tage skærmbilleder: indtil funktion 25 gælder tom clientCapabilities, så agenten ikke må kalde fs/* eller terminal/* — skærmbilleder kommer altid fra klienten. Forudsætning: funktion 23 grøn (.rpm mål-byg, GitHub Release, installeret og kørt igennem på Jolla Phone 2026). Slutbrugeranvendelighedssonderingsstokastikeren kører derefter en session inde i Skrynja_2 på enheden og måler med skærmbilleder + --selvtest; vurderings-JSON'erne føres hjem via chatten og committes via PR fra en sandkasse — agenten på telefonen må ikke selv skrive filer. Trin fra plan-revision PR #36.",
       "filer": [
-        "src/acpclient.h",
-        "src/acpclient.cpp",
-        "src/acpsession.cpp",
-        "src/samtalemodel.h",
+        "kilder/acpclient.h",
+        "kilder/acpclient.cpp",
+        "kilder/acpsession.cpp",
+        "kilder/samtalemodel.h",
         "qml/harbour-skrynja-2.qml",
         "qml/pages/StartSide.qml",
         "tests/tst_prompt_og_svar.cpp"
@@ -1425,14 +1425,14 @@
       "navn": "Terminal-tilladelse på enheden",
       "beskrivelse": "På enheden udvides clientCapabilities, så agenten må kalde terminal/* og fs/* — MEN kun med sikkerhedsrammerne: hver kommando gennem tilladelsesdialogen (session/request_permission) besvaret med et tryk; allowlist (læsninger, git status/log, gh-læsning, qmake/make, pkcon install-local — skrivende/destruktive kommandoer som rm, pkcon remove, git push kun med eksplicit godkendelse); trinvis åbning (read-only først, først når målt grønt åbnes skrive-kommandoer); hemmelighedsfilter i loggen (adgangstokens/nøgler logges og committes aldrig; gh-token ligger i telefonens nøglering, ikke i filer); --selvtest før og efter hver session med terminal-adgang. Bemærk: dette reviderer teknisk_ramme.acp (tom clientCapabilities) — kun på enheden; i værtsløkke/sandbox forbliver clientCapabilities tom indtil dette trin. Trin fra plan-revision PR #37.",
       "filer": [
-        "src/acpclient.h",
-        "src/acpclient.cpp",
-        "src/acpprotokol.cpp",
-        "src/tilladelsesmodel.h",
-        "src/tilladelsesmodel.cpp",
-        "src/konfiguration.h",
-        "src/konfiguration.cpp",
-        "src/logfil.cpp",
+        "kilder/acpclient.h",
+        "kilder/acpclient.cpp",
+        "kilder/acpprotokol.cpp",
+        "kilder/tilladelsesmodel.h",
+        "kilder/tilladelsesmodel.cpp",
+        "kilder/konfiguration.h",
+        "kilder/konfiguration.cpp",
+        "kilder/logfil.cpp",
         "tests/tst_tilladelsesdialog.cpp"
       ],
       "parret_test": {

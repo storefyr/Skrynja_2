@@ -83,7 +83,7 @@ void TestVaerktoejskaldVisning::flere_kald_i_raekkefoelge()
 
 void TestVaerktoejskaldVisning::enkelt_projektion_i_toolkaldsmodel()
 {
-    QString kilde = testReadSource("src/toolcallmodel.cpp");
+    QString kilde = testReadSource("kilder/toolcallmodel.cpp");
     QVERIFY(!kilde.isEmpty());
     QVERIFY(kilde.contains("projektion"));
     QCOMPARE(kilde.count("m.insert(\"toolCallId\""), 1);
@@ -102,20 +102,20 @@ void TestVaerktoejskaldVisning::enkelt_projektion_i_toolkaldsmodel()
 void TestVaerktoejskaldVisning::qml_bruger_en_eneste_model_mekanisme()
 {
     QStringList modelFiler;
-    modelFiler << "src/conversationmodel.h" << "src/conversationmodel.cpp"
-               << "src/toolcallmodel.h" << "src/toolcallmodel.cpp"
-               << "src/diffmodel.h" << "src/diffmodel.cpp";
+    modelFiler << "kilder/conversationmodel.h" << "kilder/conversationmodel.cpp"
+               << "kilder/toolcallmodel.h" << "kilder/toolcallmodel.cpp"
+               << "kilder/diffmodel.h" << "kilder/diffmodel.cpp";
     for (int i = 0; i < modelFiler.size(); ++i) {
         QString src = testReadSource(modelFiler.at(i));
         QVERIFY2(!src.isEmpty(), qPrintable("mangler " + modelFiler.at(i)));
         QVERIFY2(!src.contains("QAbstractListModel"),
                  qPrintable("QAbstractListModel stadig i " + modelFiler.at(i)));
     }
-    QVERIFY(testReadSource("src/conversationmodel.h").contains("changed()"));
-    QVERIFY(testReadSource("src/toolcallmodel.h").contains("QVariantList"));
-    QVERIFY(testReadSource("src/diffmodel.h").contains("QVariantList"));
+    QVERIFY(testReadSource("kilder/conversationmodel.h").contains("changed()"));
+    QVERIFY(testReadSource("kilder/toolcallmodel.h").contains("QVariantList"));
+    QVERIFY(testReadSource("kilder/diffmodel.h").contains("QVariantList"));
     QStringList cppFiler;
-    cppFiler << "src/conversationmodel.cpp" << "src/toolcallmodel.cpp" << "src/diffmodel.cpp";
+    cppFiler << "kilder/conversationmodel.cpp" << "kilder/toolcallmodel.cpp" << "kilder/diffmodel.cpp";
     for (int i = 0; i < cppFiler.size(); ++i) {
         QString src = testReadSource(cppFiler.at(i));
         QVERIFY2(!src.contains("beginInsertRows") && !src.contains("rowCount"),

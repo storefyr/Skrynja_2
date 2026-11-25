@@ -101,8 +101,8 @@ void TestDiffOgUddata::diff_test_paastaaer_kun_diff()
 
 void TestDiffOgUddata::diffmodel_uden_acpframereader_include()
 {
-    QString cpp = testReadSource("src/diffmodel.cpp");
-    QString h = testReadSource("src/diffmodel.h");
+    QString cpp = testReadSource("kilder/diffmodel.cpp");
+    QString h = testReadSource("kilder/diffmodel.h");
     QVERIFY(!cpp.isEmpty());
     QVERIFY2(!cpp.contains("acpframereader"), "diffmodel.cpp inkluderer stadig transport-laget");
     QVERIFY2(!h.contains("acpframereader"), "diffmodel.h inkluderer stadig transport-laget");

@@ -5,39 +5,39 @@ QT += core gui qml quick
 CONFIG += c++11
 
 SOURCES += \
-    src/main.cpp \
-    src/logfile.cpp \
-    src/acpframereader.cpp \
-    src/acpmessage.cpp \
-    src/agentprocess.cpp \
-    src/acpprotokol.cpp \
-    src/acpsession.cpp \
-    src/acpclient.cpp \
-    src/conversationmodel.cpp \
-    src/sessionstore.cpp \
-    src/toolcallmodel.cpp \
-    src/permissionmodel.cpp \
-    src/diffmodel.cpp \
-    src/configurationmodel.cpp \
-    src/konfiguration.cpp \
-    src/selftest.cpp
+    kilder/main.cpp \
+    kilder/logfile.cpp \
+    kilder/acpframereader.cpp \
+    kilder/acpmessage.cpp \
+    kilder/agentprocess.cpp \
+    kilder/acpprotokol.cpp \
+    kilder/acpsession.cpp \
+    kilder/acpclient.cpp \
+    kilder/conversationmodel.cpp \
+    kilder/sessionstore.cpp \
+    kilder/toolcallmodel.cpp \
+    kilder/permissionmodel.cpp \
+    kilder/diffmodel.cpp \
+    kilder/configurationmodel.cpp \
+    kilder/konfiguration.cpp \
+    kilder/selftest.cpp
 
 HEADERS += \
-    src/logfile.h \
-    src/acpframereader.h \
-    src/acpmessage.h \
-    src/agentprocess.h \
-    src/acpprotokol.h \
-    src/acpsession.h \
-    src/acpclient.h \
-    src/conversationmodel.h \
-    src/sessionstore.h \
-    src/toolcallmodel.h \
-    src/permissionmodel.h \
-    src/diffmodel.h \
-    src/configurationmodel.h \
-    src/konfiguration.h \
-    src/selftest.h
+    kilder/logfile.h \
+    kilder/acpframereader.h \
+    kilder/acpmessage.h \
+    kilder/agentprocess.h \
+    kilder/acpprotokol.h \
+    kilder/acpsession.h \
+    kilder/acpclient.h \
+    kilder/conversationmodel.h \
+    kilder/sessionstore.h \
+    kilder/toolcallmodel.h \
+    kilder/permissionmodel.h \
+    kilder/diffmodel.h \
+    kilder/configurationmodel.h \
+    kilder/konfiguration.h \
+    kilder/selftest.h
 
 OTHER_FILES += \
     harbour-skrynja-2.desktop \

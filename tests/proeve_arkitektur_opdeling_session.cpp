@@ -138,10 +138,10 @@ void TestArkitekturOpdelingSession::session_id_lagres_i_sessionlager()
 
 void TestArkitekturOpdelingSession::acpclient_har_ingen_sessionlogik()
 {
-    QString header = testReadSource("src/acpclient.h");
-    QString kilde = testReadSource("src/acpclient.cpp");
-    QString protokolKilde = testReadSource("src/acpprotokol.cpp");
-    QString sessionKilde = testReadSource("src/acpsession.cpp");
+    QString header = testReadSource("kilder/acpclient.h");
+    QString kilde = testReadSource("kilder/acpclient.cpp");
+    QString protokolKilde = testReadSource("kilder/acpprotokol.cpp");
+    QString sessionKilde = testReadSource("kilder/acpsession.cpp");
     QVERIFY(!header.isEmpty());
     QVERIFY(!kilde.isEmpty());
     QVERIFY(!sessionKilde.isEmpty());

@@ -207,7 +207,7 @@ Denne plan fastlægger 26 funktioner i følgende rækkefølge (svarende til mani
 
 === ark-1 — AcpClient er et god-objekt med hård kobling (alvorlighed: høj)
 
-*Kilde:* `vurdering_af_realiseringsartefaktets_arkitektur_fragilitet_og_støjindhold_for_stokastikere.json` (Kildesondringsstokastiker, id `ark-1`; evidens `src/acpclient.h:23-135`, `src/acpclient.cpp:27-52`, `src/acpclient.cpp:362-460`), eskaleret af Projektstokastikeren via manifestets `triage_logik.ved_arkitektur_brister`.
+*Kilde:* `vurdering_af_realiseringsartefaktets_arkitektur_fragilitet_og_støjindhold_for_stokastikere.json` (Kildesondringsstokastiker, id `ark-1`; evidens `kilder/acpclient.h:23-135`, `kilder/acpclient.cpp:27-52`, `kilder/acpclient.cpp:362-460`), eskaleret af Projektstokastikeren via manifestets `triage_logik.ved_arkitektur_brister`.
 
 *Beslutning:* Plan-revision — ark-1 accepteres ikke. Begrundelse: én klasse med 10 Q_PROPERTYs, protokol-dispatch, request-id-bogføring, signal-videresendelse og ejerskab af AgentProces, AcpFrameReader og fem modeller er ikke et forsvarligt bevidst designvalg, når hver ny ACP-metode får `handleMessage`/`handleSessionUpdate` til at vokse; det er netop den fragilitet, visionen skal holde ude af kernen. Ifølge `triage_logik` må arkitektoniske brister ikke løses lokalt i kildekoden, så opdelingen føres her som plan-revision.
 
@@ -223,7 +223,7 @@ Denne plan fastlægger 26 funktioner i følgende rækkefølge (svarende til mani
 
 === ark-2 — Test-kroge indlejret i produktionsklasserne (alvorlighed: middel)
 
-*Kilde:* vurderings-JSON id `ark-2`, eskaleret i manifestets `triage_af_kildesonderingsvurdering.eskalering_til_strategistokastiker`. Evidens verificeret på `main`: `src/acpclient.h:80-85`, `src/acpframereader.h:20-21`, `src/agentprocess.h:24,37-38`, `src/logfile.cpp:32`.
+*Kilde:* vurderings-JSON id `ark-2`, eskaleret i manifestets `triage_af_kildesonderingsvurdering.eskalering_til_strategistokastiker`. Evidens verificeret på `main`: `kilder/acpclient.h:80-85`, `kilder/acpframereader.h:20-21`, `kilder/agentprocess.h:24,37-38`, `kilder/logfile.cpp:32`.
 
 *Beslutning:* Plan-revision — ark-2 accepteres ikke. Produktionsklasser må ikke koble til test-infrastruktur; adfærd under test må ikke kunne afvige fra drift.
 
@@ -233,7 +233,7 @@ Denne plan fastlægger 26 funktioner i følgende rækkefølge (svarende til mani
 
 === ark-3 — Magiske metode-strenge ved svar-korrelation (alvorlighed: middel)
 
-*Kilde:* vurderings-JSON id `ark-3`, eskaleret i manifestet. Audit på `main`: efter ark-1-trin 1 ligger metoderne som navngivne konstanter i `AcpProtokol` (`src/acpprotokol.h:14-20`), men `src/acpsession.cpp:10` har stadig et lokalt `kSessionCancel`-literal.
+*Kilde:* vurderings-JSON id `ark-3`, eskaleret i manifestet. Audit på `main`: efter ark-1-trin 1 ligger metoderne som navngivne konstanter i `AcpProtokol` (`kilder/acpprotokol.h:14-20`), men `kilder/acpsession.cpp:10` har stadig et lokalt `kSessionCancel`-literal.
 
 *Beslutning:* Plan-revision — ark-3 accepteres ikke, før alle metode-strenge ligger ét sted.
 
@@ -243,7 +243,7 @@ Denne plan fastlægger 26 funktioner i følgende rækkefølge (svarende til mani
 
 === ark-4 — UI-model afhænger af transport-laget (alvorlighed: middel)
 
-*Kilde:* vurderings-JSON id `ark-4`, eskaleret i manifestet. Evidens verificeret på `main`: `src/diffmodel.cpp:3` inkluderer `acpframereader.h` kun for `standardCap()`.
+*Kilde:* vurderings-JSON id `ark-4`, eskaleret i manifestet. Evidens verificeret på `main`: `kilder/diffmodel.cpp:3` inkluderer `acpframereader.h` kun for `standardCap()`.
 
 *Beslutning:* Plan-revision — ark-4 accepteres ikke; afhængighedsretningen skal vendes.
 
@@ -253,7 +253,7 @@ Denne plan fastlægger 26 funktioner i følgende rækkefølge (svarende til mani
 
 === ark-5 — QSettings som skjult global tilstand læst i gettere (alvorlighed: lav)
 
-*Kilde:* vurderings-JSON id `ark-5`, eskaleret i manifestet. Evidens verificeret på `main`: `src/agentprocess.cpp:19,25` læser QSettings pr. kald; `src/sessionstore.h:17` har eget QSettings-medlem.
+*Kilde:* vurderings-JSON id `ark-5`, eskaleret i manifestet. Evidens verificeret på `main`: `kilder/agentprocess.cpp:19,25` læser QSettings pr. kald; `kilder/sessionstore.h:17` har eget QSettings-medlem.
 
 *Beslutning:* Plan-revision — ark-5 accepteres ikke; konfiguration skal have én ejer med change-signaler.
 

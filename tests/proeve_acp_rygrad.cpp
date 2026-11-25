@@ -269,16 +269,16 @@ void TestAcpRygrad::alle_metoder_er_konstanter()
     metoder << "initialize" << "session/new" << "session/load" << "session/prompt"
             << "session/cancel" << "session/update" << "session/set_config_option"
             << "session/request_permission" << "end_turn";
-    QString protokol = testReadSource("src/acpprotokol.cpp");
+    QString protokol = testReadSource("kilder/acpprotokol.cpp");
     QVERIFY(!protokol.isEmpty());
-    QDir srcDir(testRepoRoot() + "/src");
+    QDir srcDir(testRepoRoot() + "/kilder");
     QStringList filer = srcDir.entryList(QStringList() << "*.cpp" << "*.h", QDir::Files);
     for (int m = 0; m < metoder.size(); ++m) {
         QCOMPARE(protokol.count("\"" + metoder.at(m) + "\""), 1);
         for (int i = 0; i < filer.size(); ++i) {
             if (filer.at(i) == "acpprotokol.cpp" || filer.at(i) == "acpprotokol.h")
                 continue;
-            QString src = testReadSource("src/" + filer.at(i));
+            QString src = testReadSource("kilder/" + filer.at(i));
             QVERIFY2(!src.contains("\"" + metoder.at(m) + "\""),
                      qPrintable("metode-literal uden for AcpProtokol i " + filer.at(i) + ": " + metoder.at(m)));
         }

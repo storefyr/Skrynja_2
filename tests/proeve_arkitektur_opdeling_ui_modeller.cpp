@@ -30,8 +30,8 @@ REGISTER_TEST(TestArkitekturOpdelingUiModeller)
 
 void TestArkitekturOpdelingUiModeller::acpclient_er_tynd_facade()
 {
-    QString header = testReadSource("src/acpclient.h");
-    QString kilde = testReadSource("src/acpclient.cpp");
+    QString header = testReadSource("kilder/acpclient.h");
+    QString kilde = testReadSource("kilder/acpclient.cpp");
     QVERIFY(!header.isEmpty());
     QVERIFY(!kilde.isEmpty());
 
@@ -89,7 +89,7 @@ void TestArkitekturOpdelingUiModeller::fem_modeller_uden_acpclient_ejerskab()
 
 void TestArkitekturOpdelingUiModeller::q_properties_uenaendret_for_qml()
 {
-    QString header = testReadSource("src/acpclient.h");
+    QString header = testReadSource("kilder/acpclient.h");
     QVERIFY(!header.isEmpty());
     QCOMPARE(header.count("Q_PROPERTY(bool hadRestoredHistory"), 1);
     QCOMPARE(header.count("Q_PROPERTY(QVariantList toolCalls"), 1);

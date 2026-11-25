@@ -145,7 +145,7 @@ void TestByggestiOgLogfil::kilder_filnavne_matcher_klassenavne()
 
 void TestByggestiOgLogfil::manglende_qml_giver_ikke_exit_0()
 {
-    QString main = testReadSource("src/main.cpp");
+    QString main = testReadSource("kilder/main.cpp");
     QVERIFY(!main.isEmpty());
     QVERIFY2(main.contains("return 2"), "main.cpp giver ikke exit != 0 ved manglende QML-fil");
     QVERIFY2(main.contains("qWarning"), "main.cpp skriver ikke besked ved manglende QML-fil");
@@ -153,7 +153,7 @@ void TestByggestiOgLogfil::manglende_qml_giver_ikke_exit_0()
 
 void TestByggestiOgLogfil::startAgent_fejl_signaleres()
 {
-    QString main = testReadSource("src/main.cpp");
+    QString main = testReadSource("kilder/main.cpp");
     QVERIFY(!main.isEmpty());
     QVERIFY2(main.contains("if (!client.startAgent())"), "main.cpp tjekker ikke startAgent()-resultatet");
     QVERIFY2(main.contains("return 3"), "main.cpp giver ikke exit != 0 ved startAgent-fejl");

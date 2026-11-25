@@ -111,11 +111,11 @@ void TestKonfigurationAfAgent::set_config_option_debounced()
 
 void TestKonfigurationAfAgent::en_config_ejer_med_signaler()
 {
-    QString agentSrc = testReadSource("src/agentprocess.cpp");
-    QString storeSrc = testReadSource("src/sessionstore.cpp");
-    QString storeHdr = testReadSource("src/sessionstore.h");
-    QString cfgHdr = testReadSource("src/konfiguration.h");
-    QString cfgSrc = testReadSource("src/konfiguration.cpp");
+    QString agentSrc = testReadSource("kilder/agentprocess.cpp");
+    QString storeSrc = testReadSource("kilder/sessionstore.cpp");
+    QString storeHdr = testReadSource("kilder/sessionstore.h");
+    QString cfgHdr = testReadSource("kilder/konfiguration.h");
+    QString cfgSrc = testReadSource("kilder/konfiguration.cpp");
     QVERIFY2(!agentSrc.contains("QSettings"), "agentprocess.cpp reads QSettings directly");
     QVERIFY2(!storeSrc.contains("QSettings"), "sessionstore.cpp reads QSettings directly");
     QVERIFY2(!storeHdr.contains("QSettings"), "sessionstore.h still has a QSettings member");

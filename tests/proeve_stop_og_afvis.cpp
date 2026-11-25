@@ -128,7 +128,7 @@ void TestStopOgAfvis::stopAgent_kaldes_fra_qml()
 
 void TestStopOgAfvis::stopAgent_rapporterer_overlevende_proces()
 {
-    QString kilde = testReadSource("src/agentprocess.cpp");
+    QString kilde = testReadSource("kilder/agentprocess.cpp");
     QVERIFY(!kilde.isEmpty());
     int pos = kilde.indexOf("AgentProcess::stopAgent");
     QVERIFY(pos >= 0);
