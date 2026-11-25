@@ -35,10 +35,20 @@ tag_via_redirect() {
         | sed -E 's#.*/releases/tag/##'
 }
 
-# Finder aarch64.rpm-asset-navnet på release-siden for et tag (direkte HTML, uden API)
+# Finder aarch64.rpm-asset-navnet for et tag uden API: expanded_assets/<tag> først, fallback releases/tag/<tag>
 asset_navn_for_tag() {
-    curl -fsSL "https://github.com/${REPO}/releases/tag/$1" \
-        | grep -oE "${APP}-[0-9][^\"']*\.aarch64\.rpm" | head -1 || true
+    local navn
+    navn="$(curl -fsSL --retry 2 "https://github.com/${REPO}/releases/expanded_assets/$1" \
+        | grep -oE "${APP}-[0-9][^\"']*\.aarch64\.rpm" | head -1 || true)"
+    if [ -z "$navn" ]; then
+        navn="$(curl -fsSL --retry 2 "https://github.com/${REPO}/releases/tag/$1" \
+            | grep -oE "${APP}-[0-9][^\"']*\.aarch64\.rpm" | head -1 || true)"
+    fi
+    echo "$navn"
+}
+
+diagnose_asset_opslag() {
+    echo "diagnose: expanded_assets http $(curl -s -o /dev/null -w '%{http_code}' "https://github.com/${REPO}/releases/expanded_assets/$1") / release-side http $(curl -s -o /dev/null -w '%{http_code}' "https://github.com/${REPO}/releases/tag/$1")"
 }
 
 if [ -n "$TAG" ]; then
@@ -64,6 +74,7 @@ if [ -n "$TAG" ]; then
     done
     if [ -z "$ASSET_NAVN" ]; then
         echo "FEJL: intet ${APP}-*.aarch64.rpm-asset i release for tag $TAG efter 45 min ventetid"
+        diagnose_asset_opslag "$TAG"
         exit 1
     fi
     TAG_OP="$TAG"
@@ -78,6 +89,7 @@ else
     ASSET_NAVN="$(asset_navn_for_tag "$TAG_OP")"
     if [ -z "$ASSET_NAVN" ]; then
         echo "FEJL: fandt intet ${APP}-*.aarch64.rpm-asset i release $TAG_OP"
+        diagnose_asset_opslag "$TAG_OP"
         exit 1
     fi
 fi
@@ -85,7 +97,7 @@ fi
 ASSET_URL="https://github.com/${REPO}/releases/download/${TAG_OP}/${ASSET_NAVN}"
 trin "henter asset via direkte download-URL (${TAG_OP}/${ASSET_NAVN})"
 RPM="${TMP}/${ASSET_NAVN}"
-curl -fsSL "$ASSET_URL" -o "$RPM"
+curl -fsSL --retry 2 "$ASSET_URL" -o "$RPM"
 echo "hentet: $RPM ($(stat -c%s "$RPM") bytes)"
 
 trin "rpm -qpl: tjekker forventede sti-linjer"
@@ -118,13 +130,38 @@ fi
 echo "rpm -qpl ok: $ANTAL sti-linjer verificeret (binær, desktop, qml, 4 ikoner)"
 
 trin "pkcon install-local"
-devel-su pkcon install-local -y "$RPM"
+ROOTKODE=""
+if [ -r /dev/tty ]; then
+    echo -n "Root-kode (til devel-su, vises ikke, logges ikke): " >&2
+    read -s ROOTKODE < /dev/tty || true
+    echo >&2
+fi
+INSTALL_FEJL=0
+if [ -n "$ROOTKODE" ]; then
+    printf '%s\n' "$ROOTKODE" | devel-su pkcon install-local -y "$RPM" || INSTALL_FEJL=1
+else
+    devel-su pkcon install-local -y "$RPM" || INSTALL_FEJL=1
+fi
+unset ROOTKODE
+if [ "$INSTALL_FEJL" = "1" ]; then
+    echo "FEJL: pkcon install-local fejlede — er root-koden sat i Udviklertilstand (Indstillinger → System → Udviklertilstand)?"
+    exit 1
+fi
 
 trin "kører ${APP} --selvtest"
 set +e
 "$APP" --selvtest
 KODE=$?
 set -e
+VERDICTSTI="$HOME/.local/share/harbour/harbour-skrynja-2/selvtest-verdict.json"
+if [ -f "$VERDICTSTI" ]; then
+    echo "verdict: $(cat "$VERDICTSTI")"
+fi
+LOGSTI="$HOME/.local/share/harbour/harbour-skrynja-2/skrynja-2.log"
+if [ -f "$LOGSTI" ]; then
+    echo "log (sidste 10 linjer):"
+    tail -n 10 "$LOGSTI"
+fi
 echo "exit-kode: $KODE"
 if [ "$KODE" -ne 0 ]; then
     echo "FEJL: --selvtest gav exit $KODE (forventet 0)"
