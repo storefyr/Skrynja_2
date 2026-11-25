@@ -10,6 +10,7 @@
 
 #include "acpclient.h"
 #include "testregistrering.h"
+#include "logfile.h"
 #include "permissionmodel.h"
 
 class TestTilladelsesdialog : public QObject
@@ -26,6 +27,9 @@ private slots:
     void ukendt_svar_id_signaleres();
     void permissionRequested_forbundet_i_qml();
     void dialog_tjekker_svar_retvaerdi();
+    void clientCapabilities_paa_enhed_ikke_tom();
+    void terminal_kald_uden_godkendt_tilladelse_afvises();
+    void hemmelighedsfilter_fanger_token_lignende_strenge_i_log();
 private:
 };
 
@@ -152,6 +156,107 @@ void TestTilladelsesdialog::dialog_tjekker_svar_retvaerdi()
     QVERIFY(!qml.isEmpty());
     QVERIFY2(qml.contains("if (acp.answerPermission("), "dialog tjekker ikke answerPermission-returværdi");
     QVERIFY2(qml.contains("if (acp.declinePermission("), "dialog tjekker ikke declinePermission-returværdi");
+}
+
+void TestTilladelsesdialog::clientCapabilities_paa_enhed_ikke_tom()
+{
+    QString sessionSrc = testReadSource("kilder/acpsession.cpp");
+    QVERIFY2(sessionSrc.contains("terminal/aktiv"), "acpsession.cpp skal gate terminal-capabilities på enhedsindstillingen terminal/aktiv");
+
+    QSettings s;
+    s.remove("terminal/aktiv");
+    s.sync();
+    {
+        TestClient client;
+        injectTestModels(&client, this);
+        QVERIFY(testInitializeParams(client).value("clientCapabilities").toObject().isEmpty());
+    }
+    s.setValue("terminal/aktiv", true);
+    s.sync();
+    {
+        TestClient client;
+        injectTestModels(&client, this);
+        QJsonObject cap = testInitializeParams(client).value("clientCapabilities").toObject();
+        QVERIFY2(!cap.isEmpty(), "clientCapabilities skal være ikke-tom når terminal/aktiv er sat (på enheden)");
+        QVERIFY2(cap.contains("terminal") || cap.contains("fs"), "clientCapabilities skal indeholde terminal/fs på enheden");
+    }
+    s.remove("terminal/aktiv");
+    s.sync();
+}
+
+void TestTilladelsesdialog::terminal_kald_uden_godkendt_tilladelse_afvises()
+{
+    QSettings s;
+    s.remove("terminal/aktiv");
+    s.sync();
+
+    TestClient client;
+    injectTestModels(&client, this);
+    client.setTestMode(true);
+    client.sendSessionNew("/tmp");
+    qint64 id = testIdOf(client.lastSentForTest());
+    QJsonObject result;
+    result.insert("sessionId", "sess-term");
+    client.feedBytesForTest(testResponseJson(id, result) + "\n");
+
+    QJsonObject tc;
+    tc.insert("toolCallId", "tc-t1");
+    tc.insert("title", "k\u00f8r kommando");
+    tc.insert("kind", "terminal/exec");
+    QJsonObject params;
+    params.insert("toolCall", tc);
+    QJsonArray options;
+    QJsonObject allow;
+    allow.insert("optionId", "allow");
+    allow.insert("label", "Tillad");
+    options.append(allow);
+    params.insert("options", options);
+    QJsonObject req;
+    req.insert("jsonrpc", "2.0");
+    req.insert("id", QJsonValue(100));
+    req.insert("method", "session/request_permission");
+    req.insert("params", params);
+    client.feedBytesForTest(QJsonDocument(req).toJson(QJsonDocument::Compact) + "\n");
+
+    QVERIFY(client.permissionModel()->isPending());
+    QVERIFY2(!client.answerPermission("allow"),
+             "terminal-kald uden aktiveret terminal-kapacitet må ikke kunne tillades");
+    for (int i = 0; i < client.sentForTest().size(); ++i)
+        QVERIFY2(!client.sentForTest().at(i).contains("\"allowed\""), "der blev sendt et allow-svar uden kapacitet");
+
+    s.setValue("terminal/aktiv", true);
+    s.sync();
+    TestClient client2;
+    injectTestModels(&client2, this);
+    client2.setTestMode(true);
+    client2.sendSessionNew("/tmp");
+    qint64 id2 = testIdOf(client2.lastSentForTest());
+    QJsonObject result2;
+    result2.insert("sessionId", "sess-term-2");
+    client2.feedBytesForTest(testResponseJson(id2, result2) + "\n");
+    client2.feedBytesForTest(testReadFixture("fixture_tilladelse.ndjson"));
+    QVERIFY(client2.permissionModel()->isPending());
+    QVERIFY(client2.answerPermission("allow"));
+    s.remove("terminal/aktiv");
+    s.sync();
+}
+
+void TestTilladelsesdialog::hemmelighedsfilter_fanger_token_lignende_strenge_i_log()
+{
+    QString sti = QDir::tempPath() + "/skrynja-tst-hemmelighedsfilter.log";
+    QFile::remove(sti);
+    LogFile::instance()->setLogPath(sti);
+    LogFile::instance()->writeLine("agent svarede med token ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 her");
+    LogFile::instance()->writeLine("almindelig loglinje uden hemmeligheder");
+    LogFile::instance()->writeLine("Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0In0.dummysig");
+    QFile f(sti);
+    QVERIFY(f.open(QIODevice::ReadOnly));
+    QString log = QString::fromUtf8(f.readAll());
+    f.close();
+    QVERIFY2(!log.contains("ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"), "ghp_-token blev logget råt");
+    QVERIFY2(!log.contains("eyJhbGciOiJIUzI1NiJ9"), "JWT-lignende token blev logget råt");
+    QVERIFY2(log.contains("almindelig loglinje uden hemmeligheder"), "almindelige linjer skal ikke filtreres");
+    QFile::remove(sti);
 }
 
 #include "proeve_tilladelsesdialog.moc"
