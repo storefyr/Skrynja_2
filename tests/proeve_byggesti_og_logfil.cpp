@@ -221,10 +221,11 @@ void TestByggestiOgLogfil::spec_og_yaml_er_konsistente_med_pro()
     QVERIFY2(spec.contains("/usr/share/" + target + "/qml"), "spec %files mangler qml");
     QVERIFY2(spec.contains("%{_datadir}/icons/hicolor"), "spec %files mangler ikoner");
     QVERIFY2(spec.contains("%{name}.png"), "spec %files mangler ikon-glob");
-    QVERIFY2(spec.contains("BuildRequires: qt5-qmake"), "spec mangler qt5-qmake BuildRequires");
-    QVERIFY2(spec.contains("qmake " + target + ".pro"), "spec %build kører ikke qmake på pro-filen");
+    QVERIFY2(spec.contains("BuildRequires: pkgconfig(Qt5Core)"), "spec mangler pkgconfig(Qt5Core) BuildRequires");
+    QVERIFY2(spec.contains("BuildRequires: pkgconfig(Qt5Quick)"), "spec mangler pkgconfig(Qt5Quick) BuildRequires");
+    QVERIFY2(spec.contains("%qmake5 " + target + ".pro"), "spec %build skal køre %qmake5 på pro-filen");
 
-    QVERIFY2(yaml.contains("Builder: qmake"), "yaml Builder skal være qmake");
+    QVERIFY2(yaml.contains("Builder: qmake5"), "yaml Builder skal være qmake5");
     QVERIFY2(yaml.contains("- " + target + ".desktop"), "yaml Files mangler desktop");
     QVERIFY2(yaml.contains("- qml"), "yaml Files mangler qml");
     QVERIFY2(yaml.contains("- icons"), "yaml Files mangler icons");

@@ -5,9 +5,10 @@ Release: 1
 License: GPL-3.0
 URL: https://github.com/storefyr/Skrynja_2
 Source0: %{name}-%{version}.tar.gz
-BuildRequires: qt5-qmake
-BuildRequires: qtbase5-dev
-BuildRequires: qtdeclarative5-dev
+BuildRequires: pkgconfig(Qt5Core)
+BuildRequires: pkgconfig(Qt5Gui)
+BuildRequires: pkgconfig(Qt5Qml)
+BuildRequires: pkgconfig(Qt5Quick)
 
 %description
 Skrynja_2 er en ACP-klient til Sailfish OS: den starter agenten
@@ -19,7 +20,7 @@ sker. Tilladelser besvares med et enkelt tryk.
 %setup -q
 
 %build
-qmake harbour-skrynja-2.pro
+%qmake5 harbour-skrynja-2.pro
 make %{?_smp_mflags}
 
 %install

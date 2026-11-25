@@ -1,4 +1,4 @@
-Builder: qmake
+Builder: qmake5
 PkgConfigBR: []
 PkgBR: []
 
