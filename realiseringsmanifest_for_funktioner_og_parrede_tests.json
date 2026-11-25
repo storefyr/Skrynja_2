@@ -337,6 +337,14 @@
         "parret_test": "tests/proeve_byggesti_og_logfil.cpp + ny slot: verificeringsskript_paa_enhed_findes_og_bestaaer_bash_n (tjekker at værktøjer/verificer_paa_enhed.sh findes og består bash -n)",
         "måling": "PR #82 merged 2026-11-25T17:24:50Z (vaerktoejler/verificer_paa_enhed.sh + parret slot verificeringsskript_paa_enhed_findes_og_bestaaer_bash_n i tests/proeve_byggesti_og_logfil.cpp, prøve før kilde: 5b4f4dd før cd93f96); målt på main @ cf2f967: vaerktoejler/verificer_paa_enhed.sh findes, er eksekverbar og består bash -n; slot deklareret og implementeret i proeve_byggesti_og_logfil.cpp; CI success 2026-11-25T17:23:50 (PR-kørsel 45664310723) og Værtsløkke QtTest-suite + kontroller success på main @ cf2f967; tjek_manifest_parrede_tests.py og tjek_plan_manifest_spejl.py exit 0",
         "gennemført": true
+      },
+      {
+        "id": "navn-3",
+        "type": "støj",
+        "mål_funktion": "byggesti_og_logfil",
+        "ordre": "Omdøb mappen vaerktoejler/ → værktøjer/ (ægte ø). Målt på main @ 016537a: vaerktoejler forekommer i selve mappen + 3 sti-referencer i tests/proeve_byggesti_og_logfil.cpp:285-287 (slot verificeringsskript_paa_enhed_findes_og_bestaaer_bash_n); manifestets måling-tekst er historisk log og bevares. Begrundelse: ortografi-maksimum forbyder ascii-udvanding (oe) i navne; ascii-undtagelsen gælder kun kildefilnavne/C++-identifikatorer/test-slots (moc), wire-strenge og harbour-navnet — et mappenavn er intet af det, så det skal være ægte dansk værktøjer. Ordren automatisk-1 foreskrev allerede værktøjer/.",
+        "parret_test": "samme slot verificeringsskript_paa_enhed_findes_og_bestaaer_bash_n i tests/proeve_byggesti_og_logfil.cpp med opdateret sti værktøjer/verificer_paa_enhed.sh; efter omdøbning må git grep vaerktoejler i live kode give 0 (kun den historiske måling i manifestet må blive stående)",
+        "gennemført": false
       }
     ]
   },
