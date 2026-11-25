@@ -327,6 +327,14 @@
         "parret_test": "omdøbt slot kilder_filnavne_matcher_klassenavne i tests/proeve_byggesti_og_logfil.cpp tjekker at ingen sti eller fil i depotet hedder src; tjek_plan_manifest_spejl.py og tjek_manifest_parrede_tests.py opdateret til kilder/",
         "måling": "PR #74 merged 2026-11-25T12:32:56Z (src/ → kilder/, 31 filer, manifest+plan samme PR); målt på main @ b25bf21: src/ væk, kilder/ = 31 filer, 0 tests/tst_*; slot kilder_filnavne_matcher_klassenavne deklareret og implementeret i proeve_byggesti_og_logfil.cpp; CI success 2026-11-25T12:59:32; tjek_manifest_parrede_tests.py og tjek_plan_manifest_spejl.py exit 0",
         "gennemført": true
+      },
+      {
+        "id": "automatisk-1",
+        "type": "støj",
+        "mål_funktion": "distributionsartefakt_rpm",
+        "ordre": "Tilføj værktøjer/verificer_paa_enhed.sh (fuldt dansk navn, ascii), der på Jolla Phone 2026 i én kommando: henter seneste GitHub Release-asset (harbour-skrynja-2-*.aarch64.rpm), kører rpm -qpl og tjekker de 12 forventede filer, kører pkcon install-local, kører appens --selvtest og udskriver verdict-JSON + exit-kode. Så bliver enhedsløkken for funktion 23 én kommando for orkestratoren. release.yml udløses allerede automatisk ved tag-push v*.*.* (verificeret med v1.0.2), så byg+udgivelse kræver kun git push origin <tag>.",
+        "parret_test": "tests/proeve_byggesti_og_logfil.cpp + ny slot: verificeringsskript_paa_enhed_findes_og_bestaaer_bash_n (tjekker at værktøjer/verificer_paa_enhed.sh findes og består bash -n)",
+        "gennemført": false
       }
     ]
   },
