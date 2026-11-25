@@ -308,6 +308,14 @@
         "ordre": "Enten fjern de ubrugte QAbstractListModel-roller fra ConversationModel/ToolCallModel/DiffModel, eller skift QML til at bruge model-rollerne — ikke begge dele.",
         "parret_test": "tests/tst_vaerktoejskald_visning.cpp + ny slot: qml_bruger_en_eneste_model_mekanisme",
         "gennemført": true
+      },
+      {
+        "id": "navn-1",
+        "type": "støj",
+        "mål_funktion": "prøvesuite_i_tests",
+        "ordre": "Omdøb navngivnings-afkortningen tst_ → proeve_ i tests/ (målt omfang på main @ f84c82a): alle 16 tests/tst_*.cpp → tests/proeve_*.cpp inkl. #include \"proeve_*.moc\" i hver af de 16 filer; tests/tests.pro (17 referencer, samt TARGET tst_skrynja_2 → proeve_skrynja_2); .gitignore (/tests/tst_skrynja_2); manifestets parret_test.testfil-referencer (Projektstokastikeren opdaterer dem i samme PR ifølge spejlingsreglen — navngivningsreglen fra 2026-11-22 står for dette planlagte omdøb); planens 6 referencer (Strategistokastikeren, samme PR). Vurderings-JSON'ens historiske citater af tst_-navne bevares (log-undtagelsen i navngivningsreglen). Begrundelse: navngivningsreglen forbyder afkortninger og præfiks-koder — prøve skrives ascii som proeve i kildefilnavne (moc-undtagelsen gælder ascii, ikke afkortninger).",
+        "parret_test": "tests/proeve_proevesuite_i_tests.cpp + ny slot: ingen_afkortede_tst_filnavne_i_tests (tjekker at ingen fil i tests/ har præfikset tst_)",
+        "gennemført": false
       }
     ]
   },
