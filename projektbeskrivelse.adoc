@@ -110,7 +110,7 @@ Kæden er lukket og sporbar i begge retninger:
 * *Input:* `vurdering_af_realiseringsartefaktets_arkitektur_fragilitet_og_støjindhold_for_stokastikere.json` fra Kildesondringsstokastikeren.
 * *Ved støj:* Projektstokastikeren udsteder direkte rengøringsordrer til Realiseringsstokastikeren — støj fjernes fra realiseringsartefaktet uden ny funktionalitet, og rengøringen dækkes af den eksisterende parrede test.
 * *Ved fragilitet:* manifestet opdateres med krav om nye parrede tests eller specifik fejlhåndtering i den berørte funktion — nye verifikations_trin og testslots tilføjes, eksisterende må ikke fjernes.
-* *Ved arkitektur-brister:* enten omdefineres funktionerne i manifestet, eller også eskaleres der til Strategistokastikeren for revision af denne plan; arkitektoniske brister løses ikke lokalt i kildekoden.
+* *Ved arkitekturbrister:* enten omdefineres funktionerne i manifestet, eller også eskaleres der til Strategistokastikeren for revision af denne plan; arkitektoniske brister løses ikke lokalt i kildekoden.
 
 == Strategistokastikerens mandat
 
@@ -130,7 +130,7 @@ Rammen er ikke-forhandlingsbar og arves fra forgængerprojekterne og fra license
 * Ingen SailJail: `Sandboxing=Disabled` i `.desktop`-filen fra første indskrivning, ellers er agentstien ikke nåbar.
 * Agentsti: `/home/defaultuser/.local/bin/vibe-acp`.
 * Sprog: kode og kommentarer er engelske; dokumentation, brugerflade og indskrivninger er danske. Alle stokastikere — også nystartede — kommunikerer desuden udelukkende på dansk med hinanden og med den menneskelige realiseringsorkestrator; intet andet sprog i nogen samtale (den menneskelige realiseringsorkestrators ønske 2026-11-22).
-* Ortografi (hele realiseringsøkosystemet, uden undtagelse i prosa): alle artefakter og alle stokastikere skriver ortografisk dansk (æ, ø, å) — denne plan, manifestet, vurderings-JSON'erne, dokumentation, JSON-nøgler, funktions-id'er, indskrivningsbeskeder og PR-titler. Ingen ascii-udvanding (aa/ae/oe) af dansk noget sted: hver forekomst i prosa, nøgle, id eller navn er en fejl og rettes ved næste berøring af artefaktet. Fysisk tvangne undtagelser minimeres og dokumenteres hver gang: C++-identifikatorer, kildefilnavne og test-slot-navne (moc håndterer ikke æøå), ACP-protokolstrenge på ledningsformat, `harbour-`-appnavnet.
+* Ortografi (hele realiseringsøkosystemet, uden undtagelse i prosa): alle artefakter og alle stokastikere skriver ortografisk dansk (æ, ø, å) — denne plan, manifestet, vurderings-JSON'erne, dokumentation, JSON-nøgler, funktions-id'er, indskrivningsbeskeder og PR-titler. Ingen ascii-udvanding (aa/ae/oe) af dansk noget sted: hver forekomst i prosa, nøgle, id eller navn er en fejl og rettes ved næste berøring af artefaktet. Nye sammensatte ord i prosa skrives uden bindestreg (f.eks. `arkitekturbrister` og `kildesondringsvurdering`, ikke `arkitektur-brister`). Fysisk tvangne undtagelser minimeres og dokumenteres hver gang: C++-identifikatorer, kildefilnavne og test-slot-navne (moc håndterer ikke æøå), ACP-protokolstrenge på ledningsformat, `harbour-`-appnavnet.
 * Terminologi (dansk frem for engelsk fagsprog i prosa): hvor et præcist dansk alternativ findes, bruges det — specifikt `merge` erstattes med `integration` (substantiv) eller `integreres`/`integreret` (verbum), `draft` med kladde, `commit` med indskrivning, `backend` med bagvedliggende system, `branch` med gren, `token` med adgangstoken. Egennavne, protokol-/platformtermer samt kommandoer og API-stier i backticks (GitHub, PR, ACP, CI, `git push`, `merge` som API-sti) undtages; i historiske logposter (triage-poster, eskaleringslog) bevares id'er, hashes og citeret tekst, men terminologien i denne regel gælder også dér (orkestratorens krav 2026-11-22).
 * Navngivning (selvdokumenterende, uden undtagelse for nye navne): ethvert navn — funktioner, id'er, nøgler, filer, roller, artefakter, variabler, PR-titler — skal i sig selv fortælle præcist, hvad det er et navn for, på fuldt dansk sammen med ortografi-reglen. Ingen afkortninger eller præfiks-koder: `fragilitet_...` — aldrig `fra-...`; `arkitektur_...` — aldrig `ark-...`; `støj_...` er i orden, fordi "støj" er hele ordet. Undtagelse: historiske id'er i lukkede triage-poster (`ark-*`, `fra-*`, `støj-*`, `test-*`) er uforanderlige log og omdøbes ikke; reglen gælder alle nye navne.
 * Prøver: QtTest i `tests/` uden Silica-afhængighed; prøven indskrives før den kilde, den afprøver.
@@ -237,7 +237,7 @@ Denne plan fastlægger 26 funktioner i følgende rækkefølge (svarende til mani
 
 *Trin:* `arkitektur_fjern_testkroge` (funktion 17, mål_funktion `prøvesuite_i_tests`) — flyt alle `*ForTest`-metoder og `m_testMode`-grenen i `write()` ud af `acpclient`, `acpframereader`, `agentprocess` og `logfile` og ind i en separat test-harness under `tests/`. Parret test: ny slot `ingen_testkroge_i_produktionsklasser` i `tests/tst_proevesuite_i_tests.cpp`.
 
-*Status:* LUKKET — gennemført som funktion 17 (`arkitektur_fjern_testkroge`), `passerer: sand` på `main` @ `45e339e` (kildesondrings-triage 26/26 lukket).
+*Status:* LUKKET — gennemført som funktion 17 (`arkitektur_fjern_testkroge`), `passerer: sand` på `main` @ `45e339e` (kildesondringstriage 26/26 lukket).
 
 === ark-3 — Magiske metode-strenge ved svar-korrelation (alvorlighed: middel)
 
