@@ -25,19 +25,19 @@ echo "hentet: $RPM ($(stat -c%s "$RPM") bytes)"
 
 echo "== 2/4 rpm -qpl: tjek forventede sti-linjer =="
 LISTING="$(rpm -qpl "$RPM")"
-FORVENTEDE="/usr/bin/${APP}
-/usr/share/applications/${APP}.desktop
-/usr/share/${APP}/qml
-/usr/share/${APP}/qml/harbour-skrynja-2.qml
-/usr/share/${APP}/qml/pages
-/usr/share/${APP}/qml/pages/DiffVisning.qml
-/usr/share/${APP}/qml/pages/KonfigurationsSide.qml
-/usr/share/${APP}/qml/pages/StartSide.qml
-/usr/share/${APP}/qml/pages/TilladelsesDialog.qml
-/usr/share/icons/hicolor/86x86/apps/${APP}.png
-/usr/share/icons/hicolor/108x108/apps/${APP}.png
-/usr/share/icons/hicolor/128x128/apps/${APP}.png
-/usr/share/icons/hicolor/172x172/apps/${APP}.png"
+FORVENTEDE="/usr/bin/harbour-skrynja-2
+/usr/share/applications/harbour-skrynja-2.desktop
+/usr/share/harbour-skrynja-2/qml
+/usr/share/harbour-skrynja-2/qml/harbour-skrynja-2.qml
+/usr/share/harbour-skrynja-2/qml/pages
+/usr/share/harbour-skrynja-2/qml/pages/DiffVisning.qml
+/usr/share/harbour-skrynja-2/qml/pages/KonfigurationsSide.qml
+/usr/share/harbour-skrynja-2/qml/pages/StartSide.qml
+/usr/share/harbour-skrynja-2/qml/pages/TilladelsesDialog.qml
+/usr/share/icons/hicolor/86x86/apps/harbour-skrynja-2.png
+/usr/share/icons/hicolor/108x108/apps/harbour-skrynja-2.png
+/usr/share/icons/hicolor/128x128/apps/harbour-skrynja-2.png
+/usr/share/icons/hicolor/172x172/apps/harbour-skrynja-2.png"
 ANTAL=0
 while IFS= read -r linje; do
     [ -z "$linje" ] && continue
