@@ -353,7 +353,8 @@
         "mål_funktion": "distributionsartefakt_rpm",
         "ordre": "værktøjer/verificer_paa_enhed.sh må ikke kalde api.github.com på enheden — målt 2026-11-25 på Jolla Phone 2026: curl mod api.github.com/.../releases/latest giver 403 (mellemlaget blokerer API-kald, samme klasse som POST /releases). Løs i stedet seneste tag via redirect fra github.com (curl -sIL -o /dev/null -w '%{url_effective}' https://github.com/storefyr/Skrynja_2/releases/latest → .../releases/tag/vX.Y.Z) og hent asset via direkte download-URL https://github.com/storefyr/Skrynja_2/releases/download/<tag>/<assetnavn>; tag-tilstand bygger download-URL'en direkte uden API. Intil rettelsen: manuel vej på enheden = hent rpm i browser eller curl direkte download-URL, så rpm -qpl, devel-su pkcon install-local, --selvtest.",
         "parret_test": "slot verificeringsskript_paa_enhed_findes_og_bestaaer_bash_n udvides: git grep api.github.com i værktøjer/verificer_paa_enhed.sh = 0, bash -n ok, og simuleret hent via github.com redirect virker",
-        "gennemført": false
+        "måling": "PR #90 merged 2026-11-25T19:50:59Z (merge fa9577a, CI success kørsel 45687746994, Værtsløkke SUCCESS, ALL TESTS PASSED inkl. simuleret hent); målt på main @ fa9577a: værktøjer/verificer_paa_enhed.sh har 0 forekomster af api.github.com, bash -n exit 0, filtilstand 755; tjek_manifest_parrede_tests.py og tjek_plan_manifest_spejl.py exit 0",
+        "gennemført": true
       }
     ]
   },
