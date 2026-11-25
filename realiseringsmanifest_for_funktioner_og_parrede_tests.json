@@ -348,7 +348,7 @@
         "gennemført": true
       },
       {
-        "id": "fra-13",
+        "id": "fragilitet-13",
         "type": "fragilitet",
         "mål_funktion": "distributionsartefakt_rpm",
         "ordre": "værktøjer/verificer_paa_enhed.sh må ikke kalde api.github.com på enheden — målt 2026-11-25 på Jolla Phone 2026: curl mod api.github.com/.../releases/latest giver 403 (mellemlaget blokerer API-kald, samme klasse som POST /releases). Løs i stedet seneste tag via redirect fra github.com (curl -sIL -o /dev/null -w '%{url_effective}' https://github.com/storefyr/Skrynja_2/releases/latest → .../releases/tag/vX.Y.Z) og hent asset via direkte download-URL https://github.com/storefyr/Skrynja_2/releases/download/<tag>/<assetnavn>; tag-tilstand bygger download-URL'en direkte uden API. Intil rettelsen: manuel vej på enheden = hent rpm i browser eller curl direkte download-URL, så rpm -qpl, devel-su pkcon install-local, --selvtest.",
