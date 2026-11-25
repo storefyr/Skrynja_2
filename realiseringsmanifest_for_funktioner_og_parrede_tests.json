@@ -325,7 +325,8 @@
         "mål_funktion": "byggesti_og_logfil",
         "ordre": "Omdøb den engelske forkortelse src/ → kilder/ (kilde = source; ascii-sikkert, moc-sikkert). Målt omfang på main: 31 filer i src/; sti-referencer i harbour-skrynja-2.pro (31), tests/tests.pro (30), projektbeskrivelse.adoc (5), manifestets filer-lister (125) og tjek-scripts (/src i testRepoRoot); slot-navnet src_filnavne_matcher_klassenavne i proeve_byggesti_og_logfil.cpp (2) + manifestets testslots (1) → kilder_filnavne_matcher_klassenavne. #include bruger bare filnavne, så ingen include-ændringer. Prosa src-filer → kildefiler. Manifestets filer/testslots opdateres af Projektstokastikeren i samme PR (spejlingsregel); planens referencer af Strategistokastikeren i samme PR. Navngivningsreglen kræver fuldt dansk, selvdokumenterende navne — src er en engelsk forkortelse.",
         "parret_test": "omdøbt slot kilder_filnavne_matcher_klassenavne i tests/proeve_byggesti_og_logfil.cpp tjekker at ingen sti eller fil i depotet hedder src; tjek_plan_manifest_spejl.py og tjek_manifest_parrede_tests.py opdateret til kilder/",
-        "gennemført": false
+        "måling": "PR #74 merged 2026-11-25T12:32:56Z (src/ → kilder/, 31 filer, manifest+plan samme PR); målt på main @ b25bf21: src/ væk, kilder/ = 31 filer, 0 tests/tst_*; slot kilder_filnavne_matcher_klassenavne deklareret og implementeret i proeve_byggesti_og_logfil.cpp; CI success 2026-11-25T12:59:32; tjek_manifest_parrede_tests.py og tjek_plan_manifest_spejl.py exit 0",
+        "gennemført": true
       }
     ]
   },
