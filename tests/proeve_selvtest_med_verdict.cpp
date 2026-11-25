@@ -188,4 +188,4 @@ void TestSelvtestMedVerdict::watchdog_udloeser_verdict_fail_ved_haeng()
     QCOMPARE(selfTest.verdict().value("resultat").toString(), QString("fail"));
 }
 
-#include "tst_selvtest_med_verdict.moc"
+#include "proeve_selvtest_med_verdict.moc"

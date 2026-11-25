@@ -302,4 +302,4 @@ void TestAcpRygrad::alle_metoder_er_konstanter()
     }
 }
 
-#include "tst_acp_rygrad.moc"
+#include "proeve_acp_rygrad.moc"

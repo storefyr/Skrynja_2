@@ -142,4 +142,4 @@ void TestStopOgAfvis::stopAgent_rapporterer_overlevende_proces()
     QVERIFY(!p.isRunning());
 }
 
-#include "tst_stop_og_afvis.moc"
+#include "proeve_stop_og_afvis.moc"

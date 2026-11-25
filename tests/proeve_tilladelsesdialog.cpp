@@ -154,4 +154,4 @@ void TestTilladelsesdialog::dialog_tjekker_svar_retvaerdi()
     QVERIFY2(qml.contains("if (acp.declinePermission("), "dialog tjekker ikke declinePermission-returværdi");
 }
 
-#include "tst_tilladelsesdialog.moc"
+#include "proeve_tilladelsesdialog.moc"

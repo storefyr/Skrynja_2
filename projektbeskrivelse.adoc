@@ -227,7 +227,7 @@ Denne plan fastlægger 26 funktioner i følgende rækkefølge (svarende til mani
 
 *Beslutning:* Plan-revision — ark-2 accepteres ikke. Produktionsklasser må ikke koble til test-infrastruktur; adfærd under test må ikke kunne afvige fra drift.
 
-*Trin:* `arkitektur_fjern_testkroge` (funktion 17, mål_funktion `prøvesuite_i_tests`) — flyt alle `*ForTest`-metoder og `m_testMode`-grenen i `write()` ud af `acpclient`, `acpframereader`, `agentprocess` og `logfile` og ind i en separat test-harness under `tests/`. Parret test: ny slot `ingen_testkroge_i_produktionsklasser` i `tests/tst_proevesuite_i_tests.cpp`.
+*Trin:* `arkitektur_fjern_testkroge` (funktion 17, mål_funktion `prøvesuite_i_tests`) — flyt alle `*ForTest`-metoder og `m_testMode`-grenen i `write()` ud af `acpclient`, `acpframereader`, `agentprocess` og `logfile` og ind i en separat test-harness under `tests/`. Parret test: ny slot `ingen_testkroge_i_produktionsklasser` i `tests/proeve_proevesuite_i_tests.cpp`.
 
 *Status:* LUKKET — gennemført som funktion 17 (`arkitektur_fjern_testkroge`), `passerer: sand` på `main` @ `45e339e` (kildesondrings-triage 26/26 lukket).
 
@@ -237,7 +237,7 @@ Denne plan fastlægger 26 funktioner i følgende rækkefølge (svarende til mani
 
 *Beslutning:* Plan-revision — ark-3 accepteres ikke, før alle metode-strenge ligger ét sted.
 
-*Trin:* `arkitektur_alle_metoder_konstanter` (funktion 18, mål_funktion `acp_rygrad`) — flyt resterende lokale metode-literaler (f.eks. `kSessionCancel` i `acpsession.cpp`) ind i `AcpProtokol`'s konstantsæt, så en omdøbning ét sted ikke kan give stille korrelationsfejl. Parret test: ny slot `alle_metoder_er_konstanter` i `tests/tst_acp_rygrad.cpp`.
+*Trin:* `arkitektur_alle_metoder_konstanter` (funktion 18, mål_funktion `acp_rygrad`) — flyt resterende lokale metode-literaler (f.eks. `kSessionCancel` i `acpsession.cpp`) ind i `AcpProtokol`'s konstantsæt, så en omdøbning ét sted ikke kan give stille korrelationsfejl. Parret test: ny slot `alle_metoder_er_konstanter` i `tests/proeve_acp_rygrad.cpp`.
 
 *Status:* LUKKET — gennemført som funktion 18 (`arkitektur_alle_metoder_konstanter`), `passerer: sand` på `main` @ `45e339e`.
 
@@ -247,7 +247,7 @@ Denne plan fastlægger 26 funktioner i følgende rækkefølge (svarende til mani
 
 *Beslutning:* Plan-revision — ark-4 accepteres ikke; afhængighedsretningen skal vendes.
 
-*Trin:* `arkitektur_diffmodel_uden_transport` (funktion 19, mål_funktion `diff_og_uddata`) — fjern `#include "acpframereader.h"` fra `diffmodel`; flyt cap-konstanten til det fælles konstant-header (eller giv den som parameter), så UI-laget ikke kender transport-laget. Parret test: ny slot `diffmodel_uden_acpframereader_include` i `tests/tst_diff_og_uddata.cpp`.
+*Trin:* `arkitektur_diffmodel_uden_transport` (funktion 19, mål_funktion `diff_og_uddata`) — fjern `#include "acpframereader.h"` fra `diffmodel`; flyt cap-konstanten til det fælles konstant-header (eller giv den som parameter), så UI-laget ikke kender transport-laget. Parret test: ny slot `diffmodel_uden_acpframereader_include` i `tests/proeve_diff_og_uddata.cpp`.
 
 *Status:* LUKKET — gennemført som funktion 19 (`arkitektur_diffmodel_uden_transport`), `passerer: sand` på `main` @ `45e339e`.
 
@@ -257,7 +257,7 @@ Denne plan fastlægger 26 funktioner i følgende rækkefølge (svarende til mani
 
 *Beslutning:* Plan-revision — ark-5 accepteres ikke; konfiguration skal have én ejer med change-signaler.
 
-*Trin:* `arkitektur_en_config_ejer` (funktion 20, mål_funktion `konfiguration_af_agent`) — centralisér agentsti og session-id i én konfigurationsklasse med change-signaler; fjern QSettings-læsninger fra spredte gettere. Parret test: ny slot `en_config_ejer_med_signaler` i `tests/tst_konfiguration_af_agent.cpp`.
+*Trin:* `arkitektur_en_config_ejer` (funktion 20, mål_funktion `konfiguration_af_agent`) — centralisér agentsti og session-id i én konfigurationsklasse med change-signaler; fjern QSettings-læsninger fra spredte gettere. Parret test: ny slot `en_config_ejer_med_signaler` i `tests/proeve_konfiguration_af_agent.cpp`.
 
 *Status:* LUKKET — gennemført som funktion 20 (`arkitektur_en_config_ejer`), `passerer: sand` på `main` @ `45e339e`.
 
@@ -267,7 +267,7 @@ Denne plan fastlægger 26 funktioner i følgende rækkefølge (svarende til mani
 
 *Beslutning:* Plan-revision — ark-6 accepteres ikke; ét model-lag, ikke to.
 
-*Trin:* `arkitektur_fjern_ubrugte_roller` (funktion 21, mål_funktion `værktøjskald_visning`) — fjern det ubrugte QAbstractListModel-lag fra de tre modeller (rene data-holdere); QML fortsætter uændret med QVariantList-properties. Parret test: ny slot `qml_bruger_en_eneste_model_mekanisme` i `tests/tst_vaerktoejskald_visning.cpp`.
+*Trin:* `arkitektur_fjern_ubrugte_roller` (funktion 21, mål_funktion `værktøjskald_visning`) — fjern det ubrugte QAbstractListModel-lag fra de tre modeller (rene data-holdere); QML fortsætter uændret med QVariantList-properties. Parret test: ny slot `qml_bruger_en_eneste_model_mekanisme` i `tests/proeve_vaerktoejskald_visning.cpp`.
 
 *Status:* LUKKET — gennemført som funktion 21 (`arkitektur_fjern_ubrugte_roller`), `passerer: sand` på `main` @ `45e339e`.
 
@@ -286,7 +286,7 @@ Strategisk begrundelse (spørgsmål fra orkestratoren, besvaret 2026-11-21): Ja,
 
 *Begrænsning:* denne sandkasse kan ikke bygge RPM (ingen sfdk/rpmbuild/qmake, vært x86_64) — mål-bygget kører i en sandkasse med Sailfish SDK, ikke hos orkestratoren og ikke i denne sandkasse; værtssuiten (QtTest) dækker fortsat kodekvalitet her.
 
-*Parret test:* nye væverts-slots `spec_og_yaml_er_konsistente_med_pro` og `ingen_rpm_eller_log_i_depotet` i `tests/tst_byggesti_og_logfil.cpp` (prøve før kilde; ingen .rpm eller logfil må nogensinde ligge i depotet).
+*Parret test:* nye væverts-slots `spec_og_yaml_er_konsistente_med_pro` og `ingen_rpm_eller_log_i_depotet` i `tests/proeve_byggesti_og_logfil.cpp` (prøve før kilde; ingen .rpm eller logfil må nogensinde ligge i depotet).
 
 *Verifikation:* `python3 tjek_manifest_parrede_tests.py` exit 0; vært `ALL TESTS PASSED`; mål-byg rc=0 med 0 fejl; `rpm -qpl` viser forventet indhold; exit 0 på enheden.
 

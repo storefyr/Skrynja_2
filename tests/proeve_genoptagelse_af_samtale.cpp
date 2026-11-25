@@ -174,4 +174,4 @@ void TestGenoptagelseAfSamtale::genoptagelsesregel_koerer_git_kommandoer_mod_fix
     QVERIFY(QString::fromUtf8(p.readAllStandardOutput()).contains("fixture-commit"));
 }
 
-#include "tst_genoptagelse_af_samtale.moc"
+#include "proeve_genoptagelse_af_samtale.moc"

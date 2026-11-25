@@ -216,4 +216,4 @@ void TestArkitekturOpdelingSession::eksisterende_session_tests_stadig_groenne()
     QVERIFY(navne.contains("TestArkitekturOpdelingSession"));
 }
 
-#include "tst_arkitektur_opdeling_session.moc"
+#include "proeve_arkitektur_opdeling_session.moc"

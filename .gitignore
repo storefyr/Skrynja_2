@@ -13,7 +13,7 @@ ui_*.h
 
 # binærer
 /harbour-skrynja-2
-/tests/tst_skrynja_2
+/tests/proeve_skrynja_2
 
 # build-mapper
 build/

@@ -102,7 +102,7 @@ int main(int argc, char** argv)
 {
     QCoreApplication app(argc, argv);
     QCoreApplication::setOrganizationName("harbour");
-    QCoreApplication::setApplicationName("tst_skrynja_2");
+    QCoreApplication::setApplicationName("proeve_skrynja_2");
     int failed = 0;
     QStringList navne;
     for (int i = 0; i < testRegistrations().size(); ++i) {
@@ -265,7 +265,7 @@ void TestByggestiOgLogfil::release_workflow_bygger_og_udgiver_rpm()
     QVERIFY2(wf.contains("aarch64"), "workflow skal bygge aarch64");
     QVERIFY2(wf.contains("v*.*.*"), "workflow skal trigge på tags v*.*.*");
     QVERIFY2(wf.contains("workflow_dispatch"), "workflow skal kunne køres manuelt");
-    QVERIFY2(wf.contains("tst_skrynja_2"), "workflow skal køre værtssuiten før release");
+    QVERIFY2(wf.contains("proeve_skrynja_2"), "workflow skal køre værtssuiten før release");
     QVERIFY2(wf.contains("tjek_plan_manifest_spejl.py"), "workflow skal køre spejlkontrollen");
     QVERIFY2(wf.contains("contents: write"), "release-job skal have contents: write (GITHUB_TOKEN)");
     QVERIFY2(wf.contains("action-gh-release") || wf.contains("gh release create"), "workflow skal oprette GitHub Release");
@@ -273,4 +273,4 @@ void TestByggestiOgLogfil::release_workflow_bygger_og_udgiver_rpm()
     QVERIFY2(!wf.contains("git add"), "workflow må ikke commite rpm ind i depotet");
 }
 
-#include "tst_byggesti_og_logfil.moc"
+#include "proeve_byggesti_og_logfil.moc"

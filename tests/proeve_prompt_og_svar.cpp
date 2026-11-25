@@ -134,4 +134,4 @@ void TestPromptOgSvar::messageSent_kun_ved_faktisk_skrevet()
     QVERIFY(!client.lastSentForTest().isEmpty());
 }
 
-#include "tst_prompt_og_svar.moc"
+#include "proeve_prompt_og_svar.moc"

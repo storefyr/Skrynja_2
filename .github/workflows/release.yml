@@ -78,7 +78,7 @@ jobs:
           cd tests
           qmake tests.pro
           make -j2
-          ./tst_skrynja_2
+          ./proeve_skrynja_2
 
       - name: Manifest- og spejlkontroller
         run: |

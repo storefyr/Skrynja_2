@@ -157,4 +157,4 @@ void TestArkitekturOpdelingUiModeller::eksisterende_model_tests_stadig_groenne()
     QVERIFY(navne.contains("TestArkitekturOpdelingUiModeller"));
 }
 
-#include "tst_arkitektur_opdeling_ui_modeller.moc"
+#include "proeve_arkitektur_opdeling_ui_modeller.moc"

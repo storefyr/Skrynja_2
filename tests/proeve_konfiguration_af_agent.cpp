@@ -162,4 +162,4 @@ void TestKonfigurationAfAgent::en_config_ejer_med_signaler()
     s.sync();
 }
 
-#include "tst_konfiguration_af_agent.moc"
+#include "proeve_konfiguration_af_agent.moc"

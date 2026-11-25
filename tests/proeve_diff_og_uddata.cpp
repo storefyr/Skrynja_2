@@ -90,7 +90,7 @@ void TestDiffOgUddata::diff_vises_mens_det_sker()
 
 void TestDiffOgUddata::diff_test_paastaaer_kun_diff()
 {
-    QString kilde = testReadSource("tests/tst_diff_og_uddata.cpp");
+    QString kilde = testReadSource("tests/proeve_diff_og_uddata.cpp");
     int pos = kilde.indexOf("TestDiffOgUddata::diff_vises_mens_det_sker");
     QVERIFY(pos >= 0);
     int slut = kilde.indexOf("TestDiffOgUddata::diff_test_paastaaer_kun_diff", pos);
@@ -114,4 +114,4 @@ void TestDiffOgUddata::diffmodel_uden_acpframereader_include()
     QVERIFY(client.diffModel()->diffCount() > 0);
 }
 
-#include "tst_diff_og_uddata.moc"
+#include "proeve_diff_og_uddata.moc"

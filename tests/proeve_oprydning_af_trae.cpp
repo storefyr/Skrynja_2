@@ -66,7 +66,7 @@ void TestOprydningAfTrae::ingen_hemmeligheder_i_trae()
 void TestOprydningAfTrae::ingen_build_artefakter_i_trae()
 {
     QString output = runGit(QStringList() << "ls-files");
-    QRegExp artefakt("(^|/)(Makefile|\\.o$|moc_|qrc_|ui_|\\.qmake\\.stash|tst_skrynja_2|harbour-skrynja-2)$");
+    QRegExp artefakt("(^|/)(Makefile|\\.o$|moc_|qrc_|ui_|\\.qmake\\.stash|proeve_skrynja_2|harbour-skrynja-2)$");
     QStringList lines = output.split('\n', QString::SkipEmptyParts);
     for (int i = 0; i < lines.size(); ++i)
         QVERIFY2(!artefakt.exactMatch(lines.at(i)), qPrintable("build-artefakt i træet: " + lines.at(i)));
@@ -100,7 +100,7 @@ void TestOprydningAfTrae::logfil_uden_transskripter()
 
 void TestOprydningAfTrae::status_test_er_reproducerbar()
 {
-    QString kilde = testReadSource("tests/tst_oprydning_af_trae.cpp");
+    QString kilde = testReadSource("tests/proeve_oprydning_af_trae.cpp");
     QVERIFY2(kilde.contains("--porcelain"), "git status uden --porcelain");
     QVERIFY2(kilde.contains("-- \"src\"") || kilde.contains("<< \"src\""),
              "git status tæller ikke kun udvalgte sporede filer");
@@ -112,8 +112,8 @@ void TestOprydningAfTrae::status_test_er_reproducerbar()
 
 void TestOprydningAfTrae::ingen_pgrep_mod_vaertsmiljoe()
 {
-    QString kilde = testReadSource("tests/tst_oprydning_af_trae.cpp");
+    QString kilde = testReadSource("tests/proeve_oprydning_af_trae.cpp");
     QVERIFY2(!kilde.contains("\"pgrep\""), "testen pgrep'er stadig værtsmiljøet");
 }
 
-#include "tst_oprydning_af_trae.moc"
+#include "proeve_oprydning_af_trae.moc"

@@ -159,4 +159,4 @@ void TestVaerktoejskaldVisning::qml_bruger_en_eneste_model_mekanisme()
     QVERIFY(changedSpy.count() > 0);
 }
 
-#include "tst_vaerktoejskald_visning.moc"
+#include "proeve_vaerktoejskald_visning.moc"

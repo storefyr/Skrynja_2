@@ -206,4 +206,4 @@ void TestArkitekturOpdelingProtokol::eksisterende_rygrad_tests_stadig_groenne()
     QVERIFY(navne.contains("TestArkitekturOpdelingProtokol"));
 }
 
-#include "tst_arkitektur_opdeling_protokol.moc"
+#include "proeve_arkitektur_opdeling_protokol.moc"

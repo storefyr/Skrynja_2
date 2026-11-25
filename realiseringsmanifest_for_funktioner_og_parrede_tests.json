@@ -313,7 +313,7 @@
         "id": "navn-1",
         "type": "støj",
         "mål_funktion": "prøvesuite_i_tests",
-        "ordre": "Omdøb navngivnings-afkortningen tst_ → proeve_ i tests/ (målt omfang på main @ f84c82a): alle 16 tests/tst_*.cpp → tests/proeve_*.cpp inkl. #include \"proeve_*.moc\" i hver af de 16 filer; tests/tests.pro (17 referencer, samt TARGET tst_skrynja_2 → proeve_skrynja_2); .gitignore (/tests/tst_skrynja_2); manifestets parret_test.testfil-referencer (Projektstokastikeren opdaterer dem i samme PR ifølge spejlingsreglen — navngivningsreglen fra 2026-11-22 står for dette planlagte omdøb); planens 6 referencer (Strategistokastikeren, samme PR). Vurderings-JSON'ens historiske citater af tst_-navne bevares (log-undtagelsen i navngivningsreglen). Begrundelse: navngivningsreglen forbyder afkortninger og præfiks-koder — prøve skrives ascii som proeve i kildefilnavne (moc-undtagelsen gælder ascii, ikke afkortninger).",
+        "ordre": "Omdøb navngivnings-afkortningen tst_ → proeve_ i tests/ (målt omfang på main @ f84c82a): alle 16 tests/tst_*.cpp → tests/proeve_*.cpp inkl. #include \"proeve_*.moc\" i hver af de 16 filer; tests/tests.pro (17 referencer, samt TARGET proeve_skrynja_2 → proeve_skrynja_2); .gitignore (/tests/proeve_skrynja_2); manifestets parret_test.testfil-referencer (Projektstokastikeren opdaterer dem i samme PR ifølge spejlingsreglen — navngivningsreglen fra 2026-11-22 står for dette planlagte omdøb); planens 6 referencer (Strategistokastikeren, samme PR). Vurderings-JSON'ens historiske citater af tst_-navne bevares (log-undtagelsen i navngivningsreglen). Begrundelse: navngivningsreglen forbyder afkortninger og præfiks-koder — prøve skrives ascii som proeve i kildefilnavne (moc-undtagelsen gælder ascii, ikke afkortninger).",
         "parret_test": "tests/proeve_proevesuite_i_tests.cpp + ny slot: ingen_afkortede_tst_filnavne_i_tests (tjekker at ingen fil i tests/ har præfikset tst_)",
         "gennemført": false
       }
@@ -364,7 +364,7 @@
         "tests/tests.pro"
       ],
       "parret_test": {
-        "testfil": "tests/tst_byggesti_og_logfil.cpp",
+        "testfil": "tests/proeve_byggesti_og_logfil.cpp",
         "testklasse": "TestByggestiOgLogfil",
         "testslots": [
           "logfil_oprettes_ved_foerste_linje",
@@ -395,7 +395,7 @@
         },
         {
           "trin": "Parret test kører grønt",
-          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "kommando": "cd tests && qmake tests.pro && make && ./proeve_skrynja_2",
           "forventet_uddata": "ALL TESTS PASSED (heraf TestByggestiOgLogfil)"
         }
       ],
@@ -412,7 +412,7 @@
         "src/acpbesked.cpp"
       ],
       "parret_test": {
-        "testfil": "tests/tst_acp_rygrad.cpp",
+        "testfil": "tests/proeve_acp_rygrad.cpp",
         "testklasse": "TestAcpRygrad",
         "testslots": [
           "rygrad_fixture_hoved",
@@ -441,7 +441,7 @@
       "verifikations_trin": [
         {
           "trin": "Parret test kører grønt på alle fixtures",
-          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "kommando": "cd tests && qmake tests.pro && make && ./proeve_skrynja_2",
           "forventet_uddata": "ALL TESTS PASSED (heraf TestAcpRygrad)"
         },
         {
@@ -463,7 +463,7 @@
         "src/acpclient.cpp"
       ],
       "parret_test": {
-        "testfil": "tests/tst_agentproces_og_initialisering.cpp",
+        "testfil": "tests/proeve_agentproces_og_initialisering.cpp",
         "testklasse": "TestAgentprocesOgInitialisering",
         "testslots": [
           "standard_agentsti_er_vibe_acp",
@@ -478,7 +478,7 @@
       "verifikations_trin": [
         {
           "trin": "Parret test kører grønt",
-          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "kommando": "cd tests && qmake tests.pro && make && ./proeve_skrynja_2",
           "forventet_uddata": "ALL TESTS PASSED (heraf TestAgentprocesOgInitialisering)"
         },
         {
@@ -505,7 +505,7 @@
         "src/samtalemodel.cpp"
       ],
       "parret_test": {
-        "testfil": "tests/tst_prompt_og_svar.cpp",
+        "testfil": "tests/proeve_prompt_og_svar.cpp",
         "testklasse": "TestPromptOgSvar",
         "testslots": [
           "session_new_payload_cwd",
@@ -523,7 +523,7 @@
       "verifikations_trin": [
         {
           "trin": "Parret test kører grønt",
-          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "kommando": "cd tests && qmake tests.pro && make && ./proeve_skrynja_2",
           "forventet_uddata": "ALL TESTS PASSED (heraf TestPromptOgSvar)"
         },
         {
@@ -545,7 +545,7 @@
         "src/sessionlager.cpp"
       ],
       "parret_test": {
-        "testfil": "tests/tst_genoptagelse_af_samtale.cpp",
+        "testfil": "tests/proeve_genoptagelse_af_samtale.cpp",
         "testklasse": "TestGenoptagelseAfSamtale",
         "testslots": [
           "session_id_gemmes_i_settings",
@@ -561,7 +561,7 @@
       "verifikations_trin": [
         {
           "trin": "Parret test kører grønt",
-          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "kommando": "cd tests && qmake tests.pro && make && ./proeve_skrynja_2",
           "forventet_uddata": "ALL TESTS PASSED (heraf TestGenoptagelseAfSamtale)"
         },
         {
@@ -585,7 +585,7 @@
         "qml/pages/StartSide.qml"
       ],
       "parret_test": {
-        "testfil": "tests/tst_vaerktoejskald_visning.cpp",
+        "testfil": "tests/proeve_vaerktoejskald_visning.cpp",
         "testklasse": "TestVaerktoejskaldVisning",
         "testslots": [
           "tool_call_felter_parses",
@@ -601,7 +601,7 @@
       "verifikations_trin": [
         {
           "trin": "Parret test kører grønt",
-          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "kommando": "cd tests && qmake tests.pro && make && ./proeve_skrynja_2",
           "forventet_uddata": "ALL TESTS PASSED (heraf TestVaerktoejskaldVisning)"
         },
         {
@@ -624,7 +624,7 @@
         "qml/pages/TilladelsesDialog.qml"
       ],
       "parret_test": {
-        "testfil": "tests/tst_tilladelsesdialog.cpp",
+        "testfil": "tests/proeve_tilladelsesdialog.cpp",
         "testklasse": "TestTilladelsesdialog",
         "testslots": [
           "anmodning_parses_til_pendingPermission",
@@ -645,7 +645,7 @@
       "verifikations_trin": [
         {
           "trin": "Parret test kører grønt",
-          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "kommando": "cd tests && qmake tests.pro && make && ./proeve_skrynja_2",
           "forventet_uddata": "ALL TESTS PASSED (heraf TestTilladelsesdialog)"
         },
         {
@@ -667,7 +667,7 @@
         "src/agentproces.cpp"
       ],
       "parret_test": {
-        "testfil": "tests/tst_stop_og_afvis.cpp",
+        "testfil": "tests/proeve_stop_og_afvis.cpp",
         "testklasse": "TestStopOgAfvis",
         "testslots": [
           "cancel_notification_payload",
@@ -685,7 +685,7 @@
       "verifikations_trin": [
         {
           "trin": "Parret test kører grønt",
-          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "kommando": "cd tests && qmake tests.pro && make && ./proeve_skrynja_2",
           "forventet_uddata": "ALL TESTS PASSED (heraf TestStopOgAfvis)"
         },
         {
@@ -713,7 +713,7 @@
         "qml/pages/DiffVisning.qml"
       ],
       "parret_test": {
-        "testfil": "tests/tst_diff_og_uddata.cpp",
+        "testfil": "tests/proeve_diff_og_uddata.cpp",
         "testklasse": "TestDiffOgUddata",
         "testslots": [
           "diff_blok_parses",
@@ -732,7 +732,7 @@
       "verifikations_trin": [
         {
           "trin": "Parret test kører grønt",
-          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "kommando": "cd tests && qmake tests.pro && make && ./proeve_skrynja_2",
           "forventet_uddata": "ALL TESTS PASSED (heraf TestDiffOgUddata)"
         },
         {
@@ -755,7 +755,7 @@
         "qml/pages/KonfigurationsSide.qml"
       ],
       "parret_test": {
-        "testfil": "tests/tst_konfiguration_af_agent.cpp",
+        "testfil": "tests/proeve_konfiguration_af_agent.cpp",
         "testklasse": "TestKonfigurationAfAgent",
         "testslots": [
           "config_options_fra_initialize_svar",
@@ -773,7 +773,7 @@
       "verifikations_trin": [
         {
           "trin": "Parret test kører grønt",
-          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "kommando": "cd tests && qmake tests.pro && make && ./proeve_skrynja_2",
           "forventet_uddata": "ALL TESTS PASSED (heraf TestKonfigurationAfAgent)"
         },
         {
@@ -796,7 +796,7 @@
         "src/selvtest.cpp"
       ],
       "parret_test": {
-        "testfil": "tests/tst_selvtest_med_verdict.cpp",
+        "testfil": "tests/proeve_selvtest_med_verdict.cpp",
         "testklasse": "TestSelvtestMedVerdict",
         "testslots": [
           "verdict_pass_ved_end_turn_og_exit_0",
@@ -816,7 +816,7 @@
       "verifikations_trin": [
         {
           "trin": "Parret test kører grønt",
-          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "kommando": "cd tests && qmake tests.pro && make && ./proeve_skrynja_2",
           "forventet_uddata": "ALL TESTS PASSED (heraf TestSelvtestMedVerdict)"
         },
         {
@@ -837,7 +837,7 @@
         "tjek_manifest_parrede_tests.py"
       ],
       "parret_test": {
-        "testfil": "tests/tst_proevesuite_i_tests.cpp",
+        "testfil": "tests/proeve_proevesuite_i_tests.cpp",
         "testklasse": "TestProevesuiteITests",
         "testslots": [
           "alle_manifest_testfiler_er_i_tests_pro",
@@ -854,7 +854,7 @@
       "verifikations_trin": [
         {
           "trin": "Hele suiten bygger og kører grønt",
-          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "kommando": "cd tests && qmake tests.pro && make && ./proeve_skrynja_2",
           "forventet_uddata": "ALL TESTS PASSED (alle 13 testklasser)"
         },
         {
@@ -875,7 +875,7 @@
         "src/acpclient.cpp"
       ],
       "parret_test": {
-        "testfil": "tests/tst_oprydning_af_trae.cpp",
+        "testfil": "tests/proeve_oprydning_af_trae.cpp",
         "testklasse": "TestOprydningAfTrae",
         "testslots": [
           "git_status_porcelain_tom_efter_indskrivning",
@@ -892,7 +892,7 @@
       "verifikations_trin": [
         {
           "trin": "Parret test kører grønt",
-          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "kommando": "cd tests && qmake tests.pro && make && ./proeve_skrynja_2",
           "forventet_uddata": "ALL TESTS PASSED (heraf TestOprydningAfTrae)"
         },
         {
@@ -920,7 +920,7 @@
         "tests/tst_arkitektur_opdeling_protokol.cpp"
       ],
       "parret_test": {
-        "testfil": "tests/tst_arkitektur_opdeling_protokol.cpp",
+        "testfil": "tests/proeve_arkitektur_opdeling_protokol.cpp",
         "testklasse": "TestArkitekturOpdelingProtokol",
         "testslots": [
           "acp_protokol_haandterer_dispatch",
@@ -936,7 +936,7 @@
       "verifikations_trin": [
         {
           "trin": "Eksisterende parrede tests forbliver grønne",
-          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "kommando": "cd tests && qmake tests.pro && make && ./proeve_skrynja_2",
           "forventet_uddata": "ALL TESTS PASSED (inkl. TestAcpRygrad og TestArkitekturOpdelingProtokol)"
         },
         {
@@ -966,7 +966,7 @@
         "tests/tst_arkitektur_opdeling_session.cpp"
       ],
       "parret_test": {
-        "testfil": "tests/tst_arkitektur_opdeling_session.cpp",
+        "testfil": "tests/proeve_arkitektur_opdeling_session.cpp",
         "testklasse": "TestArkitekturOpdelingSession",
         "testslots": [
           "acp_session_haandterer_initialize_new_load_prompt_cancel",
@@ -983,7 +983,7 @@
       "verifikations_trin": [
         {
           "trin": "Eksisterende parrede tests forbliver grønne",
-          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "kommando": "cd tests && qmake tests.pro && make && ./proeve_skrynja_2",
           "forventet_uddata": "ALL TESTS PASSED (inkl. TestGenoptagelseAfSamtale, TestPromptOgSvar og TestArkitekturOpdelingSession)"
         },
         {
@@ -1014,7 +1014,7 @@
         "tests/tst_arkitektur_opdeling_ui_modeller.cpp"
       ],
       "parret_test": {
-        "testfil": "tests/tst_arkitektur_opdeling_ui_modeller.cpp",
+        "testfil": "tests/proeve_arkitektur_opdeling_ui_modeller.cpp",
         "testklasse": "TestArkitekturOpdelingUiModeller",
         "testslots": [
           "acpclient_er_tynd_facade",
@@ -1028,7 +1028,7 @@
       "verifikations_trin": [
         {
           "trin": "Eksisterende parrede tests forbliver grønne",
-          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "kommando": "cd tests && qmake tests.pro && make && ./proeve_skrynja_2",
           "forventet_uddata": "ALL TESTS PASSED (inkl. model-testklasserne og TestArkitekturOpdelingUiModeller)"
         },
         {
@@ -1061,7 +1061,7 @@
         "tests/tst_proevesuite_i_tests.cpp"
       ],
       "parret_test": {
-        "testfil": "tests/tst_proevesuite_i_tests.cpp",
+        "testfil": "tests/proeve_proevesuite_i_tests.cpp",
         "testklasse": "TestProevesuiteITests",
         "testslots": [
           "ingen_testkroge_i_produktionsklasser"
@@ -1072,7 +1072,7 @@
       "verifikations_trin": [
         {
           "trin": "Host-suite grøn med ny slot; baseline 136 PASS / 0 FAIL bevaret",
-          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "kommando": "cd tests && qmake tests.pro && make && ./proeve_skrynja_2",
           "forventet_uddata": "ALL TESTS PASSED (inkl. TestProevesuiteITests::ingen_testkroge_i_produktionsklasser); 136 PASS / 0 FAIL"
         },
         {
@@ -1099,7 +1099,7 @@
         "tests/tst_acp_rygrad.cpp"
       ],
       "parret_test": {
-        "testfil": "tests/tst_acp_rygrad.cpp",
+        "testfil": "tests/proeve_acp_rygrad.cpp",
         "testklasse": "TestAcpRygrad",
         "testslots": [
           "alle_metoder_er_konstanter"
@@ -1112,7 +1112,7 @@
       "verifikations_trin": [
         {
           "trin": "Host-suite grøn med ny slot; baseline 136 PASS / 0 FAIL bevaret",
-          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "kommando": "cd tests && qmake tests.pro && make && ./proeve_skrynja_2",
           "forventet_uddata": "ALL TESTS PASSED (inkl. TestAcpRygrad::alle_metoder_er_konstanter); 136 PASS / 0 FAIL"
         },
         {
@@ -1139,7 +1139,7 @@
         "tests/tst_diff_og_uddata.cpp"
       ],
       "parret_test": {
-        "testfil": "tests/tst_diff_og_uddata.cpp",
+        "testfil": "tests/proeve_diff_og_uddata.cpp",
         "testklasse": "TestDiffOgUddata",
         "testslots": [
           "diffmodel_uden_acpframereader_include"
@@ -1152,7 +1152,7 @@
       "verifikations_trin": [
         {
           "trin": "Host-suite grøn med ny slot; baseline 136 PASS / 0 FAIL bevaret",
-          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "kommando": "cd tests && qmake tests.pro && make && ./proeve_skrynja_2",
           "forventet_uddata": "ALL TESTS PASSED (inkl. TestDiffOgUddata::diffmodel_uden_acpframereader_include); 136 PASS / 0 FAIL"
         },
         {
@@ -1182,7 +1182,7 @@
         "tests/tst_konfiguration_af_agent.cpp"
       ],
       "parret_test": {
-        "testfil": "tests/tst_konfiguration_af_agent.cpp",
+        "testfil": "tests/proeve_konfiguration_af_agent.cpp",
         "testklasse": "TestKonfigurationAfAgent",
         "testslots": [
           "en_config_ejer_med_signaler"
@@ -1195,7 +1195,7 @@
       "verifikations_trin": [
         {
           "trin": "Host-suite grøn med ny slot; baseline 136 PASS / 0 FAIL bevaret",
-          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "kommando": "cd tests && qmake tests.pro && make && ./proeve_skrynja_2",
           "forventet_uddata": "ALL TESTS PASSED (inkl. TestKonfigurationAfAgent::en_config_ejer_med_signaler); 136 PASS / 0 FAIL"
         },
         {
@@ -1225,7 +1225,7 @@
         "tests/tst_vaerktoejskald_visning.cpp"
       ],
       "parret_test": {
-        "testfil": "tests/tst_vaerktoejskald_visning.cpp",
+        "testfil": "tests/proeve_vaerktoejskald_visning.cpp",
         "testklasse": "TestVaerktoejskaldVisning",
         "testslots": [
           "qml_bruger_en_eneste_model_mekanisme"
@@ -1238,7 +1238,7 @@
       "verifikations_trin": [
         {
           "trin": "Host-suite grøn med ny slot; baseline 136 PASS / 0 FAIL bevaret",
-          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "kommando": "cd tests && qmake tests.pro && make && ./proeve_skrynja_2",
           "forventet_uddata": "ALL TESTS PASSED (inkl. TestVaerktoejskaldVisning::qml_bruger_en_eneste_model_mekanisme); 136 PASS / 0 FAIL"
         },
         {
@@ -1268,7 +1268,7 @@
         "harbour-skrynja-2.yaml"
       ],
       "parret_test": {
-        "testfil": "tests/tst_byggesti_og_logfil.cpp",
+        "testfil": "tests/proeve_byggesti_og_logfil.cpp",
         "testklasse": "TestByggestiOgLogfil",
         "testslots": [
           "ikoner_findes_i_fire_stoerrelser_og_er_png",
@@ -1290,7 +1290,7 @@
         },
         {
           "trin": "Parret test og hele suiten grøn",
-          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "kommando": "cd tests && qmake tests.pro && make && ./proeve_skrynja_2",
           "forventet_uddata": "ALL TESTS PASSED (inkl. TestByggestiOgLogfil nye slots)"
         },
         {
@@ -1319,7 +1319,7 @@
         "tests/tst_byggesti_og_logfil.cpp"
       ],
       "parret_test": {
-        "testfil": "tests/tst_byggesti_og_logfil.cpp",
+        "testfil": "tests/proeve_byggesti_og_logfil.cpp",
         "testklasse": "TestByggestiOgLogfil",
         "testslots": [
           "spec_og_yaml_er_konsistente_med_pro",
@@ -1332,7 +1332,7 @@
       "verifikations_trin": [
         {
           "trin": "Host: packaging-konsistens via nye parrede slots",
-          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "kommando": "cd tests && qmake tests.pro && make && ./proeve_skrynja_2",
           "forventet_uddata": "ALL TESTS PASSED (inkl. TestByggestiOgLogfil::spec_og_yaml_er_konsistente_med_pro og ::ingen_rpm_eller_log_i_depotet)"
         },
         {
@@ -1382,7 +1382,7 @@
         "tests/tst_prompt_og_svar.cpp"
       ],
       "parret_test": {
-        "testfil": "tests/tst_prompt_og_svar.cpp",
+        "testfil": "tests/proeve_prompt_og_svar.cpp",
         "testklasse": "TestPromptOgSvar",
         "testslots": [
           "skraerbillede_sendes_som_billedblok_i_session_prompt",
@@ -1396,7 +1396,7 @@
       "verifikations_trin": [
         {
           "trin": "Host-suite grøn med nye slots",
-          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "kommando": "cd tests && qmake tests.pro && make && ./proeve_skrynja_2",
           "forventet_uddata": "ALL TESTS PASSED (inkl. TestPromptOgSvar nye slots)"
         },
         {
@@ -1428,7 +1428,7 @@
         "tests/tst_tilladelsesdialog.cpp"
       ],
       "parret_test": {
-        "testfil": "tests/tst_tilladelsesdialog.cpp",
+        "testfil": "tests/proeve_tilladelsesdialog.cpp",
         "testklasse": "TestTilladelsesdialog",
         "testslots": [
           "clientCapabilities_paa_enhed_ikke_tom",
@@ -1443,7 +1443,7 @@
       "verifikations_trin": [
         {
           "trin": "Host-suite grøn med nye slots (clientCapabilities forbliver tom i værtsløkke)",
-          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "kommando": "cd tests && qmake tests.pro && make && ./proeve_skrynja_2",
           "forventet_uddata": "ALL TESTS PASSED (inkl. TestTilladelsesdialog nye slots)"
         },
         {
@@ -1470,7 +1470,7 @@
         "realiseringsmanifest_for_funktioner_og_parrede_tests.json"
       ],
       "parret_test": {
-        "testfil": "tests/tst_proevesuite_i_tests.cpp",
+        "testfil": "tests/proeve_proevesuite_i_tests.cpp",
         "testklasse": "TestProevesuiteITests",
         "testslots": [
           "plan_og_manifest_spejler_hinanden",
@@ -1492,7 +1492,7 @@
         },
         {
           "trin": "Host-suite grøn med ny slot",
-          "kommando": "cd tests && qmake tests.pro && make && ./tst_skrynja_2",
+          "kommando": "cd tests && qmake tests.pro && make && ./proeve_skrynja_2",
           "forventet_uddata": "ALL TESTS PASSED (inkl. TestProevesuiteITests::plan_og_manifest_spejler_hinanden)"
         },
         {

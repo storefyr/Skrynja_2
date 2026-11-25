@@ -97,4 +97,4 @@ void TestAgentprocesOgInitialisering::startfejl_giver_lastError_uden_haeng()
     QVERIFY(!client.lastError().isEmpty());
 }
 
-#include "tst_agentproces_og_initialisering.moc"
+#include "proeve_agentproces_og_initialisering.moc"
