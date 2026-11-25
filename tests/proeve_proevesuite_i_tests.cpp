@@ -25,7 +25,7 @@ private slots:
     void meta_test_afledt_af_manifest_ikke_hardkodet();
     void ingen_testkroge_i_produktionsklasser();
     void plan_og_manifest_spejler_hinanden();
-    void ingen_afkortede_proeve_filnavne_i_tests();
+    void ingen_afkortede_tst_filnavne_i_tests();
     void spejlkontrol_daekker_navngivningsregel();
 private:
     QJsonObject readManifest();
@@ -301,21 +301,21 @@ void TestProevesuiteITests::spejlkontrol_daekker_navngivningsregel()
     QFile::remove(tempSti);
 }
 
-void TestProevesuiteITests::ingen_afkortede_proeve_filnavne_i_tests()
+void TestProevesuiteITests::ingen_afkortede_tst_filnavne_i_tests()
 {
     QDir dir(testRepoRoot() + "/tests");
     QStringList filer = dir.entryList(QStringList() << "*.cpp" << "*.h", QDir::Files);
     int proeveAntal = 0;
     for (int i = 0; i < filer.size(); ++i) {
-        QVERIFY2(!filer.at(i).startsWith("proeve_"), qPrintable("afkortet filnavn: " + filer.at(i)));
+        QVERIFY2(!filer.at(i).startsWith("tst_"), qPrintable("afkortet filnavn: " + filer.at(i)));
         if (filer.at(i).startsWith("proeve_"))
             ++proeveAntal;
         QString src = testReadSource("tests/" + filer.at(i));
-        QVERIFY2(!src.contains("#include \"proeve_"), qPrintable("proeve_-moc-include i " + filer.at(i)));
+        QVERIFY2(!src.contains("#include \"tst_"), qPrintable("tst_-moc-include i " + filer.at(i)));
     }
     QVERIFY2(proeveAntal >= 16, qPrintable("for faa proeve_*-filer: " + QString::number(proeveAntal)));
-    QVERIFY2(!testReadSource("tests/tests.pro").contains("proeve_"), "tests.pro har stadig proeve_-referencer");
-    QVERIFY2(!testReadSource(".gitignore").contains("proeve_"), ".gitignore har stadig proeve_-referencer");
+    QVERIFY2(!testReadSource("tests/tests.pro").contains("tst_"), "tests.pro har stadig tst_-referencer");
+    QVERIFY2(!testReadSource(".gitignore").contains("tst_"), ".gitignore har stadig tst_-referencer");
 }
 
 #include "proeve_proevesuite_i_tests.moc"
