@@ -392,7 +392,8 @@
           "logfil_roerer_ikke_transskripter",
           "manglende_qml_giver_ikke_exit_0",
           "startAgent_fejl_signaleres"
-        ],
+        ,
+          "verificeringsskript_paa_enhed_findes_og_bestaaer_bash_n"],
         "fixtures": [],
         "bemærkning": "QtTest uden Silica (QT += core testlib); prøven indskrives før src/logfil.cpp og registreres i tests/tests.pro"
       },
