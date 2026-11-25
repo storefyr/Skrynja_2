@@ -846,7 +846,8 @@
           "manifest_har_13_parrede_tests",
           "ingen_global_settings_mutation_i_tests",
           "meta_test_afledt_af_manifest_ikke_hardkodet"
-        ],
+        ,
+          "ingen_afkortede_tst_filnavne_i_tests"],
         "fixtures": [],
         "bemærkning": "Meta-prøve: læser manifestet og tests.pro og tjekker parringen 1:1"
       },
