@@ -295,6 +295,7 @@ void TestByggestiOgLogfil::verificeringsskript_paa_enhed_findes_og_bestaaer_bash
     QVERIFY2(indhold.contains("icons/hicolor"), "skript skal tjekke ikon-stierne");
     QVERIFY2(indhold.contains("git push origin"), "skript skal udløse mål-byg og udgivelse via tag-push (git push origin vX.Y.Z) i samme kørsel");
     QVERIFY2(indhold.contains("releases/tag/"), "skript skal vente på release-siden for det nye tag før hentning, så intet manuelt trin står mellem byg og hentning");
+    QVERIFY2(indhold.contains("releases/expanded_assets/"), "skript skal finde asset-navn via expanded_assets/<tag> først (fallback releases/tag/) — målt på Jolla Phone 2026: den fulde release-side gav intet asset-match på enheden");
     QVERIFY2(!indhold.contains("api.github.com"), "skript må ikke kalde api.github.com på enheden (403 målt 2026-11-25, ordre fra-13)");
     QVERIFY2(indhold.contains("url_effective"), "skript skal løse seneste tag via github.com-redirect (url_effective på releases/latest)");
     QVERIFY2(indhold.contains("releases/download/"), "skript skal hente asset via direkte download-URL (releases/download/<tag>/<fil>)");
@@ -319,6 +320,10 @@ done
 case "$url" in
     */releases/latest)
         if [ "$fmt" = "%{url_effective}" ]; then echo "https://github.com/storefyr/Skrynja_2/releases/tag/v1.0.2"; fi ;;
+    */releases/expanded_assets/*)
+        if [ "$fmt" = "%{http_code}" ]; then echo "200"; else
+            echo '<a href="/storefyr/Skrynja_2/releases/download/v1.0.2/harbour-skrynja-2-1.0.2-1.aarch64.rpm">rpm</a>'
+        fi ;;
     */releases/tag/*)
         if [ "$fmt" = "%{http_code}" ]; then echo "200"; else
             echo '<a href="/storefyr/Skrynja_2/releases/download/v1.0.2/harbour-skrynja-2-1.0.2-1.aarch64.rpm">rpm</a>'
@@ -377,6 +382,7 @@ exit 0
     QVERIFY2(!kald.contains("api.github.com"), qPrintable("simuleret kørsel ramte api.github.com: " + kald));
     QVERIFY2(kald.contains("releases/latest"), qPrintable("seneste tag skal løses via releases/latest-redirect: " + kald));
     QVERIFY2(kald.contains("releases/download/v1.0.2/harbour-skrynja-2-1.0.2-1.aarch64.rpm"), qPrintable("asset skal hentes via direkte download-URL: " + kald));
+    QVERIFY2(kald.contains("releases/expanded_assets/v1.0.2"), qPrintable("asset-navn skal slås op via expanded_assets-fragmentet først: " + kald));
 }
 
 #include "proeve_byggesti_og_logfil.moc"
