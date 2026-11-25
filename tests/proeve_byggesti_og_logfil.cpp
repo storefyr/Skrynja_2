@@ -293,6 +293,8 @@ void TestByggestiOgLogfil::verificeringsskript_paa_enhed_findes_og_bestaaer_bash
     QVERIFY2(indhold.contains("--selvtest"), "skript skal køre appens --selvtest");
     QVERIFY2(indhold.contains("/usr/bin/harbour-skrynja-2"), "skript skal tjekke binær-stien");
     QVERIFY2(indhold.contains("icons/hicolor"), "skript skal tjekke ikon-stierne");
+    QVERIFY2(indhold.contains("git push origin"), "skript skal udløse mål-byg og udgivelse via tag-push (git push origin vX.Y.Z) i samme kørsel");
+    QVERIFY2(indhold.contains("releases/tags/"), "skript skal vente på release for det nye tag før hentning, så intet manuelt trin står mellem byg og hentning");
 
     QProcess bash;
     bash.setWorkingDirectory(testRepoRoot());
