@@ -282,9 +282,9 @@ void TestByggestiOgLogfil::release_workflow_bygger_og_udgiver_rpm()
 
 void TestByggestiOgLogfil::verificeringsskript_paa_enhed_findes_og_bestaaer_bash_n()
 {
-    QString sti = testRepoRoot() + "/vaerktoejler/verificer_paa_enhed.sh";
-    QVERIFY2(QFileInfo::exists(sti), "vaerktoejler/verificer_paa_enhed.sh mangler");
-    QString indhold = testReadSource("vaerktoejler/verificer_paa_enhed.sh");
+    QString sti = testRepoRoot() + "/værktøjer/verificer_paa_enhed.sh";
+    QVERIFY2(QFileInfo::exists(sti), "værktøjer/verificer_paa_enhed.sh mangler");
+    QString indhold = testReadSource("værktøjer/verificer_paa_enhed.sh");
     QVERIFY2(indhold.startsWith("#!"), "skript skal starte med shebang");
     QVERIFY2(indhold.contains("releases/latest"), "skript skal hente seneste GitHub Release");
     QVERIFY2(indhold.contains("aarch64.rpm"), "skript skal hente aarch64-rpm-asset");
