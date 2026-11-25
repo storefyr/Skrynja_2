@@ -277,7 +277,7 @@ void TestProevesuiteITests::spejlkontrol_daekker_navngivningsregel()
     bool harNavngivning = false;
     for (int i = 0; i < arbejdsregler.size(); ++i) {
         QString regel = arbejdsregler.at(i).toString();
-        if (regel.contains("Navngivning"))
+        if (regel.contains("Navngivning", Qt::CaseInsensitive))
             harNavngivning = true;
         else
             udenNavngivning.append(regel);
