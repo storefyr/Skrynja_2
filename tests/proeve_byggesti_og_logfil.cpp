@@ -18,7 +18,7 @@ private slots:
     void logfil_linje_har_iso_tidsstempel();
     void logfil_appender_uden_at_overskrive();
     void logfil_roerer_ikke_transskripter();
-    void src_filnavne_matcher_klassenavne();
+    void kilder_filnavne_matcher_klassenavne();
     void manglende_qml_giver_ikke_exit_0();
     void startAgent_fejl_signaleres();
     void ikoner_findes_i_fire_stoerrelser_og_er_png();
@@ -118,24 +118,28 @@ int main(int argc, char** argv)
     return failed;
 }
 
-void TestByggestiOgLogfil::src_filnavne_matcher_klassenavne()
+void TestByggestiOgLogfil::kilder_filnavne_matcher_klassenavne()
 {
-    QDir srcDir(testRepoRoot() + "/src");
-    QStringList filer = srcDir.entryList(QStringList() << "*.h" << "*.cpp", QDir::Files);
+    QVERIFY2(!QFileInfo::exists(testRepoRoot() + "/src"), "src/ findes stadig — mappen skal hedde kilder/");
+    QDir kilderDir(testRepoRoot() + "/kilder");
+    QVERIFY2(kilderDir.exists(), "kilder/ mangler");
+    QStringList filer = kilderDir.entryList(QStringList() << "*.h" << "*.cpp", QDir::Files);
     for (int i = 0; i < filer.size(); ++i)
         QVERIFY2(filer.at(i).toUtf8().size() == filer.at(i).size(),
                  qPrintable("ikke-ascii filnavn: " + filer.at(i)));
+    QVERIFY2(!testReadSource("harbour-skrynja-2.pro").contains("src/"), "harbour-skrynja-2.pro har stadig src/-stier");
+    QVERIFY2(!testReadSource("tests/tests.pro").contains("../src"), "tests.pro har stadig ../src-stier");
 
     const char* forventede[] = {
         "logfile", "acpframereader", "acpmessage", "agentprocess", "acpprotokol",
         "acpsession", "acpclient", "conversationmodel", "sessionstore", "toolcallmodel",
-        "permissionmodel", "diffmodel", "configurationmodel", "selftest", "main"
+        "permissionmodel", "diffmodel", "configurationmodel", "konfiguration", "selftest", "main"
     };
-    for (int i = 0; i < 15; ++i) {
+    for (int i = 0; i < 16; ++i) {
         QString base = QString::fromLatin1(forventede[i]);
         if (base != "main")
-            QVERIFY2(QFileInfo::exists(srcDir.filePath(base + ".h")), qPrintable(base + ".h mangler"));
-        QVERIFY2(QFileInfo::exists(srcDir.filePath(base + ".cpp")), qPrintable(base + ".cpp mangler"));
+            QVERIFY2(QFileInfo::exists(kilderDir.filePath(base + ".h")), qPrintable(base + ".h mangler"));
+        QVERIFY2(QFileInfo::exists(kilderDir.filePath(base + ".cpp")), qPrintable(base + ".cpp mangler"));
     }
 }
 
